@@ -89,12 +89,12 @@ set_resize_handler()
 int
 main(int argc, char *argv[])
 {
-        set_resize_handler();
-        toggle_raw_mode();
-        render_all();
-        char c;
-        while (read(STDIN_FILENO, &c, 1) || 1) {
-        }
-        toggle_raw_mode();
+        // set_resize_handler();
+        // toggle_raw_mode();
+        // render_all();
+        // char c;
+        // while (read(STDIN_FILENO, &c, 1) || 1) {
+        // }
+        // toggle_raw_mode();
         return 0;
 }
