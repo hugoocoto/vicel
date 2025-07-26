@@ -38,7 +38,11 @@ start_kbhandler()
         int read_index = 0;
         Action action;
         APTree mappings = ap_init();
+
         add_action(mappings, "q", ACTION(a_quit));
+        add_action(mappings, "r", ACTION(render));
+        add_action(mappings, " ", ACTION(a_add_col));
+        add_action(mappings, "j", ACTION(a_add_row));
 
         while (read(STDIN_FILENO, buf + read_index, 1)) {
                 if (buf[read_index] == '\033') {

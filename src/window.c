@@ -1,10 +1,26 @@
 #include "window.h"
+#include "cellmap.h"
 #include "common.h"
+#include "da.h"
 #include "escape_code.h"
 #include "keyboard.h"
+#include <assert.h>
 #include <stdio.h>
+#include <unistd.h>
+
+#define CELL_BG BG_BLUE
+#define CELL_FG FG_BLACK
 
 Context active_ctx = INIT_CONTEXT;
+
+void
+get_current_position(int *x, int *y)
+{
+        // starting at 1,1
+        printf(T_DSR());
+        fflush(stdout);
+        fscanf(stdin, T_CSI "%d;%dR", x, y);
+}
 
 /* Todo: Remove commented lines */
 void
@@ -62,6 +78,34 @@ print_at(int r, int c, char *buf, int buflen, int n)
         printf(T_RCP());
 }
 
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
+/* Print the submatrix of mat, starting at x_off and y_off (top left) that
+ * fits into the screen, starting at cursor position with the size
+ * scr_x x scr_h. It doesn't need to be left neither top aligned. */
+void
+cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
+{
+        int x0, y0;
+        int max = 10; // should be in column
+        get_current_position(&x0, &y0);
+        printf(EFFECT(CELL_BG, CELL_FG));
+        int cx = x0;
+        int cy = y0;
+        for_da_each(ca, *mat)
+        {
+                for_da_each(cell, *ca)
+                {
+                        printCUP(cx, cy); // can optimize this
+                        assert(cell->heigh == 1);
+                        printf("%-*.*s", max, max, cell->repr);
+                        cx += max;
+                }
+                ++cy;
+        }
+        printf(EFFECT(RESET));
+}
+
 void
 clear_screen()
 {
@@ -70,10 +114,12 @@ clear_screen()
 }
 
 void
-render_all()
+render()
 {
         clear_screen();
         print_status_bar();
+        T_CUP(2, 1);
+        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row - 1, active_ctx.ws.ws_col);
         fflush(stdout);
 }
 
@@ -84,7 +130,7 @@ resize_handler(int _)
                 perror("resize_handler: ioctl");
                 exit(errno);
         }
-        render_all();
+        render();
 }
 
 void
@@ -99,9 +145,13 @@ main(int argc, char *argv[])
 {
         printf(T_ASBE());
         printf(EFFECT(RESET));
-        set_resize_handler();
+        active_ctx.body = cm_init();
         toggle_raw_mode();
-        render_all();
+
+        /* This should be called when rendering can be done */
+        set_resize_handler();
+        render();
+
         start_kbhandler();
         toggle_raw_mode();
         return 0;
