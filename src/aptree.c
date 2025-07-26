@@ -3,21 +3,9 @@
  * Author: Hugo Coto Florez
  */
 
+#include "aptree.h"
 #include "action.h"
 #include "common.h"
-#include <assert.h>
-#include <stdio.h>
-
-typedef struct __APTree {
-        Action action;
-        struct __APTree *after[128]; // can be reduced
-        int descents;
-} *APTree;
-
-APTree ap_init();
-void ap_add(APTree t, char *prefix, Action action);
-Action ap_get(APTree t, char *prefix);
-void ap_remove(APTree t, char *prefix);
 
 APTree
 ap_init()
@@ -41,6 +29,19 @@ ap_add(APTree t, char *prefix, Action action)
         ct->action = action;
 }
 
+Action
+ap_getl(APTree t, char *prefix, int len)
+{
+        APTree ct = t;
+        int i = 0;
+        for (; i < len; i++) {
+                if (ct->after[prefix[i]] == NULL)
+                        return NoAction;
+
+                ct = ct->after[prefix[i]];
+        }
+        return ct->action;
+}
 
 Action
 ap_get(APTree t, char *prefix)
@@ -54,6 +55,67 @@ ap_get(APTree t, char *prefix)
                 ct = ct->after[*cchar];
         }
         return ct->action;
+}
+
+Action
+ap_get_unique(APTree t, char *prefix)
+{
+        char *cchar;
+        APTree ct = t;
+        for (cchar = prefix; *cchar; cchar++) {
+                if (ct->after[*cchar] == NULL)
+                        return NoAction;
+
+                ct = ct->after[*cchar];
+        }
+        return ct->descents == 0 ? ct->action : NoAction;
+}
+
+Action
+ap_getl_unique(APTree t, char *prefix, int len)
+{
+        APTree ct = t;
+        int i = 0;
+        for (; i < len; i++) {
+                if (ct->after[prefix[i]] == NULL)
+                        return NoAction;
+
+                ct = ct->after[prefix[i]];
+        }
+
+        return ct->descents == 0 ? ct->action : NoAction;
+}
+
+Action
+ap_get_last(APTree t, char *prefix)
+{
+        char *cchar;
+        APTree ct = t;
+        Action last = NoAction;
+        for (cchar = prefix; *cchar; cchar++) {
+                if (ct->after[*cchar] == NULL)
+                        return NoAction;
+
+                ct = ct->after[*cchar];
+                if (action_is_valid(ct->action)) last = ct->action;
+        }
+        return last;
+}
+
+Action
+ap_getl_last(APTree t, char *prefix, int len)
+{
+        APTree ct = t;
+        int i = 0;
+        Action last = NoAction;
+        for (; i < len; i++) {
+                if (ct->after[prefix[i]] == NULL)
+                        return NoAction;
+
+                ct = ct->after[prefix[i]];
+                if (action_is_valid(ct->action)) last = ct->action;
+        }
+        return last;
 }
 
 void

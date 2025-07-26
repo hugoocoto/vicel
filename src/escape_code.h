@@ -52,6 +52,8 @@
 #define T_APOFF(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "4i"
 #define T_DSR(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "6n"
 
+#define printCUP(r, c) printf(T_CSI  "%d;%dH", r, c)
+
 /* Private sequences */
 #define T_SCP(...) T_CSI "s"       // save current cursor position
 #define T_RCP(...) T_CSI "u"       // restore saved cursor position

@@ -1,12 +1,10 @@
 #include "window.h"
 #include "common.h"
 #include "escape_code.h"
-#include <assert.h>
+#include "keyboard.h"
 #include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
-Context active_ctx = { 0 };
+Context active_ctx = INIT_CONTEXT;
 
 /* Todo: Remove commented lines */
 void
@@ -56,6 +54,15 @@ print_status_bar()
 }
 
 void
+print_at(int r, int c, char *buf, int buflen, int n)
+{
+        printf(T_SCP());
+        printCUP(r, c);
+        printf("%*.*s", n, buflen, buf);
+        printf(T_RCP());
+}
+
+void
 clear_screen()
 {
         printf(T_ED() T_CUP()); // clear screen
@@ -67,6 +74,7 @@ render_all()
 {
         clear_screen();
         print_status_bar();
+        fflush(stdout);
 }
 
 void
@@ -89,12 +97,12 @@ set_resize_handler()
 int
 main(int argc, char *argv[])
 {
-        // set_resize_handler();
-        // toggle_raw_mode();
-        // render_all();
-        // char c;
-        // while (read(STDIN_FILENO, &c, 1) || 1) {
-        // }
-        // toggle_raw_mode();
+        printf(T_ASBE());
+        printf(EFFECT(RESET));
+        set_resize_handler();
+        toggle_raw_mode();
+        render_all();
+        start_kbhandler();
+        toggle_raw_mode();
         return 0;
 }

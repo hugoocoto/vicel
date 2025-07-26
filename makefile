@@ -8,6 +8,9 @@ OBJ_DIR = ./objs
 BUILD_DIR = .
 OUT = $(BUILD_DIR)/00-vicel
 
+test: $(OUT)
+	gdb -ex run $(OUT)
+
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md 
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)
 
