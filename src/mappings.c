@@ -9,6 +9,7 @@ a_quit()
 {
         printf(EFFECT(RESET));
         printf(T_ASBD());
+        printf(T_CUSHW());
         fflush(stdout);
         exit(0);
 }

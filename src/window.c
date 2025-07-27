@@ -91,6 +91,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
         printf(EFFECT(CELL_BG, CELL_FG));
         int cx = x0;
         int cy = y0;
+        int av = active_ctx.ws.ws_col - cy;
         for_da_each(ca, *mat)
         {
                 report("Mat iteration");
@@ -99,11 +100,14 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
                         report("Line iteration");
                         printCUP(cx, cy); // can optimize this
                         assert(cell->heigh == 1);
-                        printf("%-*.*s", max, max, cell->repr);
+                        printf("%-*.*s", min(max, av), min(max, av), cell->repr);
                         cy += max;
+                        av -= max;
+                        if (av <= 0) break;
                 }
                 ++cx;
                 cy = y0;
+                av = active_ctx.ws.ws_col - cy;
         }
         printf(EFFECT(RESET));
 }
@@ -147,6 +151,7 @@ main(int argc, char *argv[])
 {
         report("---| Starting |---");
         printf(T_ASBE());
+        printf(T_CUHDE());
         printf(EFFECT(RESET));
         active_ctx.body = cm_init();
         toggle_raw_mode();

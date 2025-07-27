@@ -2,8 +2,8 @@
 #include "action.h"
 #include "aptree.h"
 #include "common.h"
-#include "window.h"
 #include "mappings.h"
+#include "window.h"
 
 #define MAX_MAPPING_LEN 6
 
@@ -11,6 +11,12 @@ static void
 print_mapping_buffer(char *buf, int len, int n)
 {
         print_at(1, 30, buf, len, n);
+}
+
+static inline bool
+has_descents(APTree t, char *prefix, int len)
+{
+        return ap_has_descentsl(t, prefix, len);
 }
 
 static inline Action
@@ -60,6 +66,8 @@ start_kbhandler()
                         if ((action_is_valid(action = find_action_force(mappings, buf, read_index + 1)))) {
                                 action.action();
                         }
+                        read_index = 0;
+                } else if (!has_descents(mappings, buf, read_index + 1)) {
                         read_index = 0;
                 }
                 print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN);

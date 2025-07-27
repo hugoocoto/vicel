@@ -29,6 +29,34 @@ ap_add(APTree t, char *prefix, Action action)
         ct->action = action;
 }
 
+bool
+ap_has_descents(APTree t, char *prefix)
+{
+        char *cchar;
+        APTree ct = t;
+        for (cchar = prefix; *cchar; cchar++) {
+                if (ct->after[*cchar] == NULL)
+                        return false;
+
+                ct = ct->after[*cchar];
+        }
+        return ct->descents > 0;
+}
+
+bool
+ap_has_descentsl(APTree t, char *prefix, int len)
+{
+        APTree ct = t;
+        int i = 0;
+        for (; i < len; i++) {
+                if (ct->after[prefix[i]] == NULL)
+                        return false;
+
+                ct = ct->after[prefix[i]];
+        }
+        return ct->descents > 0;
+}
+
 Action
 ap_getl(APTree t, char *prefix, int len)
 {
