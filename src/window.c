@@ -2,11 +2,9 @@
 #include "cellmap.h"
 #include "common.h"
 #include "da.h"
+#include "debug.h"
 #include "escape_code.h"
 #include "keyboard.h"
-#include <assert.h>
-#include <stdio.h>
-#include <unistd.h>
 
 #define CELL_BG BG_BLUE
 #define CELL_FG FG_BLACK
@@ -86,6 +84,7 @@ print_at(int r, int c, char *buf, int buflen, int n)
 void
 cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
 {
+        report("Call display");
         int x0, y0;
         int max = 10; // should be in column
         get_current_position(&x0, &y0);
@@ -94,14 +93,17 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
         int cy = y0;
         for_da_each(ca, *mat)
         {
+                report("Mat iteration");
                 for_da_each(cell, *ca)
                 {
+                        report("Line iteration");
                         printCUP(cx, cy); // can optimize this
                         assert(cell->heigh == 1);
                         printf("%-*.*s", max, max, cell->repr);
-                        cx += max;
+                        cy += max;
                 }
-                ++cy;
+                ++cx;
+                cy = y0;
         }
         printf(EFFECT(RESET));
 }
@@ -143,6 +145,7 @@ set_resize_handler()
 int
 main(int argc, char *argv[])
 {
+        report("---| Starting |---");
         printf(T_ASBE());
         printf(EFFECT(RESET));
         active_ctx.body = cm_init();

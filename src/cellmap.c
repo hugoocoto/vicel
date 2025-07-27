@@ -6,7 +6,7 @@
 CellMat *
 cm_init()
 {
-        CellMat *cm = malloc(sizeof(CellMat));
+        CellMat *cm = calloc(1, sizeof(CellMat));
         CellArr ca = { 0 };
         da_append(&ca, EMPTY_CELL);
         da_append(cm, ca);

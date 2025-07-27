@@ -10,7 +10,7 @@
 static void
 print_mapping_buffer(char *buf, int len, int n)
 {
-        print_at(1, 1, buf, len, n);
+        print_at(1, 30, buf, len, n);
 }
 
 static inline Action
@@ -41,7 +41,7 @@ start_kbhandler()
 
         add_action(mappings, "q", ACTION(a_quit));
         add_action(mappings, "r", ACTION(render));
-        add_action(mappings, " ", ACTION(a_add_col));
+        add_action(mappings, "l", ACTION(a_add_col));
         add_action(mappings, "j", ACTION(a_add_row));
 
         while (read(STDIN_FILENO, buf + read_index, 1)) {

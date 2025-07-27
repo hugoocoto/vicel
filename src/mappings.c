@@ -17,10 +17,12 @@ void
 a_add_row()
 {
         cm_add_row(active_ctx.body);
+        render();
 }
 
 void
 a_add_col()
 {
         cm_add_col(active_ctx.body);
+        render();
 }
