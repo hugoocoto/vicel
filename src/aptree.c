@@ -122,7 +122,7 @@ ap_get_last(APTree t, char *prefix)
         Action last = NoAction;
         for (cchar = prefix; *cchar; cchar++) {
                 if (ct->after[*cchar] == NULL)
-                        return NoAction;
+                        return last;
 
                 ct = ct->after[*cchar];
                 if (action_is_valid(ct->action)) last = ct->action;
@@ -138,7 +138,7 @@ ap_getl_last(APTree t, char *prefix, int len)
         Action last = NoAction;
         for (; i < len; i++) {
                 if (ct->after[prefix[i]] == NULL)
-                        return NoAction;
+                        return last;
 
                 ct = ct->after[prefix[i]];
                 if (action_is_valid(ct->action)) last = ct->action;
@@ -191,6 +191,7 @@ test()
         ap_add(t, "hugo", (Action) { .action = (void *) 0x3 });
         ap_add(t, "hugoL", (Action) { .action = (void *) 0x4 });
         ap_add(t, "hu", (Action) { .action = (void *) 0x5 });
+        assert(ap_get_last(t, "hul").action == (void *) 0x5);
         assert(ap_get(t, "hugo").action == (void *) 0x3);
         assert(ap_get(t, "hugoL").action == (void *) 0x4);
         assert(ap_get(t, "hu").action == (void *) 0x5);

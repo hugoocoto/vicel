@@ -65,6 +65,7 @@ print_status_bar()
                 status[active_ctx.ws.ws_col - 1] = 0;
         printf("%-*s@", active_ctx.ws.ws_col - 1, status);
         assert(active_ctx.status_bar_height == 1);
+        printf(EFFECT(RESET));
 }
 
 void
@@ -122,6 +123,7 @@ clear_screen()
 void
 render()
 {
+        printf(EFFECT(RESET));
         clear_screen();
         print_status_bar();
         T_CUP(2, 1);

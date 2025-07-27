@@ -2,6 +2,7 @@
 #include "action.h"
 #include "aptree.h"
 #include "common.h"
+#include "escape_code.h"
 #include "mappings.h"
 #include "window.h"
 
@@ -10,6 +11,7 @@
 static void
 print_mapping_buffer(char *buf, int len, int n)
 {
+        printf(EFFECT(FG_BLUE, BG_BLACK));
         print_at(1, 30, buf, len, n);
 }
 
@@ -51,25 +53,36 @@ start_kbhandler()
         add_action(mappings, "j", ACTION(a_add_row));
 
         while (read(STDIN_FILENO, buf + read_index, 1)) {
-                if (buf[read_index] == '\033') {
-                        read_index = 0;
-                }
+                ++read_index;
 
-                else if ((action_is_valid(action = find_action(mappings, buf, read_index + 1)))) {
-                        action.action();
+                /* Buffer contains a valid action whose prefix is unique */
+                if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
                         read_index = 0;
-                } else if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
                         action.action();
-                        buf[0] = buf[read_index];
+                }
+                /* Buffer contains an invalid action, but the previous buffered action was valid */
+                else if ((action_is_valid(action = find_action(mappings, buf, read_index - 1)))) {
+                        buf[0] = buf[read_index - 1];
                         read_index = 1;
-                } else if (++read_index == MAX_MAPPING_LEN) {
-                        if ((action_is_valid(action = find_action_force(mappings, buf, read_index + 1)))) {
+                        action.action();
+                }
+                /* Buffer is full */
+                else if (read_index == MAX_MAPPING_LEN) {
+                        /* Get the action whose prefix is in buffer with or without shared prefix */
+                        if ((action_is_valid(action = find_action_force(mappings, buf, read_index)))) {
                                 action.action();
                         }
                         read_index = 0;
-                } else if (!has_descents(mappings, buf, read_index + 1)) {
+                }
+                /* If buffer has no actions and no descents, invalidate buffer */
+                else if (!has_descents(mappings, buf, read_index)) {
                         read_index = 0;
                 }
+                /* Clear buffer if pressing esc */
+                else if (buf[read_index - 1] == '\033') {
+                        read_index = 0;
+                }
+
                 print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN);
                 fflush(stdout);
         }
