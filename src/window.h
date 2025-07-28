@@ -10,6 +10,9 @@ typedef struct Context {
         char *filename;
         int status_bar_height;
 
+        // starting at 0,0
+        int cursor_pos_x;
+        int cursor_pos_y;
 } Context;
 
 #define INIT_CONTEXT ((Context) { \
@@ -17,10 +20,13 @@ typedef struct Context {
 .body = NULL,                     \
 .filename = NULL,                 \
 .status_bar_height = 1,           \
+.cursor_pos_x = 0,                \
+.cursor_pos_y = 0,                \
 })
 
 void print_at(int r, int c, char *buf, int buflen, int n);
 void render();
+void cursor_gotocell(int x, int y);
 
 extern Context active_ctx;
 

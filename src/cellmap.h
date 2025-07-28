@@ -4,8 +4,10 @@
 #include "da.h"
 
 typedef enum {
-        TYPE_NUMBER,
+        TYPE_NUMBER = 0,
+        TYPE_TEXT,
         TYPE_EMPTY,
+        TYPE_LEN,
 } CellType;
 
 typedef struct Cell {
@@ -13,14 +15,20 @@ typedef struct Cell {
         CellType type;
         union {
                 double num;
+                char *text;
         } as;
+        int selected;
         char *repr; // string representation
 } Cell;
 
 typedef DA(Cell) CellArr;
 typedef DA(CellArr) CellMat;
 
-#define EMPTY_CELL (Cell){ .width = 20, .heigh = 1, .type = TYPE_EMPTY, .repr = "empty" }
+#define EMPTY_CELL                                                               \
+        (Cell)                                                                   \
+        {                                                                        \
+                .width = 20, .heigh = 1, .type = TYPE_EMPTY, .repr = strdup(""), \
+        }
 
 
 /* Create a 1x1 cell map */
@@ -39,5 +47,7 @@ void cm_convert(Cell *c, CellType tnew);
 void cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w);
 
 void cm_destroy(CellMat *mat);
+
+const char* cm_type_repr(CellType);
 
 #endif

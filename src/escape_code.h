@@ -96,6 +96,8 @@
 #define SBLINK 5
 #define RBLINK 6
 #define INVERT 7
+#define REVERSE 7
+#define REVERSED 7
 #define CONCEAL 8
 #define STRIKE 9
 #define FONT_1 10
@@ -117,6 +119,7 @@
 #define BLINK_OFF 25
 #define PROPOTIONAL_SPACING 26
 #define REVERSED_OFF 27
+#define REVERSE_OFF 27
 #define CONCEAL_OFF 28
 #define STRIKE_OFF 29
 #define FG 30
