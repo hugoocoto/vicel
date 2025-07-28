@@ -9,6 +9,7 @@ typedef struct Context {
         CellMat *body;
         char *filename;
         int status_bar_height;
+
 } Context;
 
 #define INIT_CONTEXT ((Context) { \
