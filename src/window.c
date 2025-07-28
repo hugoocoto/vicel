@@ -38,7 +38,7 @@ print_status_bar()
         strcat(status, "filename: ");
         strcat(status, active_ctx.filename ?: "(unnamed)");
         strcat(status, mappings_buffer);
-        buf[snprintf(buf, active_ctx.ws.ws_col+1, "%-*s %*s @",
+        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%-*s %*s @",
                      active_ctx.ws.ws_col - 3 - 15, status,
                      15, cm_type_repr(get_cursor_cell()->type))] = 0;
 
@@ -55,11 +55,11 @@ print_mapping_buffer(char *buf, int len, int n, int repeat)
         if (repeat == 0) {
                 mappings_buffer[snprintf(
                 mappings_buffer, sizeof mappings_buffer,
-                " [%*.*s] ", n, len, buf)] = 0;
+                " [%-*.*s  ] ", n, len, buf)] = 0;
         } else {
                 mappings_buffer[snprintf(
                 mappings_buffer, sizeof mappings_buffer,
-                " [x%d %*.*s] ", repeat, n, len, buf)] = 0;
+                " [x%d %-*.*s] ", repeat, n, len, buf)] = 0;
         }
         print_status_bar();
 }
@@ -180,10 +180,15 @@ main(int argc, char *argv[])
         printf(T_ASBE());
         printf(T_CUHDE());
         printf(EFFECT(RESET));
+
         active_ctx.body = cm_init();
         set_resize_handler();
         start_kbhandler(); // render from here
 
+        printf(EFFECT(RESET));
+        printf(T_ASBD());
+        printf(T_CUSHW());
+        fflush(stdout);
         report("---| End without error |---");
         return 0;
 }

@@ -1,37 +1,29 @@
-[Mon Jul 28 16:17:19 2025] ---| Starting |---
-[Mon Jul 28 16:17:19 2025] Call display
-[Mon Jul 28 16:17:23 2025] Call display
-[Mon Jul 28 16:17:24 2025] Call display
-[Mon Jul 28 16:17:24 2025] Call display
-[Mon Jul 28 16:17:24 2025] Call display
-[Mon Jul 28 16:17:27 2025] Call display
-[Mon Jul 28 16:17:28 2025] Call display
-[Mon Jul 28 16:17:31 2025] Call display
-[Mon Jul 28 16:17:33 2025] Call display
-[Mon Jul 28 16:17:34 2025] Call display
-[Mon Jul 28 16:17:36 2025] Call display
-[Mon Jul 28 16:17:37 2025] Call display
-[Mon Jul 28 16:17:44 2025] Call display
-[Mon Jul 28 16:17:44 2025] Call display
-[Mon Jul 28 16:17:44 2025] Call display
-[Mon Jul 28 16:17:45 2025] Call display
-[Mon Jul 28 16:17:45 2025] Call display
-[Mon Jul 28 16:17:45 2025] Call display
-[Mon Jul 28 16:17:46 2025] Call display
-[Mon Jul 28 16:17:47 2025] Call display
-[Mon Jul 28 16:17:47 2025] Call display
-[Mon Jul 28 16:17:48 2025] Call display
-[Mon Jul 28 16:17:48 2025] Call display
-[Mon Jul 28 16:17:49 2025] Call display
-[Mon Jul 28 16:17:49 2025] Call display
-[Mon Jul 28 16:17:50 2025] Call display
-[Mon Jul 28 16:17:50 2025] Call display
-[Mon Jul 28 16:17:50 2025] Call display
-[Mon Jul 28 16:17:51 2025] Call display
-[Mon Jul 28 16:17:51 2025] Call display
-[Mon Jul 28 16:17:52 2025] Call display
-[Mon Jul 28 16:17:52 2025] Call display
-[Mon Jul 28 16:17:52 2025] Call display
-[Mon Jul 28 16:17:52 2025] Call display
-[Mon Jul 28 16:17:53 2025] Call display
-[Mon Jul 28 16:17:55 2025] Call display
+[Mon Jul 28 17:27:43 2025] ---| Starting |---
+[Mon Jul 28 17:27:43 2025] Call display
+[Mon Jul 28 17:27:44 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:44 2025] Call display
+[Mon Jul 28 17:27:44 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:44 2025] Call display
+[Mon Jul 28 17:27:44 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:44 2025] Call display
+[Mon Jul 28 17:27:44 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:44 2025] Call display
+[Mon Jul 28 17:27:44 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:44 2025] Call display
+[Mon Jul 28 17:27:45 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:45 2025] Call display
+[Mon Jul 28 17:27:45 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:45 2025] Call display
+[Mon Jul 28 17:27:45 2025] Action on buffer: [gj]
+[Mon Jul 28 17:27:45 2025] Call display
+[Mon Jul 28 17:27:45 2025] Action on buffer: [j]
+[Mon Jul 28 17:27:45 2025] Call display
+[Mon Jul 28 17:27:45 2025] [KB] Escape sequence: [2;1R
+[Mon Jul 28 17:27:46 2025] Action on buffer: [j]
+[Mon Jul 28 17:27:46 2025] Call display
+[Mon Jul 28 17:27:46 2025] [KB] Escape sequence: [2;1R
+[Mon Jul 28 17:27:46 2025] Action on buffer: [j]
+[Mon Jul 28 17:27:46 2025] Call display
+[Mon Jul 28 17:27:46 2025] [KB] Escape sequence: [2;1R
+[Mon Jul 28 17:27:47 2025] Action on buffer: [q]
+[Mon Jul 28 17:27:47 2025] ---| End without error |---

@@ -6,6 +6,19 @@
 #include "aptree.h"
 #include "action.h"
 #include "common.h"
+#include "debug.h"
+#include <string.h>
+
+void
+check_prefix(char *prefix, int length)
+{
+        for (int i = 0; i < length; i++) {
+                if (prefix[i] < ' ' || prefix[i] >= 127) {
+                        report("Invalid prefix: `%.*s`", length, prefix);
+                        exit(1);
+                }
+        }
+}
 
 APTree
 ap_init()
@@ -16,6 +29,7 @@ ap_init()
 void
 ap_add(APTree t, char *prefix, Action action)
 {
+        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
@@ -32,6 +46,7 @@ ap_add(APTree t, char *prefix, Action action)
 bool
 ap_has_descents(APTree t, char *prefix)
 {
+        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
@@ -46,6 +61,7 @@ ap_has_descents(APTree t, char *prefix)
 bool
 ap_has_descentsl(APTree t, char *prefix, int len)
 {
+        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         for (; i < len; i++) {
@@ -58,22 +74,9 @@ ap_has_descentsl(APTree t, char *prefix, int len)
 }
 
 Action
-ap_getl(APTree t, char *prefix, int len)
-{
-        APTree ct = t;
-        int i = 0;
-        for (; i < len; i++) {
-                if (ct->after[prefix[i]] == NULL)
-                        return NoAction;
-
-                ct = ct->after[prefix[i]];
-        }
-        return ct->action;
-}
-
-Action
 ap_get(APTree t, char *prefix)
 {
+        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
@@ -86,8 +89,24 @@ ap_get(APTree t, char *prefix)
 }
 
 Action
+ap_getl(APTree t, char *prefix, int len)
+{
+        check_prefix(prefix, len);
+        APTree ct = t;
+        int i = 0;
+        for (; i < len; i++) {
+                if (ct->after[prefix[i]] == NULL)
+                        return NoAction;
+
+                ct = ct->after[prefix[i]];
+        }
+        return ct->action;
+}
+
+Action
 ap_get_unique(APTree t, char *prefix)
 {
+        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
@@ -102,6 +121,7 @@ ap_get_unique(APTree t, char *prefix)
 Action
 ap_getl_unique(APTree t, char *prefix, int len)
 {
+        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         for (; i < len; i++) {
@@ -117,6 +137,7 @@ ap_getl_unique(APTree t, char *prefix, int len)
 Action
 ap_get_last(APTree t, char *prefix)
 {
+        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         Action last = NoAction;
@@ -133,6 +154,7 @@ ap_get_last(APTree t, char *prefix)
 Action
 ap_getl_last(APTree t, char *prefix, int len)
 {
+        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         Action last = NoAction;
@@ -149,6 +171,7 @@ ap_getl_last(APTree t, char *prefix, int len)
 void
 ap_remove(APTree t, char *prefix)
 {
+        check_prefix(prefix, strlen(prefix));
         if (t->after[*prefix] == NULL) return;
 
         ap_remove(t->after[*prefix], prefix + 1);

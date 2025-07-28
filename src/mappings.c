@@ -3,23 +3,11 @@
 #include "common.h"
 #include "escape_code.h"
 #include "window.h"
-#include <stdio.h>
-#include <string.h>
 
 inline Cell *
 get_cursor_cell()
 {
         return &active_ctx.body->data[active_ctx.cursor_pos_y].data[active_ctx.cursor_pos_x];
-}
-
-void
-a_quit()
-{
-        printf(EFFECT(RESET));
-        printf(T_ASBD());
-        printf(T_CUSHW());
-        fflush(stdout);
-        exit(0);
 }
 
 void

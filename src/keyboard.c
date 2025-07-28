@@ -3,43 +3,65 @@
 #include "aptree.h"
 #include "cellmap.h"
 #include "common.h"
+#include "debug.h"
 #include "escape_code.h"
 #include "mappings.h"
 #include "window.h"
-#include <stdio.h>
 #include <string.h>
 
 #define MAX_MAPPING_LEN 6
 
-/* Todo: Remove commented lines */
+bool quit = false;
+
+void
+should_quit()
+{
+        quit = true;
+}
+
 void
 toggle_raw_mode()
 {
         static struct termios origin_termios;
-        // static int flags;
         static bool enabled = false;
+        struct termios raw_opts;
 
         /* Disable raw mode if enabled */
         if (enabled) {
                 tcsetattr(STDIN_FILENO, TCSANOW, &origin_termios);
-                // fcntl(STDIN_FILENO, F_SETFL, flags);
                 enabled = false;
                 return;
         }
 
         /* Enable raw mode if disabled */
-        struct termios raw_opts;
         tcgetattr(STDIN_FILENO, &origin_termios);
         raw_opts = origin_termios;
         cfmakeraw(&raw_opts);
-        raw_opts.c_oflag |= (OPOST | ONLCR); // '\n' -> '\r\n'
-        // raw_opts.c_cc[VMIN] = 0;
-        // raw_opts.c_cc[VTIME] = 2; // wait 200ms for input
+        raw_opts.c_oflag |= (OPOST | ONLCR);
         tcsetattr(STDIN_FILENO, TCSANOW, &raw_opts);
-        // flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-        //  READ is blocking. It returns after VTIME * 100 ms
-        // fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
         enabled = true;
+}
+
+static void
+get_escape_sequence()
+{
+        int flags;
+        char buf[32];
+        ssize_t n;
+
+        flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+        fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+
+        switch (n = read(STDIN_FILENO, buf, sizeof buf - 1)) {
+        case 0:
+        case -1:
+                break;
+        default:
+                buf[n] = 0;
+                report("[KB] Escape sequence: \033%s", buf);
+        }
+
+        fcntl(STDIN_FILENO, F_SETFL, flags);
 }
 
 static inline bool
@@ -137,7 +159,7 @@ start_kbhandler()
         APTree mappings = ap_init();
         int repeat = 0;
 
-        add_action(mappings, "q", ACTION(a_quit));
+        add_action(mappings, "q", ACTION(should_quit));
         add_action(mappings, "r", ACTION(render));
         add_action(mappings, "gl", ACTION(a_add_col));
         add_action(mappings, "gj", ACTION(a_add_row));
@@ -156,13 +178,19 @@ start_kbhandler()
         toggle_raw_mode();
         render();
 
-        while (read(STDIN_FILENO, buf + read_index, 1)) {
+        while (!quit && read(STDIN_FILENO, buf + read_index, 1)) {
+                if (buf[read_index] < 0 || buf[read_index] >= 127) {
+                        report("Invalid char read: %d", buf[read_index]);
+                        continue;
+                }
+
                 ++read_index;
 
                 if (buf[0] == '.') {
-                        strcpy(buf, saved_buf);
+                        strncpy(buf, saved_buf, MAX_MAPPING_LEN);
                         read_index = saved_read_index;
                         repeat = saved_repeat;
+                        // have to fall down (out of else-if)
                 }
 
                 if (buf[0] >= '0' && buf[0] <= '9') {
@@ -171,40 +199,45 @@ start_kbhandler()
                         repeat += buf[0] - '0';
                 }
 
-                /* Buffer contains a valid action whose prefix is unique */
-                else if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
-                        strcpy(saved_buf, buf);
-                        saved_read_index = read_index;
-                        saved_repeat = repeat;
+                else if (buf[read_index - 1] == '\033') {
+                        get_escape_sequence();
                         read_index = 0;
-                        do {
-                                action.action();
-                        } while (--repeat > 0);
                         repeat = 0;
                 }
+
+                /* Buffer contains a valid action whose prefix is unique */
+                else if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
+                        strncpy(saved_buf, buf, read_index);
+                        saved_read_index = read_index;
+                        saved_repeat = repeat;
+                        do {
+                                report("Action on buffer: [%.*s]", read_index, buf);
+                                action.action();
+                        } while (--repeat > 0);
+                        read_index = 0;
+                        repeat = 0;
+                }
+
                 /* Buffer contains an invalid action, but the previous buffered action was valid */
                 // Todo
                 /* Buffer is full */
                 else if (read_index == MAX_MAPPING_LEN) {
                         /* Get the action whose prefix is in buffer with or without shared prefix */
                         if ((action_is_valid(action = find_action_force(mappings, buf, read_index)))) {
-                                strcpy(saved_buf, buf);
+                                strncpy(saved_buf, buf, read_index);
                                 saved_read_index = read_index;
                                 saved_repeat = repeat;
                                 do {
+                                        report("Action on buffer: [%.*s]", read_index, buf);
                                         action.action();
                                 } while (--repeat > 0);
-                                repeat = 0;
                         }
+                        repeat = 0;
                         read_index = 0;
                 }
+
                 /* If buffer has no actions and no descents, invalidate buffer */
                 else if (!has_descents(mappings, buf, read_index)) {
-                        read_index = 0;
-                        repeat = 0;
-                }
-                /* Clear buffer if pressing esc */
-                else if (buf[read_index - 1] == '\033') {
                         read_index = 0;
                         repeat = 0;
                 }
