@@ -42,17 +42,6 @@ toggle_raw_mode()
         enabled = true;
 }
 
-static void
-print_mapping_buffer(char *buf, int len, int n, int repeat)
-{
-        char repstr[10];
-        printf(EFFECT(FG_BLUE, BG_BLACK));
-        repstr[snprintf(repstr, 10, "x%d", repeat)] = 0;
-        print_at(1, 30, repstr, strlen(repstr), strlen(repstr));
-        print_at(1, 30 + strlen(repstr) + 1, buf, len, n);
-        printf(EFFECT(RESET));
-}
-
 static inline bool
 has_descents(APTree t, char *prefix, int len)
 {
@@ -163,6 +152,7 @@ start_kbhandler()
         add_action(mappings, "st", ACTION(a_set_cell_type_text));
         add_action(mappings, "d", ACTION(a_set_cell_type_empty));
 
+        print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();
         render();
 

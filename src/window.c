@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "keyboard.h"
+#include "mappings.h"
 
 #define CELL_BG BG_BLUE
 #define CELL_FG FG_BLACK
@@ -22,24 +23,45 @@ get_current_position(int *x, int *y)
         fscanf(stdin, T_CSI "%d;%dR", x, y);
 }
 
+char mappings_buffer[24];
 
 void
 print_status_bar()
 {
         /* Quite hardcoded for now */
         char status[1024];
+        char buf[1024];
+
         *status = 0;
         strcat(status, "vicel");
         strcat(status, " | ");
         strcat(status, "filename: ");
         strcat(status, active_ctx.filename ?: "(unnamed)");
+        strcat(status, mappings_buffer);
+        buf[snprintf(buf, active_ctx.ws.ws_col+1, "%-*s %*s @",
+                     active_ctx.ws.ws_col - 3 - 15, status,
+                     15, cm_type_repr(get_cursor_cell()->type))] = 0;
+
+        assert(active_ctx.status_bar_height == 1);
         printf(T_CUP()); // go to top left corner
         printf(EFFECT(BG_BLACK, FG_YELLOW, BOLD));
-        if (active_ctx.ws.ws_col <= strlen(status))
-                status[active_ctx.ws.ws_col - 1] = 0;
-        printf("%-*s@", active_ctx.ws.ws_col - 1, status);
-        assert(active_ctx.status_bar_height == 1);
+        printf("%s", buf);
         printf(EFFECT(RESET));
+}
+
+void
+print_mapping_buffer(char *buf, int len, int n, int repeat)
+{
+        if (repeat == 0) {
+                mappings_buffer[snprintf(
+                mappings_buffer, sizeof mappings_buffer,
+                " [%*.*s] ", n, len, buf)] = 0;
+        } else {
+                mappings_buffer[snprintf(
+                mappings_buffer, sizeof mappings_buffer,
+                " [x%d %*.*s] ", repeat, n, len, buf)] = 0;
+        }
+        print_status_bar();
 }
 
 void
