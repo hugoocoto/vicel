@@ -6,6 +6,7 @@
 #include "escape_code.h"
 #include "keyboard.h"
 #include "mappings.h"
+#include <unistd.h>
 
 #define CELL_BG BG_BLUE
 #define CELL_FG FG_BLACK
@@ -20,7 +21,15 @@ get_current_position(int *x, int *y)
         // starting at 1,1
         printf(T_DSR());
         fflush(stdout);
-        fscanf(stdin, T_CSI "%d;%dR", x, y);
+        char buf[1024];
+        ssize_t n;
+repeat:
+        if ((n = read(STDIN_FILENO, buf, sizeof buf - 1)) < 0) {
+                report("Error reading stdin from get_current_position");
+                exit(1);
+        }
+        buf[n] = 0;
+        if (sscanf(buf, T_CSI "%d;%dR", x, y) != 2) goto repeat;
 }
 
 char mappings_buffer[24];
@@ -116,7 +125,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
                             active_ctx.cursor_pos_y == yy)
                                 printf(EFFECT(REVERSE));
 
-                        printf("%-*.*s", min(column_width, av), min(column_width, av), cell->repr);
+                        printf("[%-*.*s]", min(column_width, av) - 2, min(column_width, av) - 2, cell->repr);
 
                         if (active_ctx.cursor_pos_x == xx &&
                             active_ctx.cursor_pos_y == yy)
@@ -150,7 +159,6 @@ void
 render()
 {
         printf(EFFECT(RESET));
-        clear_screen();
         print_status_bar();
         T_CUP(2, 1);
         cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row - 1, active_ctx.ws.ws_col);
@@ -180,6 +188,7 @@ main(int argc, char *argv[])
         printf(T_ASBE());
         printf(T_CUHDE());
         printf(EFFECT(RESET));
+        clear_screen();
 
         active_ctx.body = cm_init();
         set_resize_handler();
