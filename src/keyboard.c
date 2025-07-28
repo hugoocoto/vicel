@@ -7,6 +7,7 @@
 #include "mappings.h"
 #include "window.h"
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_MAPPING_LEN 6
 
@@ -42,10 +43,14 @@ toggle_raw_mode()
 }
 
 static void
-print_mapping_buffer(char *buf, int len, int n)
+print_mapping_buffer(char *buf, int len, int n, int repeat)
 {
+        char repstr[10];
         printf(EFFECT(FG_BLUE, BG_BLACK));
-        print_at(1, 30, buf, len, n);
+        repstr[snprintf(repstr, 10, "x%d", repeat)] = 0;
+        print_at(1, 30, repstr, strlen(repstr), strlen(repstr));
+        print_at(1, 30 + strlen(repstr) + 1, buf, len, n);
+        printf(EFFECT(RESET));
 }
 
 static inline bool
@@ -121,7 +126,7 @@ get_set_selection_input()
                 {
                         if (cell->selected) {
                                 free(cell->repr);
-                                cell->repr = buf;
+                                cell->repr = strdup(buf);
                                 cell->as.text = buf;
                                 cell->type = TYPE_TEXT;
                         }
@@ -136,8 +141,12 @@ start_kbhandler()
 {
         char buf[MAX_MAPPING_LEN];
         int read_index = 0;
+        char saved_buf[MAX_MAPPING_LEN] = { 0 };
+        int saved_read_index = 0;
+        int saved_repeat = 0;
         Action action;
         APTree mappings = ap_init();
+        int repeat = 0;
 
         add_action(mappings, "q", ACTION(a_quit));
         add_action(mappings, "r", ACTION(render));
@@ -160,35 +169,57 @@ start_kbhandler()
         while (read(STDIN_FILENO, buf + read_index, 1)) {
                 ++read_index;
 
-                /* Buffer contains a valid action whose prefix is unique */
-                if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
+                if (buf[0] == '.') {
+                        strcpy(buf, saved_buf);
+                        read_index = saved_read_index;
+                        repeat = saved_repeat;
+                }
+
+                if (buf[0] >= '0' && buf[0] <= '9') {
                         read_index = 0;
-                        action.action();
+                        repeat *= 10;
+                        repeat += buf[0] - '0';
+                }
+
+                /* Buffer contains a valid action whose prefix is unique */
+                else if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
+                        strcpy(saved_buf, buf);
+                        saved_read_index = read_index;
+                        saved_repeat = repeat;
+                        read_index = 0;
+                        do {
+                                action.action();
+                        } while (--repeat > 0);
+                        repeat = 0;
                 }
                 /* Buffer contains an invalid action, but the previous buffered action was valid */
-                else if ((action_is_valid(action = find_action(mappings, buf, read_index - 1)))) {
-                        buf[0] = buf[read_index - 1];
-                        read_index = 1;
-                        action.action();
-                }
+                // Todo
                 /* Buffer is full */
                 else if (read_index == MAX_MAPPING_LEN) {
                         /* Get the action whose prefix is in buffer with or without shared prefix */
                         if ((action_is_valid(action = find_action_force(mappings, buf, read_index)))) {
-                                action.action();
+                                strcpy(saved_buf, buf);
+                                saved_read_index = read_index;
+                                saved_repeat = repeat;
+                                do {
+                                        action.action();
+                                } while (--repeat > 0);
+                                repeat = 0;
                         }
                         read_index = 0;
                 }
                 /* If buffer has no actions and no descents, invalidate buffer */
                 else if (!has_descents(mappings, buf, read_index)) {
                         read_index = 0;
+                        repeat = 0;
                 }
                 /* Clear buffer if pressing esc */
                 else if (buf[read_index - 1] == '\033') {
                         read_index = 0;
+                        repeat = 0;
                 }
 
-                print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN);
+                print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN, repeat);
                 fflush(stdout);
         }
 

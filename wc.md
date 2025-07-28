@@ -3,9 +3,9 @@ cloc|github.com/AlDanial/cloc v 2.04
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
+src/keyboard.c|26|17|184
 src/escape_code.h|15|17|177
 src/aptree.c|26|4|172
-src/keyboard.c|24|16|156
 src/window.c|21|5|141
 src/cellmap.c|10|5|114
 src/da.h|13|14|85
@@ -20,4 +20,4 @@ src/action.h|5|0|12
 src/keyboard.h|2|0|4
 src/main.c|1|5|0
 --------|--------|--------|--------
-SUM:|163|71|1079
+SUM:|165|72|1107
