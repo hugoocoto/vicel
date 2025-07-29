@@ -49,7 +49,7 @@ print_status_bar()
         strcat(status, mappings_buffer);
         buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%-*s %*s @",
                      active_ctx.ws.ws_col - 3 - 15, status,
-                     15, cm_type_repr(get_cursor_cell()->type))] = 0;
+                     15, cm_type_repr(get_cursor_cell()->value.type))] = 0;
 
         assert(active_ctx.status_bar_height == 1);
         printf(T_CUP()); // go to top left corner

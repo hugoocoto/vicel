@@ -15,7 +15,7 @@ check_prefix(char *prefix, int length)
         for (int i = 0; i < length; i++) {
                 if (prefix[i] < ' ' || prefix[i] >= 127) {
                         report("Invalid prefix: `%.*s`", length, prefix);
-                        exit(1);
+                        return;
                 }
         }
 }

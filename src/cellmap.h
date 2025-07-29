@@ -7,16 +7,34 @@ typedef enum {
         TYPE_NUMBER = 0,
         TYPE_TEXT,
         TYPE_EMPTY,
+        TYPE_FORMULA,
         TYPE_LEN,
 } CellType;
 
-typedef struct Cell {
-        int width, heigh;
+struct Formula; // from src/formula.h
+
+typedef struct Value {
         CellType type;
         union {
                 double num;
                 char *text;
+                struct Formula *formula;
         } as;
+} Value;
+
+#define AS_NUMBER(n) (Value){ \
+        .type = TYPE_NUMBER,  \
+        .as.num = n,          \
+};
+
+
+struct CellArr;
+
+typedef struct Cell {
+        int width, heigh;
+        /* Cells that depend on the value of this cell */
+        struct CellArr *dependencies;
+        Value value;
         int selected;
         char *repr; // string representation
 } Cell;
@@ -24,10 +42,16 @@ typedef struct Cell {
 typedef DA(Cell) CellArr;
 typedef DA(CellArr) CellMat;
 
-#define EMPTY_CELL                                                               \
-        (Cell)                                                                   \
-        {                                                                        \
-                .width = 20, .heigh = 1, .type = TYPE_EMPTY, .repr = strdup(""), \
+#define VALUE_EMPTY                 \
+        (Value)                     \
+        {                           \
+                .type = TYPE_EMPTY, \
+        }
+
+#define EMPTY_CELL                                                                                       \
+        (struct Cell)                                                                                    \
+        {                                                                                                \
+                .width = 20, .heigh = 1, .value = VALUE_EMPTY, .dependencies = NULL, .repr = strdup(""), \
         }
 
 
@@ -48,6 +72,6 @@ void cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w);
 
 void cm_destroy(CellMat *mat);
 
-const char* cm_type_repr(CellType);
+const char *cm_type_repr(CellType);
 
 #endif

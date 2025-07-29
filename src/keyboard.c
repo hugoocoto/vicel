@@ -7,7 +7,6 @@
 #include "escape_code.h"
 #include "mappings.h"
 #include "window.h"
-#include <string.h>
 
 #define MAX_MAPPING_LEN 6
 
@@ -122,8 +121,8 @@ get_set_cell_input()
         char *buf = get_input_at_cursor();
         free(get_cursor_cell()->repr);
         get_cursor_cell()->repr = buf;
-        get_cursor_cell()->as.text = buf;
-        get_cursor_cell()->type = TYPE_TEXT;
+        get_cursor_cell()->value.as.text = buf;
+        get_cursor_cell()->value.type = TYPE_TEXT;
         render();
 }
 
@@ -138,8 +137,8 @@ get_set_selection_input()
                         if (cell->selected) {
                                 free(cell->repr);
                                 cell->repr = strdup(buf);
-                                cell->as.text = buf;
-                                cell->type = TYPE_TEXT;
+                                cell->value.as.text = buf;
+                                cell->value.type = TYPE_TEXT;
                         }
                 }
         }

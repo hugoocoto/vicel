@@ -1,4 +1,4 @@
-CC = cc -ggdb -std=gnu99 -O0
+CC = cc -ggdb -std=gnu11 -O0
 INC = -I.
 LIB = 
 HEADERS = $(wildcard src/*.h)

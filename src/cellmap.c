@@ -65,18 +65,18 @@ get_num_repr(double d)
 void
 cm_convert(Cell *c, CellType tnew)
 {
-        if (c->type == tnew) return;
+        if (c->value.type == tnew) return;
         if (tnew == TYPE_EMPTY) {
                 free(c->repr);
                 *c = EMPTY_CELL;
         }
 
-        switch (c->type) {
+        switch (c->value.type) {
         case TYPE_NUMBER:
                 switch (tnew) {
                 case TYPE_TEXT:
-                        c->type = tnew;
-                        c->as.text = c->repr;
+                        c->value.type = tnew;
+                        c->value.as.text = c->repr;
                         break;
                 default:
                         goto no_yet_implemented;
@@ -85,10 +85,10 @@ cm_convert(Cell *c, CellType tnew)
         case TYPE_TEXT:
                 switch (tnew) {
                 case TYPE_NUMBER:
-                        c->type = tnew;
-                        c->as.num = strtod(c->repr, NULL);
+                        c->value.type = tnew;
+                        c->value.as.num = strtod(c->repr, NULL);
                         free(c->repr);
-                        c->repr = get_num_repr(c->as.num);
+                        c->repr = get_num_repr(c->value.as.num);
                         break;
                 default:
                         goto no_yet_implemented;
@@ -97,13 +97,13 @@ cm_convert(Cell *c, CellType tnew)
         case TYPE_EMPTY:
                 switch (tnew) {
                 case TYPE_NUMBER:
-                        c->type = tnew;
-                        c->as.num = 0.0;
+                        c->value.type = tnew;
+                        c->value.as.num = 0.0;
                         free(c->repr);
-                        c->repr = get_num_repr(c->as.num);
+                        c->repr = get_num_repr(c->value.as.num);
                         break;
                 case TYPE_TEXT:
-                        c->type = tnew;
+                        c->value.type = tnew;
                         break;
                 default:
                         goto no_yet_implemented;
@@ -112,7 +112,7 @@ cm_convert(Cell *c, CellType tnew)
         default:
         no_yet_implemented:
                 report("No yet implemented: Convert from %s to %s",
-                       cm_type_repr(c->type), cm_type_repr(tnew));
+                       cm_type_repr(c->value.type), cm_type_repr(tnew));
                 break;
         }
 }
