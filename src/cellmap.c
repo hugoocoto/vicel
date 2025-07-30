@@ -99,6 +99,8 @@ get_repr(Value v)
                 return get_num_repr(v.as.num);
         case TYPE_TEXT:
                 return strdup(v.as.text);
+        case TYPE_FORMULA:
+                return get_repr(v.as.formula->value);
         case TYPE_EMPTY:
                 return strdup("");
         default:
@@ -113,7 +115,9 @@ cm_convert(Cell *c, CellType tnew)
         if (c->value.type == tnew) return;
         if (tnew == TYPE_EMPTY) {
                 free(c->repr);
+                __auto_type s = c->subscribers;
                 *c = EMPTY_CELL;
+                c->subscribers = s;
                 goto notify;
         }
 

@@ -1,6 +1,6 @@
 CC = cc -ggdb -std=gnu11 -O0
 INC = -I.
-LIB = 
+LIB = -lm
 HEADERS = $(wildcard src/*.h)
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))

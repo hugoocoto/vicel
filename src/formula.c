@@ -4,7 +4,6 @@
 #include "da.h"
 #include "debug.h"
 #include "window.h"
-#include <assert.h>
 
 Cell *cell_self = NULL;
 
@@ -51,6 +50,47 @@ vsub(Value a, Value b)
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
 }
+Value
+vdiv(Value a, Value b)
+{
+        if (a.type != b.type) return VALUE_EMPTY;
+
+        if (a.type == TYPE_NUMBER) {
+                return AS_NUMBER(a.as.num / b.as.num);
+        }
+
+        report("No yet implemented: vadd for %s and %s",
+               cm_type_repr(a.type), cm_type_repr(b.type));
+        return VALUE_EMPTY;
+}
+
+Value
+vmul(Value a, Value b)
+{
+        if (a.type != b.type) return VALUE_EMPTY;
+
+        if (a.type == TYPE_NUMBER) {
+                return AS_NUMBER(a.as.num * b.as.num);
+        }
+
+        report("No yet implemented: vadd for %s and %s",
+               cm_type_repr(a.type), cm_type_repr(b.type));
+        return VALUE_EMPTY;
+}
+
+Value
+vpow(Value a, Value b)
+{
+        if (a.type != b.type) return VALUE_EMPTY;
+
+        if (a.type == TYPE_NUMBER) {
+                return AS_NUMBER(pow(a.as.num , b.as.num));
+        }
+
+        report("No yet implemented: vadd for %s and %s",
+               cm_type_repr(a.type), cm_type_repr(b.type));
+        return VALUE_EMPTY;
+}
 
 Value
 vadd(Value a, Value b)
@@ -78,6 +118,18 @@ eval_binop(Expr *e)
 
         if (!strcmp(e->as.binop.op, "-")) {
                 return vsub(lhs, rhs);
+        };
+
+        if (!strcmp(e->as.binop.op, "/")) {
+                return vdiv(lhs, rhs);
+        };
+
+        if (!strcmp(e->as.binop.op, "*")) {
+                return vmul(lhs, rhs);
+        };
+
+        if (!strcmp(e->as.binop.op, "^")) {
+                return vpow(lhs, rhs);
         };
 
         report("No yet implemented: binop for %s", e->as.binop.op);
@@ -241,6 +293,21 @@ lexer(char *c)
                         break;
                 case '-':
                         last->next = TOK_AS_STR("-");
+                        last = last->next;
+                        ++c;
+                        break;
+                case '/':
+                        last->next = TOK_AS_STR("/");
+                        last = last->next;
+                        ++c;
+                        break;
+                case '*':
+                        last->next = TOK_AS_STR("*");
+                        last = last->next;
+                        ++c;
+                        break;
+                case '^':
+                        last->next = TOK_AS_STR("^");
                         last = last->next;
                         ++c;
                         break;
@@ -458,6 +525,11 @@ cm_notify(Cell *actor, Cell *observer)
         observer->value.as.formula->value = eval_expr(observer->value.as.formula->body);
         free(observer->repr);
         observer->repr = get_repr(observer->value.as.formula->value);
+
+        for_da_each(c, observer->subscribers)
+        {
+                cm_notify(observer, *c);
+        }
 }
 
 void

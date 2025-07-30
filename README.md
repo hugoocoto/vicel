@@ -2,7 +2,7 @@
 
 ## About
 
-Create, read and write files based on cells. 
+Create, read and write files based on cells. (<- this is the idea)
 
 ## Mappings
 
@@ -19,8 +19,12 @@ Create, read and write files based on cells.
 - "v", a_select_toggle_cell
 - "i", get_set_cell_input
 - "I", get_set_selection_input
+
+legacy as now it converts automatically:
+
 - "sd", a_set_cell_type_numeric
 - "st", a_set_cell_type_text
+- "sf", a_set_cell_type_formula
 - "d", a_set_cell_type_empty
 
 > [!CAUTION]
