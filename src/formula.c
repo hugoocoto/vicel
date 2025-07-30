@@ -84,7 +84,7 @@ vpow(Value a, Value b)
         if (a.type != b.type) return VALUE_EMPTY;
 
         if (a.type == TYPE_NUMBER) {
-                return AS_NUMBER(pow(a.as.num , b.as.num));
+                return AS_NUMBER(pow(a.as.num, b.as.num));
         }
 
         report("No yet implemented: vadd for %s and %s",

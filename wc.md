@@ -4,14 +4,14 @@ cloc|github.com/AlDanial/cloc v 2.04
 File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/formula.c|71|17|459
+src/window.c|40|6|246
 src/keyboard.c|38|11|236
-src/window.c|28|6|215
 src/aptree.c|27|4|194
-src/cellmap.c|15|5|193
+src/cellmap.c|14|2|194
 src/escape_code.h|15|17|177
 src/da.h|13|14|85
 src/mappings.c|11|0|69
-src/cellmap.h|20|5|59
+src/cellmap.h|19|2|58
 src/formula.h|11|3|48
 src/window.h|7|1|27
 src/aptree.h|5|0|21
@@ -22,4 +22,4 @@ src/action.h|5|0|12
 src/keyboard.h|2|0|4
 src/main.c|1|5|0
 --------|--------|--------|--------
-SUM:|277|88|1854
+SUM:|287|82|1885

@@ -6,13 +6,14 @@
 #include "escape_code.h"
 #include "keyboard.h"
 #include "mappings.h"
-#include <ctype.h>
-#include <unistd.h>
 
-#define CELL_BG BG_BLUE
-#define CELL_FG FG_BLACK
+#define CELL_FG FG_BLUE
+#define CELL_BG BG_BLACK
 #define CELL_SELECT_BG BG_GREEN
 #define CELL_SELECT_FG FG_BLACK
+
+#define column_width 10
+#define row_width 1
 
 Context active_ctx = INIT_CONTEXT;
 
@@ -130,38 +131,80 @@ print_at(int r, int c, char *buf, int buflen, int n)
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
 
+#define NUM_COL_WIDTH 5
 void
 cursor_gotocell(int x, int y)
 {
         int first_cell_col = 1;
         int first_cell_row = 2;
-        int column_width = 10; // should be in column
-        int row_width = 1;     // should be in row
-        printCUP(first_cell_row + row_width * x, first_cell_col + column_width * y);
+        printCUP(first_cell_row + row_width * x, NUM_COL_WIDTH + first_cell_col + column_width * (y - 1));
+}
+
+void
+display_add_names(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w, int x0, int y0)
+{
+        int cx = x0;
+        int cy = y0;
+        int av = scr_w - cy;
+        char *col = strdup("A");
+        int n = 0;
+
+        printf(EFFECT(BG_BLACK, FG_YELLOW));
+
+        cy += NUM_COL_WIDTH;
+        av -= NUM_COL_WIDTH;
+
+        /* The top left gap */
+        printf("%-*.*s", NUM_COL_WIDTH, NUM_COL_WIDTH, "");
+
+        printCUP(cx, cy);
+
+        for_da_each(cell, *mat->data)
+        {
+                int wwww = min(column_width, av);
+                int ww = wwww / 2;
+                printf("%*.*s%*.*s", ww, ww, col,
+                       wwww - ww, wwww - ww, "");
+
+                cy += column_width;
+                av -= column_width;
+                if (av <= 0) break;
+                col[0]++;
+        }
+
+        cx = x0 += row_width;
+        cy = y0;
+
+        for_da_each(_, *mat)
+        {
+                printCUP(cx, cy);
+                printf("%*d ", NUM_COL_WIDTH - 1, n);
+                cx += row_width;
+                n++;
+        }
+
+        free(col);
+        printf(EFFECT(RESET));
 }
 
 /* Print the submatrix of mat, starting at x_off and y_off (top left) that
  * fits into the screen, starting at cursor position with the size
  * scr_x x scr_h. It doesn't need to be left neither top aligned. */
+
 void
-cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
+cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w, int x0, int y0)
 {
-        // report("Call display");
-        int x0, y0;
-        int column_width = 10; // should be in column
-        int row_width = 1;     // should be in row
-        get_current_position(&x0, &y0);
         printf(EFFECT(CELL_BG, CELL_FG));
         int cx = x0;
         int cy = y0;
-        int av = active_ctx.ws.ws_col - cy;
+        int av = scr_w - cy;
         int xx = 0;
         int yy = 0;
         for_da_each(ca, *mat)
         {
-                printCUP(cx, cy); // can optimize this
                 for_da_each(cell, *ca)
                 {
+                        printCUP(cx, cy); // can optimize this
                         assert(cell->heigh == 1);
 
                         if (cell->selected)
@@ -187,7 +230,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
                 }
                 cx += row_width;
                 cy = y0;
-                av = active_ctx.ws.ws_col - cy;
+                av = scr_w - cy;
                 xx = 0;
                 ++yy;
         }
@@ -206,8 +249,8 @@ render()
 {
         printf(EFFECT(RESET));
         print_status_bar();
-        T_CUP(2, 1);
-        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row - 1, active_ctx.ws.ws_col);
+        display_add_names(active_ctx.body, 0, 0, active_ctx.ws.ws_row, active_ctx.ws.ws_col + 1, 2, 1);
+        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row, active_ctx.ws.ws_col + 1, 3, 1 + NUM_COL_WIDTH);
         fflush(stdout);
 }
 

@@ -114,6 +114,8 @@ cm_convert(Cell *c, CellType tnew)
 {
         if (c->value.type == tnew) return;
         if (tnew == TYPE_EMPTY) {
+                if (c->value.type == TYPE_FORMULA)
+                        free_formula_subscribers(c);
                 free(c->repr);
                 __auto_type s = c->subscribers;
                 *c = EMPTY_CELL;
@@ -200,11 +202,6 @@ notify:
                 cm_notify(c, *s);
         }
 }
-
-/* Print the submatrix of mat, starting at x_off and y_off (top left) that
- * fits into the screen, starting at cursor position with the size
- * scr_x x scr_h. It doesn't need to be left neither top aligned. */
-void cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w);
 
 void
 cm_destroy(CellMat *mat)

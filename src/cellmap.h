@@ -70,11 +70,6 @@ void cm_notify(Cell *actor, Cell *observer); // implemented in observer
 
 void cm_convert(Cell *c, CellType tnew);
 
-/* Print the submatrix of mat, starting at x_off and y_off (top left) that
- * fits into the screen, starting at cursor position with the size
- * scr_x x scr_h. It doesn't need to be left neither top aligned. */
-void cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w);
-
 void cm_destroy(CellMat *mat);
 
 char *get_repr(Value v);
