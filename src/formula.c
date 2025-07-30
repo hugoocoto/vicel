@@ -16,6 +16,8 @@ Value eval_expr(Expr *e);
 Value
 eval_identifier(Expr *e)
 {
+        if (e->as.identifier.cell->value.type == TYPE_FORMULA)
+                return e->as.identifier.cell->value.as.formula->value;
         return e->as.identifier.cell->value;
 }
 
@@ -37,29 +39,41 @@ eval_unop(Expr *e)
         return VALUE_EMPTY;
 }
 
+bool
+are_valid_operands(Value a, Value b)
+{
+        switch (a.type) {
+        case TYPE_FORMULA:
+                return are_valid_operands(a.as.formula->value, b);
+        case TYPE_NUMBER:
+                if (b.type == TYPE_FORMULA) return are_valid_operands(a, b.as.formula->value);
+                if (b.type == TYPE_NUMBER) return true;
+        case TYPE_TEXT:
+        case TYPE_EMPTY:
+        default:
+                return false;
+        }
+}
+
 Value
 vsub(Value a, Value b)
 {
-        if (a.type != b.type) return VALUE_EMPTY;
-
-        if (a.type == TYPE_NUMBER) {
+        if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num - b.as.num);
         }
 
-        report("No yet implemented: vadd for %s and %s",
+        report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
 }
 Value
 vdiv(Value a, Value b)
 {
-        if (a.type != b.type) return VALUE_EMPTY;
-
-        if (a.type == TYPE_NUMBER) {
+        if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num / b.as.num);
         }
 
-        report("No yet implemented: vadd for %s and %s",
+        report("No yet implemented: vdiv for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
 }
@@ -67,13 +81,11 @@ vdiv(Value a, Value b)
 Value
 vmul(Value a, Value b)
 {
-        if (a.type != b.type) return VALUE_EMPTY;
-
-        if (a.type == TYPE_NUMBER) {
+        if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num * b.as.num);
         }
 
-        report("No yet implemented: vadd for %s and %s",
+        report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
 }
@@ -81,13 +93,11 @@ vmul(Value a, Value b)
 Value
 vpow(Value a, Value b)
 {
-        if (a.type != b.type) return VALUE_EMPTY;
-
-        if (a.type == TYPE_NUMBER) {
+        if (are_valid_operands(a, b)) {
                 return AS_NUMBER(pow(a.as.num, b.as.num));
         }
 
-        report("No yet implemented: vadd for %s and %s",
+        report("No yet implemented: vpow for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
 }
@@ -95,9 +105,7 @@ vpow(Value a, Value b)
 Value
 vadd(Value a, Value b)
 {
-        if (a.type != b.type) return VALUE_EMPTY;
-
-        if (a.type == TYPE_NUMBER) {
+        if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num + b.as.num);
         }
 
@@ -112,25 +120,13 @@ eval_binop(Expr *e)
         Value lhs = eval_expr(e->as.binop.lhs);
         Value rhs = eval_expr(e->as.binop.rhs);
 
-        if (!strcmp(e->as.binop.op, "+")) {
-                return vadd(lhs, rhs);
-        };
-
-        if (!strcmp(e->as.binop.op, "-")) {
-                return vsub(lhs, rhs);
-        };
-
-        if (!strcmp(e->as.binop.op, "/")) {
-                return vdiv(lhs, rhs);
-        };
-
-        if (!strcmp(e->as.binop.op, "*")) {
-                return vmul(lhs, rhs);
-        };
-
-        if (!strcmp(e->as.binop.op, "^")) {
-                return vpow(lhs, rhs);
-        };
+        switch (*e->as.binop.op) {
+        case '+': return vadd(lhs, rhs);
+        case '-': return vsub(lhs, rhs);
+        case '/': return vdiv(lhs, rhs);
+        case '*': return vmul(lhs, rhs);
+        case '^': return vpow(lhs, rhs);
+        }
 
         report("No yet implemented: binop for %s", e->as.binop.op);
         return VALUE_EMPTY;
@@ -311,6 +307,16 @@ lexer(char *c)
                         last = last->next;
                         ++c;
                         break;
+                case '(':
+                        last->next = TOK_AS_STR("(");
+                        last = last->next;
+                        ++c;
+                        break;
+                case ')':
+                        last->next = TOK_AS_STR(")");
+                        last = last->next;
+                        ++c;
+                        break;
                 case '0' ... '9':
                         last->next = TOK_AS_NUM(strtod(c, &c));
                         last = last->next;
@@ -482,6 +488,19 @@ parse_formula(char *c, Cell *self)
 }
 
 void
+refresh_formula_value(Cell *cell)
+{
+        cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
+        free(cell->repr);
+        cell->repr = get_repr(cell->value.as.formula->value);
+
+        for_da_each(c, cell->subscribers)
+        {
+                cm_notify(cell, *c);
+        }
+}
+
+void
 build_formula(char *_str, Cell *self)
 {
         char *str = strdup(_str);
@@ -494,8 +513,7 @@ build_formula(char *_str, Cell *self)
         }
 
         self->value.as.formula->body = parse_formula(str + 1, self);
-        self->value.as.formula->value =
-        eval_expr(report_ast(self->value.as.formula->body));
+        refresh_formula_value(self);
 
         free(str);
         assert(self->value.type == TYPE_FORMULA);
@@ -522,14 +540,7 @@ cm_notify(Cell *actor, Cell *observer)
                 exit(987);
         }
 
-        observer->value.as.formula->value = eval_expr(observer->value.as.formula->body);
-        free(observer->repr);
-        observer->repr = get_repr(observer->value.as.formula->value);
-
-        for_da_each(c, observer->subscribers)
-        {
-                cm_notify(observer, *c);
-        }
+        refresh_formula_value(observer);
 }
 
 void

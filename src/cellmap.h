@@ -22,7 +22,7 @@ typedef struct Value {
 
 #define AS_NUMBER(n) (Value){ \
         .type = TYPE_NUMBER,  \
-        .as.num = n,          \
+        .as.num = (n),        \
 };
 
 
