@@ -2,11 +2,6 @@
 #include "cellmap.h"
 #include "common.h"
 #include "debug.h"
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 // EXPR_BIN,
 // EXPR_UN,
@@ -147,18 +142,6 @@ get_number(char **c)
 {
         return strtod(*c, c);
 }
-
-typedef struct Token {
-        union {
-                char *str;
-                double num;
-        } as;
-        enum {
-                TOK_STRING,
-                TOK_NUMERIC,
-        } type;
-        struct Token *next;
-} Token;
 
 Token *
 new_tok()
@@ -313,7 +296,7 @@ build_formula(char *str)
                 report("Invalid formula: `%s` does not start with `=`", str);
                 exit(2);
         }
-        f.body = parse_formula(str);
+        f.body = parse_formula(str + 1);
         f.value = eval_expr(f.body);
         return f;
 }

@@ -78,6 +78,13 @@ a_set_cell_type_text()
 }
 
 void
+a_set_cell_type_formula()
+{
+        cm_convert(get_cursor_cell(), TYPE_FORMULA);
+        render();
+}
+
+void
 a_set_cell_type_empty()
 {
         cm_convert(get_cursor_cell(), TYPE_EMPTY);

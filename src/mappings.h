@@ -17,6 +17,7 @@ void a_select_toggle_cell();
 void a_set_cell_type_numeric();
 void a_set_cell_type_text();
 void a_set_cell_type_empty();
+void a_set_cell_type_formula();
 
 #endif //!MAPPINGS_H
 

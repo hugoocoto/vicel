@@ -11,8 +11,6 @@ typedef enum {
         TYPE_LEN,
 } CellType;
 
-struct Formula; // from src/formula.h
-
 typedef struct Value {
         CellType type;
         union {

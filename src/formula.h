@@ -1,8 +1,8 @@
 #ifndef FORMULA_H_
 #define FORMULA_H_
 
-#include "cellmap.h" /* shut up */
 #include "da.h"
+#include "cellmap.h"
 
 typedef enum ExprType {
         EXPR_LITERAL = 0,
@@ -23,6 +23,19 @@ typedef struct Expr {
         } as;
 } Expr;
 /* clang-format on */
+
+typedef struct Token {
+        union {
+                char *str;
+                double num;
+        } as;
+        enum {
+                TOK_STRING,
+                TOK_NUMERIC,
+        } type;
+        struct Token *next;
+} Token;
+
 
 typedef struct Formula {
         Expr *body;

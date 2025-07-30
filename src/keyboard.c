@@ -5,8 +5,10 @@
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
+#include "formula.h"
 #include "mappings.h"
 #include "window.h"
+#include <termios.h>
 
 #define MAX_MAPPING_LEN 6
 
@@ -116,6 +118,27 @@ get_input_at_cursor()
 }
 
 void
+detect_cell_type()
+{
+        char *buf = get_cursor_cell()->repr;
+        if (*buf == '=') {
+                cm_convert(get_cursor_cell(), TYPE_FORMULA);
+                return;
+        }
+        bool is_numeric = *buf;
+        while (*buf && is_numeric) {
+                if (('0' <= *buf && *buf <= '9') || *buf == '.')
+                        ++buf;
+                else
+                        is_numeric = false;
+        }
+        if (is_numeric) {
+                cm_convert(get_cursor_cell(), TYPE_NUMBER);
+                return;
+        }
+}
+
+void
 get_set_cell_input()
 {
         char *buf = get_input_at_cursor();
@@ -123,6 +146,7 @@ get_set_cell_input()
         get_cursor_cell()->repr = buf;
         get_cursor_cell()->value.as.text = buf;
         get_cursor_cell()->value.type = TYPE_TEXT;
+        detect_cell_type();
         render();
 }
 
@@ -172,6 +196,7 @@ start_kbhandler()
         add_action(mappings, "sd", ACTION(a_set_cell_type_numeric));
         add_action(mappings, "st", ACTION(a_set_cell_type_text));
         add_action(mappings, "d", ACTION(a_set_cell_type_empty));
+        add_action(mappings, "sf", ACTION(a_set_cell_type_formula));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

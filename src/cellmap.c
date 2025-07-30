@@ -1,9 +1,9 @@
 #include "cellmap.h"
+
 #include "common.h"
 #include "da.h"
 #include "debug.h"
-#include <stdlib.h>
-#include <unistd.h>
+#include "formula.h"
 
 const char *
 cm_type_repr(CellType ct)
@@ -90,6 +90,14 @@ cm_convert(Cell *c, CellType tnew)
                         free(c->repr);
                         c->repr = get_num_repr(c->value.as.num);
                         break;
+                case TYPE_FORMULA: {
+                        Formula f = build_formula(c->value.as.text);
+                        c->value.as.formula = malloc(sizeof(Formula));
+                        *c->value.as.formula = f;
+                        free(c->repr);
+                        c->repr = get_num_repr(c->value.as.formula->value.as.num);
+                        break;
+                }
                 default:
                         goto no_yet_implemented;
                 }
@@ -104,6 +112,24 @@ cm_convert(Cell *c, CellType tnew)
                         break;
                 case TYPE_TEXT:
                         c->value.type = tnew;
+                        break;
+                default:
+                        goto no_yet_implemented;
+                }
+                break;
+        case TYPE_FORMULA:
+                switch (tnew) {
+                case TYPE_NUMBER:
+                        c->value.type = tnew;
+                        free(c->value.as.formula);
+                        c->value.as.num = 0.0;
+                        free(c->repr);
+                        c->repr = get_num_repr(c->value.as.num);
+                        break;
+                case TYPE_TEXT:
+                        c->value.type = tnew;
+                        free(c->value.as.formula);
+                        c->value.as.text = c->repr;
                         break;
                 default:
                         goto no_yet_implemented;
