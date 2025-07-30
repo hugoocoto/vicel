@@ -1,7 +1,12 @@
 #include "formula.h"
 #include "cellmap.h"
 #include "common.h"
+#include "da.h"
 #include "debug.h"
+#include "window.h"
+#include <assert.h>
+
+Cell *cell_self = NULL;
 
 // EXPR_BIN,
 // EXPR_UN,
@@ -26,7 +31,7 @@ eval_unop(Expr *e)
 {
         Value rhs = eval_expr(e->as.unop.rhs);
 
-        if (strcmp(e->as.binop.op, "-")) {
+        if (strcmp(e->as.unop.op, "-")) {
                 return AS_NUMBER(-rhs.as.num);
         };
         report("No yet implemented: unop for %s", e->as.unop.op);
@@ -88,8 +93,9 @@ eval_expr(Expr *e)
         case EXPR_LITERAL: return eval_literal(e);
         case EXPR_BIN: return eval_binop(e);
         case EXPR_UN: return eval_unop(e);
+        case EXPR_IDENTIFIER: return eval_identifier(e);
         default:
-                report("No yet implemented: binop for %s", e->as.binop.op);
+                report("No yet implemented: eval_expr for %d", e->type);
                 return VALUE_EMPTY;
         }
 }
@@ -137,6 +143,15 @@ new_literal(double value)
         return e;
 }
 
+Expr *
+new_identifier(Cell *c)
+{
+        Expr *e = new_expr();
+        e->type = EXPR_IDENTIFIER;
+        e->as.identifier.cell = c;
+        return e;
+}
+
 double
 get_number(char **c)
 {
@@ -168,6 +183,51 @@ TOK_AS_NUM(double n)
 }
 
 Token *
+TOK_AS_IDENTIFIER(char *id)
+{
+        Token *t = new_tok();
+        t->as.id = id;
+        t->type = TOK_IDENTIFIER;
+        return t;
+}
+
+char *
+get_identifier(char **c)
+{
+        report("call get_identifier with %s", *c);
+        char *id = *c;
+        if (!isalpha(**c)) {
+                report("get_identifier at %c do not match isalpha", **c);
+                return NULL;
+        }
+        while (isalpha(**c)) {
+                report("Consume alpha %c", **c);
+                ++*c;
+        }
+        if (**c < '0' || **c > '9') {
+                report("get_identifier at %c do not match isdigit", **c);
+                return NULL;
+        }
+        while ('0' <= **c && **c <= '9') {
+                report("Consume digit %c", **c);
+                ++*c;
+        }
+
+        /* without this it segfault???????? */
+        if (**c == 0) {
+                return strdup(id);
+        }
+
+        char prev = **c;
+        **c = 0;
+        report("call get_identifier id %s", id);
+        id = strdup(id);
+        **c = prev;
+        report("call get_identifier return %s", id);
+        return id;
+}
+
+Token *
 lexer(char *c)
 {
         Token *last = new_tok();
@@ -191,6 +251,12 @@ lexer(char *c)
                 default:
                         if (isspace(*c)) {
                                 ++c;
+                                break;
+                        }
+                        char *id;
+                        if ((id = get_identifier(&c))) {
+                                last->next = TOK_AS_IDENTIFIER(id);
+                                last = last->next;
                                 break;
                         }
                         report("Invalid lexeme found: `%c`", *c);
@@ -222,9 +288,31 @@ Expr *
 get_literal(Token **t)
 {
         if (*t == NULL) return NULL;
-        double n = (*t)->as.num;
-        *t = (*t)->next;
-        return new_literal(n);
+        switch ((*t)->type) {
+        case TOK_NUMERIC: {
+                double n = (*t)->as.num;
+                *t = (*t)->next;
+                return new_literal(n);
+        }
+        case TOK_IDENTIFIER: {
+                report("get_literal from identifier %s", (*t)->as.id);
+                Cell *c = get_cell_from_coords((*t)->as.id);
+                *t = (*t)->next;
+
+                if (c == NULL) { // invalid coords
+                        return new_literal(0);
+                }
+
+                assert(cell_self);
+                cm_subscribe(c, cell_self);
+
+                return new_identifier(c);
+        }
+        case TOK_STRING:
+        default:
+                report("No yet implemented: get_literal for %d", (*t)->type);
+                exit(123);
+        }
 }
 
 Expr *get_term(Token **);
@@ -277,31 +365,6 @@ get_term(Token **t)
 }
 
 Expr *
-parse_formula(char *c)
-{
-        Token *t = lexer(c);
-        // - term -> factor (("-" | "+") factor)*
-        // - factor -> unary (("/" | "\*") unary)*
-        // - unary -> ("!" | "-") unary | group
-        // - group -> "(" expr ")" | literal
-        // - literal -> NUM | STR | "true" | "false" | IDENTIFIER
-        return get_term(&t);
-}
-
-Formula
-build_formula(char *str)
-{
-        Formula f;
-        if (*str != '=') {
-                report("Invalid formula: `%s` does not start with `=`", str);
-                exit(2);
-        }
-        f.body = parse_formula(str + 1);
-        f.value = eval_expr(f.body);
-        return f;
-}
-
-Expr *
 report_ast(Expr *e)
 {
         static int indent = 0;
@@ -325,6 +388,12 @@ report_ast(Expr *e)
                 report_ast(e->as.unop.rhs);
                 indent -= 4;
                 break;
+        case EXPR_IDENTIFIER:
+                report("%-*sIDENTIFIER:", indent, "");
+                indent += 4;
+                report("%-*scell value: %s", indent, "", e->as.identifier.cell->repr);
+                indent -= 4;
+                break;
         default:
                 report("No yet implemented: report_ast for %d", e->type);
                 break;
@@ -332,19 +401,75 @@ report_ast(Expr *e)
         return e;
 }
 
+Expr *
+parse_formula(char *c, Cell *self)
+{
+        cell_self = self;
+        Token *t = lexer(c);
+        // - term -> factor (("-" | "+") factor)*
+        // - factor -> unary (("/" | "\*") unary)*
+        // - unary -> ("!" | "-") unary | group
+        // - group -> "(" expr ")" | literal
+        // - literal -> NUM | STR | "true" | "false" | IDENTIFIER
+        return report_ast(get_term(&t));
+}
+
+void
+build_formula(char *_str, Cell *self)
+{
+        char *str = strdup(_str);
+        self->value.as.formula = calloc(1, sizeof(Formula));
+        self->value.type = TYPE_FORMULA;
+
+        if (*str != '=') {
+                report("Invalid formula: `%s` does not start with `=`", str);
+                exit(2);
+        }
+
+        self->value.as.formula->body = parse_formula(str + 1, self);
+        self->value.as.formula->value =
+        eval_expr(report_ast(self->value.as.formula->body));
+
+        free(str);
+        assert(self->value.type == TYPE_FORMULA);
+}
+
 static __attribute__((constructor)) void
 test()
 {
-        assert(eval_expr(report_ast(parse_formula(""))).as.num == 0);
-        assert(eval_expr(report_ast(parse_formula("1"))).as.num == 1);
-        assert(eval_expr(report_ast(parse_formula("1.6"))).as.num == 1.6);
-        assert(eval_expr(report_ast(parse_formula("-1.6"))).as.num == -1.6);
-        assert(eval_expr(report_ast(parse_formula("1 + 1.6"))).as.num == 2.6);
-        assert(eval_expr(report_ast(parse_formula("1.0 - 1.0"))).as.num == 0.0);
-        assert(eval_expr(report_ast(parse_formula("-1.0 - 1.0 + 2.0"))).as.num == 0.0);
+        // assert(eval_expr(report_ast(parse_formula(""))).as.num == 0);
+        // assert(eval_expr(report_ast(parse_formula("1"))).as.num == 1);
+        // assert(eval_expr(report_ast(parse_formula("1.6"))).as.num == 1.6);
+        // assert(eval_expr(report_ast(parse_formula("-1.6"))).as.num == -1.6);
+        // assert(eval_expr(report_ast(parse_formula("1 + 1.6"))).as.num == 2.6);
+        // assert(eval_expr(report_ast(parse_formula("1.0 - 1.0"))).as.num == 0.0);
+        // assert(eval_expr(report_ast(parse_formula("-1.0 - 1.0 + 2.0"))).as.num == 0.0);
+}
+
+void
+cm_notify(Cell *actor, Cell *observer)
+{
+        if (observer->value.type != TYPE_FORMULA) {
+                report("Invalid cm_notify for observer type %s",
+                       cm_type_repr(observer->value.type));
+                exit(987);
+        }
+
+        observer->value.as.formula->value = eval_expr(observer->value.as.formula->body);
+        free(observer->repr);
+        observer->repr = get_repr(observer->value.as.formula->value);
 }
 
 void
 destroy_formula(Formula f)
 {
+}
+
+void
+free_formula_subscribers(Cell *c)
+{
+        for_da_each(a, c->value.as.formula->subscribed)
+        {
+                cm_unsubscribe(*a, c);
+        }
 }

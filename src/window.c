@@ -6,6 +6,7 @@
 #include "escape_code.h"
 #include "keyboard.h"
 #include "mappings.h"
+#include <ctype.h>
 #include <unistd.h>
 
 #define CELL_BG BG_BLUE
@@ -14,6 +15,51 @@
 #define CELL_SELECT_FG FG_BLACK
 
 Context active_ctx = INIT_CONTEXT;
+
+int
+parse_coords(char *coords, int *x, int *y)
+{
+        char *c = coords;
+        *x = 0;
+        *y = 0;
+
+        if (!isalpha(*c)) return 1;
+        while (isalpha(*c)) {
+                *y *= 'Z' - 'A' + 1;
+                *y += toupper(*c) - 'A';
+                ++c;
+        }
+        if (*c < '0' || *c > '9') return 1;
+        while ('0' <= *c && *c <= '9') {
+                *x *= 10;
+                *x += *c - '0';
+                ++c;
+        }
+        return 0;
+}
+
+Cell *
+get_cell_from_coords(char *coords)
+{
+        int x, y;
+        if (parse_coords(coords, &x, &y)) {
+                report("Impossible to parse coords: %s", coords);
+                exit(443);
+        }
+        if (active_ctx.body == NULL) {
+                report("get_cell_from_coords: using no yet initialized body", x, coords);
+                exit(444);
+        }
+        if (x < 0 || x >= active_ctx.body->size) {
+                report("Invalid x coord: %d from %s", x, coords);
+                return NULL;
+        }
+        if (y < 0 || y >= active_ctx.body->data->size) {
+                report("Invalid x coord: %d from %s", x, coords);
+                return NULL;
+        }
+        return cm_get_cell_ptr(active_ctx.body, x, y);
+}
 
 void
 get_current_position(int *x, int *y)
@@ -100,7 +146,7 @@ cursor_gotocell(int x, int y)
 void
 cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
 {
-        report("Call display");
+        // report("Call display");
         int x0, y0;
         int column_width = 10; // should be in column
         int row_width = 1;     // should be in row

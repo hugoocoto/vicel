@@ -1,9 +1,9 @@
 #include "cellmap.h"
-
 #include "common.h"
 #include "da.h"
 #include "debug.h"
 #include "formula.h"
+#include <assert.h>
 
 const char *
 cm_type_repr(CellType ct)
@@ -12,6 +12,7 @@ cm_type_repr(CellType ct)
                 [TYPE_NUMBER] = "TYPE_NUMBER",
                 [TYPE_TEXT] = "TYPE_TEXT",
                 [TYPE_EMPTY] = "TYPE_EMPTY",
+                [TYPE_FORMULA] = "TYPE_FORMULA",
                 [TYPE_LEN] = "TYPE_LEN",
         };
         if (ct >= 0 && ct < TYPE_LEN)
@@ -48,6 +49,34 @@ cm_add_col(CellMat *mat)
                 da_append(&mat->data[i], EMPTY_CELL);
 }
 
+void
+cm_subscribe(Cell *actor, Cell *observer)
+{
+        report("Add subscriber %p to %p", observer, actor);
+        da_append(&actor->subscribers, observer);
+        da_append(&observer->value.as.formula->subscribed, actor);
+}
+
+void
+cm_unsubscribe(Cell *actor, Cell *observer)
+{
+        int i = 0;
+        for (; i < actor->subscribers.size; i++) {
+                if (actor->subscribers.data[i] == observer) {
+                        da_remove(&actor->subscribers, i);
+                        report("Remove subscriber %p to %p", observer, actor);
+                        return;
+                }
+        }
+        report("Fail to remove subscriber %p to %p", observer, actor);
+}
+
+Cell *
+cm_get_cell_ptr(CellMat *mat, int x, int y)
+{
+        return &mat->data[x].data[y];
+}
+
 Cell
 cm_get_cell(CellMat *mat, int x, int y)
 {
@@ -62,6 +91,22 @@ get_num_repr(double d)
         return strdup(buf);
 }
 
+char *
+get_repr(Value v)
+{
+        switch (v.type) {
+        case TYPE_NUMBER:
+                return get_num_repr(v.as.num);
+        case TYPE_TEXT:
+                return strdup(v.as.text);
+        case TYPE_EMPTY:
+                return strdup("");
+        default:
+                report("No yet implemented: get_repr for %s", cm_type_repr(v.type));
+                return strdup("Err");
+        }
+}
+
 void
 cm_convert(Cell *c, CellType tnew)
 {
@@ -69,6 +114,7 @@ cm_convert(Cell *c, CellType tnew)
         if (tnew == TYPE_EMPTY) {
                 free(c->repr);
                 *c = EMPTY_CELL;
+                goto notify;
         }
 
         switch (c->value.type) {
@@ -91,11 +137,11 @@ cm_convert(Cell *c, CellType tnew)
                         c->repr = get_num_repr(c->value.as.num);
                         break;
                 case TYPE_FORMULA: {
-                        Formula f = build_formula(c->value.as.text);
-                        c->value.as.formula = malloc(sizeof(Formula));
-                        *c->value.as.formula = f;
+                        c->value.type = tnew;
+                        build_formula(c->value.as.text, c);
                         free(c->repr);
-                        c->repr = get_num_repr(c->value.as.formula->value.as.num);
+                        c->repr = get_repr(c->value.as.formula->value);
+                        assert(c->value.type == tnew);
                         break;
                 }
                 default:
@@ -120,6 +166,7 @@ cm_convert(Cell *c, CellType tnew)
         case TYPE_FORMULA:
                 switch (tnew) {
                 case TYPE_NUMBER:
+                        free_formula_subscribers(c);
                         c->value.type = tnew;
                         free(c->value.as.formula);
                         c->value.as.num = 0.0;
@@ -127,6 +174,7 @@ cm_convert(Cell *c, CellType tnew)
                         c->repr = get_num_repr(c->value.as.num);
                         break;
                 case TYPE_TEXT:
+                        free_formula_subscribers(c);
                         c->value.type = tnew;
                         free(c->value.as.formula);
                         c->value.as.text = c->repr;
@@ -139,7 +187,13 @@ cm_convert(Cell *c, CellType tnew)
         no_yet_implemented:
                 report("No yet implemented: Convert from %s to %s",
                        cm_type_repr(c->value.type), cm_type_repr(tnew));
-                break;
+                return;
+        }
+
+notify:
+        for_da_each(s, c->subscribers)
+        {
+                cm_notify(c, *s);
         }
 }
 

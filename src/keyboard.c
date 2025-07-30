@@ -3,6 +3,7 @@
 #include "aptree.h"
 #include "cellmap.h"
 #include "common.h"
+#include "da.h"
 #include "debug.h"
 #include "escape_code.h"
 #include "formula.h"
@@ -142,12 +143,18 @@ void
 get_set_cell_input()
 {
         char *buf = get_input_at_cursor();
+        if (get_cursor_cell()->value.type == TYPE_FORMULA)
+                free_formula_subscribers(get_cursor_cell());
         free(get_cursor_cell()->repr);
         get_cursor_cell()->repr = buf;
         get_cursor_cell()->value.as.text = buf;
         get_cursor_cell()->value.type = TYPE_TEXT;
         detect_cell_type();
-        render();
+
+        for_da_each(o, get_cursor_cell()->subscribers)
+        {
+                cm_notify(get_cursor_cell(), *o);
+        }
 }
 
 void
@@ -163,11 +170,15 @@ get_set_selection_input()
                                 cell->repr = strdup(buf);
                                 cell->value.as.text = buf;
                                 cell->value.type = TYPE_TEXT;
+
+                                for_da_each(o, cell->subscribers)
+                                {
+                                        cm_notify(cell, *o);
+                                }
                         }
                 }
         }
         free(buf);
-        render();
 }
 
 void
@@ -235,7 +246,7 @@ start_kbhandler()
                         saved_read_index = read_index;
                         saved_repeat = repeat;
                         do {
-                                report("Action on buffer: [%.*s]", read_index, buf);
+                                // report("Action on buffer: [%.*s]", read_index, buf);
                                 action.action();
                         } while (--repeat > 0);
                         read_index = 0;
@@ -252,7 +263,7 @@ start_kbhandler()
                                 saved_read_index = read_index;
                                 saved_repeat = repeat;
                                 do {
-                                        report("Action on buffer: [%.*s]", read_index, buf);
+                                        // report("Action on buffer: [%.*s]", read_index, buf);
                                         action.action();
                                 } while (--repeat > 0);
                         }
@@ -267,7 +278,7 @@ start_kbhandler()
                 }
 
                 print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN, repeat);
-                fflush(stdout);
+                render();
         }
 
         toggle_raw_mode();

@@ -26,12 +26,14 @@ typedef struct Value {
 };
 
 
-struct CellArr;
-
 typedef struct Cell {
         int width, heigh;
         /* Cells that depend on the value of this cell */
-        struct CellArr *dependencies;
+        struct {
+                int capacity;
+                int size;
+                struct Cell **data;
+        } subscribers;
         Value value;
         int selected;
         char *repr; // string representation
@@ -49,7 +51,7 @@ typedef DA(CellArr) CellMat;
 #define EMPTY_CELL                                                                                       \
         (struct Cell)                                                                                    \
         {                                                                                                \
-                .width = 20, .heigh = 1, .value = VALUE_EMPTY, .dependencies = NULL, .repr = strdup(""), \
+                .width = 20, .heigh = 1, .value = VALUE_EMPTY, .subscribers = { 0 }, .repr = strdup(""), \
         }
 
 
@@ -60,6 +62,11 @@ void cm_add_row(CellMat *mat);
 void cm_add_col(CellMat *mat);
 
 Cell cm_get_cell(CellMat *mat, int x, int y);
+Cell *cm_get_cell_ptr(CellMat *mat, int x, int y);
+
+void cm_subscribe(Cell *actor, Cell *observer);
+void cm_unsubscribe(Cell *actor, Cell *observer);
+void cm_notify(Cell *actor, Cell *observer); // implemented in observer
 
 void cm_convert(Cell *c, CellType tnew);
 
@@ -69,6 +76,8 @@ void cm_convert(Cell *c, CellType tnew);
 void cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w);
 
 void cm_destroy(CellMat *mat);
+
+char *get_repr(Value v);
 
 const char *cm_type_repr(CellType);
 

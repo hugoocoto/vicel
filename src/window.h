@@ -1,7 +1,7 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "cellmap.h"
+#include "cellmap.h" /* shut up */
 #include "common.h"
 
 typedef struct Context {
@@ -28,6 +28,7 @@ void print_at(int r, int c, char *buf, int buflen, int n);
 void render();
 void cursor_gotocell(int x, int y);
 void print_mapping_buffer(char *buf, int len, int n, int repeat);
+Cell *get_cell_from_coords(char *coords);
 
 extern Context active_ctx;
 
