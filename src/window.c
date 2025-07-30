@@ -159,9 +159,9 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w)
         int yy = 0;
         for_da_each(ca, *mat)
         {
+                printCUP(cx, cy); // can optimize this
                 for_da_each(cell, *ca)
                 {
-                        printCUP(cx, cy); // can optimize this
                         assert(cell->heigh == 1);
 
                         if (cell->selected)
