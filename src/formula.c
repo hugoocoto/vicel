@@ -53,6 +53,8 @@ are_valid_operands(Value a, Value b)
         case TYPE_TEXT:
         case TYPE_EMPTY:
         default:
+                report("Invalid operands %s and %s",
+                       cm_type_repr(a.type), cm_type_repr(b.type));
                 return false;
         }
 }
@@ -280,6 +282,7 @@ get_identifier(char **c)
 Token *
 lexer(char *c)
 {
+        report("Lexer for `%s`", c);
         Token *last = new_tok();
         Token *zero = last;
         while (*c) {
@@ -418,12 +421,23 @@ get_unary(Token **t)
 }
 
 Expr *
-get_factor(Token **t)
+get_power(Token **t)
 {
         Expr *e = get_unary(t);
         Token *op;
-        while ((op = match(t, "/")) || (op = match(t, "*"))) {
+        while ((op = match(t, "^"))) {
                 e = new_binop(e, op->as.str, get_unary(t));
+        }
+        return e;
+}
+
+Expr *
+get_factor(Token **t)
+{
+        Expr *e = get_power(t);
+        Token *op;
+        while ((op = match(t, "/")) || (op = match(t, "*"))) {
+                e = new_binop(e, op->as.str, get_power(t));
         }
         return e;
 }
@@ -506,7 +520,8 @@ parse_formula(char *c, Cell *self)
         Token *t = lexer(c);
         Token *tt = t;
         // - term -> factor (("-" | "+") factor)*
-        // - factor -> unary (("/" | "\*") unary)*
+        // - factor -> power (("/" | "\*") power)*
+        // - power -> unary ("^") unary)*
         // - unary -> ("!" | "-") unary | group
         // - group -> "(" expr ")" | literal
         // - literal -> NUM | STR | "true" | "false" | IDENTIFIER
