@@ -113,11 +113,13 @@ void
 cm_convert(Cell *c, CellType tnew)
 {
         if (c->value.type == tnew) return;
+
         if (tnew == TYPE_EMPTY) {
-                if (c->value.type == TYPE_FORMULA)
-                        free_formula_subscribers(c);
-                free(c->repr);
                 __auto_type s = c->subscribers;
+                if (c->value.type == TYPE_FORMULA) {
+                        destroy_formula(c);
+                } else
+                        free(c->repr);
                 *c = EMPTY_CELL;
                 c->subscribers = s;
                 goto notify;
@@ -143,10 +145,7 @@ cm_convert(Cell *c, CellType tnew)
                         c->repr = get_num_repr(c->value.as.num);
                         break;
                 case TYPE_FORMULA: {
-                        c->value.type = tnew;
                         build_formula(c->value.as.text, c);
-                        free(c->repr);
-                        c->repr = get_repr(c->value.as.formula->value);
                         assert(c->value.type == tnew);
                         break;
                 }
@@ -172,7 +171,7 @@ cm_convert(Cell *c, CellType tnew)
         case TYPE_FORMULA:
                 switch (tnew) {
                 case TYPE_NUMBER:
-                        free_formula_subscribers(c);
+                        destroy_formula(c);
                         c->value.type = tnew;
                         free(c->value.as.formula);
                         c->value.as.num = 0.0;
@@ -180,7 +179,7 @@ cm_convert(Cell *c, CellType tnew)
                         c->repr = get_num_repr(c->value.as.num);
                         break;
                 case TYPE_TEXT:
-                        free_formula_subscribers(c);
+                        destroy_formula(c);
                         c->value.type = tnew;
                         free(c->value.as.formula);
                         c->value.as.text = c->repr;
@@ -204,7 +203,40 @@ notify:
 }
 
 void
+cm_clear_cell(Cell *c)
+{
+        free(c->repr);
+        switch (c->value.type) {
+        case TYPE_FORMULA:
+                destroy_formula(c);
+                break;
+        case TYPE_TEXT:
+        case TYPE_NUMBER:
+        case TYPE_EMPTY:
+                break;
+        default:
+                report("No yet implemented: get_repr for %s",
+                       cm_type_repr(c->value.type));
+        }
+}
+
+void
+cm_free_cell(Cell *c)
+{
+        da_destroy(&c->subscribers);
+        cm_clear_cell(c);
+}
+
+void
 cm_destroy(CellMat *mat)
 {
-        // Todo
+        for_da_each(row, *mat)
+        {
+                for_da_each(c, *row)
+                {
+                        cm_free_cell(c);
+                }
+                da_destroy(row);
+        }
+        da_destroy(mat);
 }

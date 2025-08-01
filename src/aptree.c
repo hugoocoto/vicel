@@ -206,6 +206,18 @@ ap_print(APTree t)
         ap_print_branch(t, 0);
 }
 
+void
+ap_destroy(APTree t)
+{
+        int i = 0;
+        for (; i < AP_ENTRIES; ++i) {
+                if (t->after[i]) {
+                        ap_destroy(t->after[i]);
+                }
+        }
+        free(t);
+}
+
 static __attribute__((constructor)) void
 test()
 {
@@ -222,4 +234,5 @@ test()
         assert(ap_get(t, "hu").action == NoAction.action);
         ap_add(t, "hu", (Action) { .action = (void *) 0x6 });
         assert(ap_get(t, "hu").action == (void *) 0x6);
+        ap_destroy(t);
 }

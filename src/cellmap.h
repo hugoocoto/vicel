@@ -71,6 +71,8 @@ void cm_notify(Cell *actor, Cell *observer); // implemented in observer
 void cm_convert(Cell *c, CellType tnew);
 
 void cm_destroy(CellMat *mat);
+void cm_free_cell(Cell *c);
+void cm_clear_cell(Cell *c);
 
 char *get_repr(Value v);
 

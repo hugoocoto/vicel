@@ -4,6 +4,8 @@
 #include "da.h"
 #include "debug.h"
 #include "window.h"
+#include <assert.h>
+#include <unistd.h>
 
 Cell *cell_self = NULL;
 
@@ -474,17 +476,43 @@ report_ast(Expr *e)
         return e;
 }
 
+void
+free_tokens(Token *t)
+{
+        Token *prev;
+        while (t) {
+                switch (t->type) {
+                case TOK_STRING:
+                        free(t->as.str);
+                        break;
+                case TOK_IDENTIFIER:
+                        free(t->as.id);
+                        break;
+                case TOK_NUMERIC:
+                        break;
+                default:
+                        report("No yet implemented: free_tokens for %d", t->type);
+                }
+                prev = t;
+                t = t->next;
+                free(prev);
+        }
+}
+
 Expr *
 parse_formula(char *c, Cell *self)
 {
         cell_self = self;
         Token *t = lexer(c);
+        Token *tt = t;
         // - term -> factor (("-" | "+") factor)*
         // - factor -> unary (("/" | "\*") unary)*
         // - unary -> ("!" | "-") unary | group
         // - group -> "(" expr ")" | literal
         // - literal -> NUM | STR | "true" | "false" | IDENTIFIER
-        return report_ast(get_term(&t));
+        Expr *e = report_ast(get_term(&t));
+        self->value.as.formula->tokens = tt;
+        return e;
 }
 
 void
@@ -494,16 +522,24 @@ refresh_formula_value(Cell *cell)
         free(cell->repr);
         cell->repr = get_repr(cell->value.as.formula->value);
 
-        for_da_each(c, cell->subscribers)
-        {
-                cm_notify(cell, *c);
-        }
+        for_da_each(c, cell->subscribers) cm_notify(cell, *c);
+}
+
+void
+clear_cell(Cell *c)
+{
+        cm_clear_cell(c);
+        __auto_type s = c->subscribers;
+        *c = EMPTY_CELL;
+        c->subscribers = s;
 }
 
 void
 build_formula(char *_str, Cell *self)
 {
         char *str = strdup(_str);
+
+        clear_cell(self);
         self->value.as.formula = calloc(1, sizeof(Formula));
         self->value.type = TYPE_FORMULA;
 
@@ -544,15 +580,32 @@ cm_notify(Cell *actor, Cell *observer)
 }
 
 void
-destroy_formula(Formula f)
+free_expr(Expr *e)
 {
+        switch (e->type) {
+        case EXPR_BIN:
+                free_expr(e->as.binop.lhs);
+                free_expr(e->as.binop.rhs);
+                break;
+        case EXPR_UN:
+                free_expr(e->as.unop.rhs);
+                break;
+        case EXPR_LITERAL:
+        case EXPR_IDENTIFIER:
+                break;
+        default:
+                report("No yet implemented: free_expr for %d", e->type);
+        }
+        free(e);
 }
 
 void
-free_formula_subscribers(Cell *c)
+destroy_formula(Cell *c)
 {
-        for_da_each(a, c->value.as.formula->subscribed)
-        {
-                cm_unsubscribe(*a, c);
-        }
+        assert(c->value.type == TYPE_FORMULA);
+        for_da_each(a, c->value.as.formula->subscribed) cm_unsubscribe(*a, c);
+        da_destroy(&c->value.as.formula->subscribed);
+        free_expr(c->value.as.formula->body);
+        free_tokens(c->value.as.formula->tokens);
+        free(c->value.as.formula);
 }

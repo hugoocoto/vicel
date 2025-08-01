@@ -143,8 +143,10 @@ void
 get_set_cell_input()
 {
         char *buf = get_input_at_cursor();
-        if (get_cursor_cell()->value.type == TYPE_FORMULA)
-                free_formula_subscribers(get_cursor_cell());
+
+        if (get_cursor_cell()->value.type == TYPE_FORMULA) {
+                destroy_formula(get_cursor_cell());
+        }
         free(get_cursor_cell()->repr);
         get_cursor_cell()->repr = buf;
         get_cursor_cell()->value.as.text = buf;
@@ -281,5 +283,6 @@ start_kbhandler()
                 render();
         }
 
+        ap_destroy(mappings);
         toggle_raw_mode();
 }

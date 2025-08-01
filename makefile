@@ -1,4 +1,4 @@
-CC = cc -ggdb -std=gnu11 -O0
+CC = cc -ggdb -std=gnu11 -O0 -fsanitize=address,null
 INC = -I.
 LIB = -lm
 HEADERS = $(wildcard src/*.h)
@@ -10,7 +10,8 @@ OUT = $(BUILD_DIR)/00-vicel
 
 test: $(OUT)
 	rm report.log -f
-	gdb -ex run $(OUT)
+	./$(OUT)
+# gdb -ex run $(OUT)
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md 
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)

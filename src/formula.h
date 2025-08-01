@@ -42,6 +42,7 @@ typedef struct Token {
 typedef struct Formula {
         Expr *body;
         Value value;
+        Token *tokens;
         struct {
                 int capacity;
                 int size;
@@ -54,9 +55,7 @@ void build_formula(char *, Cell *self);
 
 Value eval_formula(Formula f);
 Expr *parse_formula(char *, Cell *self);
-void destroy_formula(Formula f);
-
-void free_formula_subscribers(Cell *c);
+void destroy_formula(Cell *c);
 
 
 #endif //! FORMULA_H_

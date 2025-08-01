@@ -6,6 +6,7 @@
 #include "escape_code.h"
 #include "keyboard.h"
 #include "mappings.h"
+#include <stdlib.h>
 
 #define CELL_FG FG_BLUE
 #define CELL_BG BG_BLACK
@@ -261,6 +262,10 @@ resize_handler(int _)
                 perror("resize_handler: ioctl");
                 exit(errno);
         }
+
+        /* render again on resize */
+        clear_screen();
+        render();
 }
 
 void
@@ -268,6 +273,15 @@ set_resize_handler()
 {
         signal(SIGWINCH, resize_handler);
         resize_handler(0); // get current winsize
+}
+
+void
+reset_at_exit()
+{
+        printf(EFFECT(RESET));
+        printf(T_ASBD());
+        printf(T_CUSHW());
+        fflush(stdout);
 }
 
 int
@@ -278,15 +292,13 @@ main(int argc, char *argv[])
         printf(T_CUHDE());
         printf(EFFECT(RESET));
         clear_screen();
+        atexit(reset_at_exit);
 
         active_ctx.body = cm_init();
         set_resize_handler();
-        start_kbhandler(); // render from here
+        start_kbhandler();
+        cm_destroy(active_ctx.body);
 
-        printf(EFFECT(RESET));
-        printf(T_ASBD());
-        printf(T_CUSHW());
-        fflush(stdout);
         report("---| End without error |---");
         return 0;
 }
