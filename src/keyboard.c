@@ -119,11 +119,11 @@ get_input_at_cursor()
 }
 
 void
-detect_cell_type()
+detect_cell_type(Cell *c)
 {
-        char *buf = get_cursor_cell()->repr;
+        char *buf = c->repr;
         if (*buf == '=') {
-                cm_convert(get_cursor_cell(), TYPE_FORMULA);
+                cm_convert(c, TYPE_FORMULA);
                 return;
         }
         bool is_numeric = *buf;
@@ -134,7 +134,7 @@ detect_cell_type()
                         is_numeric = false;
         }
         if (is_numeric) {
-                cm_convert(get_cursor_cell(), TYPE_NUMBER);
+                cm_convert(c, TYPE_NUMBER);
                 return;
         }
 }
@@ -145,11 +145,14 @@ set_cell_text(Cell *c, char *text)
         if (c->value.type == TYPE_FORMULA) {
                 destroy_formula(c);
         }
+
+        report("free on c.repr = %p", c->repr);
         free(c->repr);
+
         c->repr = text;
         c->value.as.text = text;
         c->value.type = TYPE_TEXT;
-        detect_cell_type();
+        detect_cell_type(c);
 
         for_da_each(o, c->subscribers)
         {

@@ -4,9 +4,10 @@
 #include "da.h"
 #include "debug.h"
 #include "escape_code.h"
+#include "flag.h"
 #include "keyboard.h"
 #include "mappings.h"
-#include <stdlib.h>
+#include "saving.h"
 
 #define CELL_FG FG_BLUE
 #define CELL_BG BG_BLACK
@@ -287,16 +288,30 @@ reset_at_exit()
 int
 main(int argc, char *argv[])
 {
+        char *filename = NULL;
+
+        flag_set(&argc, &argv);
+        if (flag_get_value(&filename, "-m", "--use-mouse")) {
+                printf("Are you idiot?\n");
+                exit(0);
+        }
+
+        if (argc == 2) {
+                filename = argv[1];
+        }
+
         report("---| Starting |---");
-        printf(T_ASBE());
+        // printf(T_ASBE());
         printf(T_CUHDE());
         printf(EFFECT(RESET));
         clear_screen();
         atexit(reset_at_exit);
+        load(filename, &active_ctx);
 
-        active_ctx.body = cm_init();
         set_resize_handler();
         start_kbhandler();
+
+        save(&active_ctx);
         cm_destroy(active_ctx.body);
 
         report("---| End without error |---");
