@@ -8,7 +8,7 @@ Create, read and write files based on cells. (<- this is the idea)
 
 ## Load files
 
-Open it with the filename as argument.
+Open it with the filename as argument. (Formulas are not saved (yet))
 
 ## Flags - Options
 - `-m`, `--use-mouse`: Enable mouse support
@@ -53,4 +53,4 @@ Text that starts with a `=`. It can contain numbers, or cell identifiers. Cell
 identifiers are one or more alpha followed by one or more numbers. FE: `= C2 + 8.5`
 
 > [!CAUTION]
-> It's not usable for now. (Well, if you need more than a sum)
+> It's kinda usable for now. 
