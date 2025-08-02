@@ -6,6 +6,14 @@ Create, read and write files based on cells. (<- this is the idea)
 
 ![image](./image.png)
 
+## Load files
+
+Open it with the filename as argument.
+
+## Flags - Options
+- `-m`, `--use-mouse`: Enable mouse support
+
+
 ## Mappings
 
 > At the time of writting this
@@ -32,7 +40,6 @@ Create, read and write files based on cells. (<- this is the idea)
 - `gil`, insert text and move cursor right
 
 ## Input text
-
 Place the cursor above a cell and press `i`.
 
 ### Numbers
