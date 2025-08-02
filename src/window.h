@@ -11,8 +11,8 @@ typedef struct Context {
         int status_bar_height;
 
         // starting at 0,0
-        int cursor_pos_x;
-        int cursor_pos_y;
+        int cursor_pos_r;
+        int cursor_pos_c;
 } Context;
 
 #define INIT_CONTEXT ((Context) { \
@@ -20,8 +20,8 @@ typedef struct Context {
 .body = NULL,                     \
 .filename = NULL,                 \
 .status_bar_height = 1,           \
-.cursor_pos_x = 0,                \
-.cursor_pos_y = 0,                \
+.cursor_pos_r = 0,                \
+.cursor_pos_c = 0,                \
 })
 
 void print_at(int r, int c, char *buf, int buflen, int n);
@@ -29,6 +29,7 @@ void render();
 void cursor_gotocell(int x, int y);
 void print_mapping_buffer(char *buf, int len, int n, int repeat);
 Cell *get_cell_from_coords(char *coords);
+int parse_coords(char *coords, int *x, int *y);
 
 extern Context active_ctx;
 

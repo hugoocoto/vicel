@@ -5,6 +5,9 @@
 #include "debug.h"
 #include "window.h"
 #include <assert.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 Cell *cell_self = NULL;
@@ -66,6 +69,10 @@ vsub(Value a, Value b)
                 return AS_NUMBER(a.as.num - b.as.num);
         }
 
+        if (a.type == TYPE_NUMBER) return a;
+        if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
+        else return AS_NUMBER(0);
+
         report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
@@ -76,6 +83,10 @@ vdiv(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num / b.as.num);
         }
+
+        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
+        else return AS_NUMBER(0);
 
         report("No yet implemented: vdiv for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -89,6 +100,10 @@ vmul(Value a, Value b)
                 return AS_NUMBER(a.as.num * b.as.num);
         }
 
+        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
+        else return AS_NUMBER(0);
+
         report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
@@ -101,6 +116,10 @@ vpow(Value a, Value b)
                 return AS_NUMBER(pow(a.as.num, b.as.num));
         }
 
+        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
+        else return AS_NUMBER(0);
+
         report("No yet implemented: vpow for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
         return VALUE_EMPTY;
@@ -112,6 +131,10 @@ vadd(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num + b.as.num);
         }
+
+        if (a.type == TYPE_NUMBER) return a;
+        if (b.type == TYPE_NUMBER) return b;
+        else return AS_NUMBER(0);
 
         report("No yet implemented: vadd for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -246,14 +269,14 @@ TOK_AS_IDENTIFIER(char *id)
 char *
 get_identifier(char **c)
 {
-        report("call get_identifier with %s", *c);
+        // report("call get_identifier with %s", *c);
         char *id = *c;
         if (!isalpha(**c)) {
                 report("get_identifier at %c do not match isalpha", **c);
                 return NULL;
         }
         while (isalpha(**c)) {
-                report("Consume alpha %c", **c);
+                // report("Consume alpha %c", **c);
                 ++*c;
         }
         if (**c < '0' || **c > '9') {
@@ -375,6 +398,7 @@ get_literal(Token **t)
         case TOK_IDENTIFIER: {
                 report("get_literal from identifier %s", (*t)->as.id);
                 Cell *c = get_cell_from_coords((*t)->as.id);
+                assert(c);
                 *t = (*t)->next;
 
                 if (c == NULL) { // invalid coords
@@ -554,15 +578,14 @@ build_formula(char *_str, Cell *self)
 {
         char *str = strdup(_str);
 
-        clear_cell(self);
-        self->value.as.formula = calloc(1, sizeof(Formula));
-        self->value.type = TYPE_FORMULA;
-
         if (*str != '=') {
                 report("Invalid formula: `%s` does not start with `=`", str);
                 exit(2);
         }
 
+        clear_cell(self);
+        self->value.as.formula = calloc(1, sizeof(Formula));
+        self->value.type = TYPE_FORMULA;
         self->value.as.formula->body = parse_formula(str + 1, self);
         refresh_formula_value(self);
 
@@ -623,4 +646,99 @@ destroy_formula(Cell *c)
         free_expr(c->value.as.formula->body);
         free_tokens(c->value.as.formula->tokens);
         free(c->value.as.formula);
+}
+
+static Token *
+dup_tokens(Token *t)
+{
+        if (t == NULL) return NULL;
+
+        Token *last = calloc(1, sizeof(Token));
+        Token *ret = last;
+
+        while (t) {
+                last->type = t->type;
+                switch (last->type) {
+                case TOK_STRING:
+                        last->as.str = strdup(t->as.str);
+                        break;
+                case TOK_IDENTIFIER:
+                        last->as.id = strdup(t->as.id);
+                        break;
+                default:
+                        last->as = t->as;
+                        break;
+                }
+                t = t->next;
+                if (t)
+                        last = last->next = calloc(1, sizeof(Token));
+        }
+        return ret;
+}
+
+char *
+create_id(int x, int y)
+{
+        char buf[32];
+        int start = 0;
+        do {
+                memcpy(buf + 1, buf, start + 1);
+                buf[start] = 'A' + y % ('Z' - 'A' + 1);
+                y /= 'Z' - 'A' + 1;
+                ++start;
+        } while (y);
+        snprintf(buf + start, sizeof buf - start, "%d", x);
+        return strdup(buf);
+}
+
+static __attribute__((constructor)) void
+test_create_id()
+{
+        char *c0, *c1, *c2;
+        assert(!strcmp(c0 = create_id(0, 0), "A0"));
+        assert(!strcmp(c1 = create_id(2, 0), "A2"));
+        assert(!strcmp(c2 = create_id(0, 2), "C0"));
+        free(c0);
+        free(c1);
+        free(c2);
+}
+
+static void
+extend_identifiers(Token *t, int r, int c)
+{
+        while (t) {
+                if (t->type == TOK_IDENTIFIER) {
+                        int rr, cc;
+                        if (parse_coords(t->as.id, &cc, &rr)) {
+                                report("Impossible to parse coords at: %s", t->as.id);
+                                exit(456);
+                        }
+                        cc += c;
+                        rr += r;
+                        // report("Parse coords on `%s` (%+d, %+d) -> (%d, %d) "
+                        //        "with the following result:",
+                        //        t->as.id, r, c, rr, cc);
+                        free(t->as.id);
+                        t->as.id = create_id(cc, rr);
+                        // report("%s", t->as.id);
+                }
+                t = t->next;
+        }
+}
+
+Formula *
+formula_extend(Cell *self, Formula *f, int r, int c)
+{
+        Formula *new = calloc(1, sizeof *f);
+        self->value.as.formula = new;
+        self->value.type = TYPE_FORMULA;
+        Token *t = new->tokens = dup_tokens(f->tokens);
+        cell_self = self;
+        report("set cell_self to %p", cell_self);
+        extend_identifiers(t, r, c);
+        report(">>> formula extend <<<<<<<<<<<");
+        new->body = report_ast(get_term(&t));
+        new->value = eval_expr(new->body);
+        report(">>> formula extend end <<<<<<<");
+        return new;
 }

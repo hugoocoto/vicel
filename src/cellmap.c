@@ -5,6 +5,13 @@
 #include "formula.h"
 #include <assert.h>
 
+bool
+cm_is_valid_pos(CellMat *mat, int x, int y)
+{
+        return x >= 0 && x < mat->size &&
+               y >= 0 && y < mat->data->size;
+}
+
 const char *
 cm_type_repr(CellType ct)
 {
@@ -239,4 +246,78 @@ cm_destroy(CellMat *mat)
                 da_destroy(row);
         }
         da_destroy(mat);
+}
+
+static Value
+extend_row(Cell *c, Value origin, int displ)
+{
+        switch (origin.type) {
+        case TYPE_EMPTY:
+        case TYPE_TEXT:
+                return origin;
+        case TYPE_NUMBER:
+                return AS_NUMBER(origin.as.num + abs(displ));
+        case TYPE_FORMULA:
+                origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
+                return origin;
+        default:
+                report("No yet implemented: extend_row for %s",
+                       cm_type_repr(origin.type));
+        }
+        return origin;
+}
+
+static Value
+extend_col(Cell *c, Value origin, int displ)
+{
+        switch (origin.type) {
+        case TYPE_EMPTY:
+        case TYPE_TEXT:
+                return origin;
+        case TYPE_NUMBER:
+                return AS_NUMBER(origin.as.num + abs(displ));
+        case TYPE_FORMULA:
+                origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
+                return origin;
+        default:
+                report("No yet implemented: extend_col for %s",
+                       cm_type_repr(origin.type));
+        }
+        return origin;
+}
+
+static void
+set_extended_value(Cell *c, Value v, int displ_r, int displ_c)
+{
+        Value vnew = v;
+        if (displ_r) vnew = extend_row(c, vnew, displ_r);
+        if (displ_c) vnew = extend_col(c, vnew, displ_c);
+        c->value = vnew;
+        free(c->repr);
+        c->repr = get_repr(c->value);
+}
+
+void
+cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y)
+{
+        if (!cm_is_valid_pos(mat, base_x, base_y)) {
+                report("Invalid position %d, %d in cell matrix", base_x, base_y);
+                return;
+        }
+        if (!cm_is_valid_pos(mat, next_x, next_y)) {
+                report("Invalid position %d, %d in cell matrix", next_x, next_y);
+                return;
+        }
+
+        Value origin = cm_get_cell(mat, base_x, base_y).value;
+        int displ_r = next_x - base_x;
+        int displ_c = next_y - base_y;
+        Cell *next_cell = cm_get_cell_ptr(mat, next_x, next_y);
+
+        report("next_cell at cm_extend: %p", next_cell);
+
+        clear_cell(next_cell);
+        set_extended_value(next_cell, origin, displ_r, displ_c);
+
+        for_da_each(o, next_cell->subscribers) cm_notify(next_cell, *o);
 }

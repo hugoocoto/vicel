@@ -52,10 +52,13 @@ typedef struct Formula {
 
 /* write formula stuff in SELF */
 void build_formula(char *, Cell *self);
+Formula * formula_dup(Formula *f);
 
 Value eval_formula(Formula f);
+void clear_cell(Cell *c);
 Expr *parse_formula(char *, Cell *self);
 void destroy_formula(Cell *c);
 
+Formula * formula_extend(Cell*self, Formula *f, int r, int c);
 
 #endif //! FORMULA_H_

@@ -23,7 +23,7 @@ typedef struct Value {
 #define AS_NUMBER(n) (Value){ \
         .type = TYPE_NUMBER,  \
         .as.num = (n),        \
-};
+}
 
 
 typedef struct Cell {
@@ -76,6 +76,7 @@ void cm_clear_cell(Cell *c);
 
 char *get_repr(Value v);
 
+void cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y);
 const char *cm_type_repr(CellType);
 
 #endif

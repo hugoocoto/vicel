@@ -98,7 +98,7 @@ get_input_at_cursor()
         char *c;
 
         printf(T_SCP());
-        cursor_gotocell(active_ctx.cursor_pos_y + 1, active_ctx.cursor_pos_x + 1);
+        cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         printf("%*s", column_width, "");
         printf(T_CUB(10));
         printf(T_CUSHW());
@@ -210,6 +210,10 @@ start_kbhandler()
         add_action(mappings, "st", ACTION(a_set_cell_type_text));
         add_action(mappings, "d", ACTION(a_set_cell_type_empty));
         add_action(mappings, "sf", ACTION(a_set_cell_type_formula));
+        add_action(mappings, "J", ACTION(a_copy_moving_down));
+        add_action(mappings, "K", ACTION(a_copy_moving_up));
+        add_action(mappings, "H", ACTION(a_copy_moving_left));
+        add_action(mappings, "L", ACTION(a_copy_moving_right));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

@@ -211,14 +211,14 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w, int x0, int
                         if (cell->selected)
                                 printf(EFFECT(CELL_SELECT_BG, CELL_SELECT_FG));
 
-                        if (active_ctx.cursor_pos_x == xx &&
-                            active_ctx.cursor_pos_y == yy)
+                        if (active_ctx.cursor_pos_r == xx &&
+                            active_ctx.cursor_pos_c == yy)
                                 printf(EFFECT(REVERSE));
 
                         printf("[%-*.*s]", min(column_width, av) - 2, min(column_width, av) - 2, cell->repr);
 
-                        if (active_ctx.cursor_pos_x == xx &&
-                            active_ctx.cursor_pos_y == yy)
+                        if (active_ctx.cursor_pos_r == xx &&
+                            active_ctx.cursor_pos_c == yy)
                                 printf(EFFECT(REVERSE_OFF));
 
                         if (cell->selected)
@@ -288,7 +288,7 @@ int
 main(int argc, char *argv[])
 {
         report("---| Starting |---");
-        printf(T_ASBE());
+        // printf(T_ASBE());
         printf(T_CUHDE());
         printf(EFFECT(RESET));
         clear_screen();

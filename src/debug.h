@@ -3,8 +3,10 @@
 
 #include "common.h"
 
+#define DEBUG 1
 #define DEBUG_LOG "report.log"
 
+#if defined(DEBUG) && DEBUG
 static void
 report(char *format, ...)
 {
@@ -20,5 +22,9 @@ report(char *format, ...)
         va_end(arg);
         fclose(file);
 }
+
+#else
+#define report(...)
+#endif
 
 #endif //! DEBUG_H
