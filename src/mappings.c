@@ -2,6 +2,7 @@
 #include "cellmap.h"
 #include "common.h"
 #include "escape_code.h"
+#include "keyboard.h"
 #include "window.h"
 
 inline Cell *
@@ -102,7 +103,7 @@ a_copy_moving_left()
 {
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                  active_ctx.cursor_pos_c , active_ctx.cursor_pos_r- 1);
+                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r - 1);
         a_move_cursor_left();
 }
 
@@ -112,5 +113,33 @@ a_copy_moving_right()
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r + 1);
+        a_move_cursor_right();
+}
+
+void
+a_insert_moving_up()
+{
+        set_cell_text(get_cursor_cell(), get_input_at_cursor());
+        a_move_cursor_up();
+}
+
+void
+a_insert_moving_down()
+{
+        set_cell_text(get_cursor_cell(), get_input_at_cursor());
+        a_move_cursor_down();
+}
+
+void
+a_insert_moving_left()
+{
+        set_cell_text(get_cursor_cell(), get_input_at_cursor());
+        a_move_cursor_left();
+}
+
+void
+a_insert_moving_right()
+{
+        set_cell_text(get_cursor_cell(), get_input_at_cursor());
         a_move_cursor_right();
 }

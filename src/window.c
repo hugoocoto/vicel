@@ -10,8 +10,8 @@
 
 #define CELL_FG FG_BLUE
 #define CELL_BG BG_BLACK
-#define CELL_SELECT_BG BG_GREEN
-#define CELL_SELECT_FG FG_BLACK
+#define CELL_SELECT_FG FG_GREEN
+#define CELL_SELECT_BG BG_BLACK
 
 #define column_width 10
 #define row_width 1
@@ -288,7 +288,7 @@ int
 main(int argc, char *argv[])
 {
         report("---| Starting |---");
-        // printf(T_ASBE());
+        printf(T_ASBE());
         printf(T_CUHDE());
         printf(EFFECT(RESET));
         clear_screen();

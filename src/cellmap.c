@@ -277,7 +277,7 @@ extend_col(Cell *c, Value origin, int displ)
         case TYPE_NUMBER:
                 return AS_NUMBER(origin.as.num + abs(displ));
         case TYPE_FORMULA:
-                origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
+                origin.as.formula = formula_extend(c, origin.as.formula, displ, 0);
                 return origin;
         default:
                 report("No yet implemented: extend_col for %s",

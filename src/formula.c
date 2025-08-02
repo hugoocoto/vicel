@@ -709,18 +709,18 @@ extend_identifiers(Token *t, int r, int c)
         while (t) {
                 if (t->type == TOK_IDENTIFIER) {
                         int rr, cc;
-                        if (parse_coords(t->as.id, &cc, &rr)) {
+                        if (parse_coords(t->as.id, &rr, &cc)) {
                                 report("Impossible to parse coords at: %s", t->as.id);
                                 exit(456);
                         }
                         cc += c;
                         rr += r;
-                        // report("Parse coords on `%s` (%+d, %+d) -> (%d, %d) "
-                        //        "with the following result:",
-                        //        t->as.id, r, c, rr, cc);
+                        report("Parse coords on `%s` (%+d, %+d) -> (%d, %d) "
+                               "with the following result:",
+                               t->as.id, r, c, rr, cc);
                         free(t->as.id);
-                        t->as.id = create_id(cc, rr);
-                        // report("%s", t->as.id);
+                        t->as.id = create_id(rr, cc);
+                        report("%s", t->as.id);
                 }
                 t = t->next;
         }

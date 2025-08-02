@@ -20,6 +20,10 @@ void a_copy_moving_up();
 void a_copy_moving_down();
 void a_copy_moving_left();
 void a_copy_moving_right();
+void a_insert_moving_up();
+void a_insert_moving_down();
+void a_insert_moving_left();
+void a_insert_moving_right();
 
 #endif //!MAPPINGS_H
 

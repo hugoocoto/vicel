@@ -22,6 +22,14 @@ Create, read and write files based on cells. (<- this is the idea)
 - `i`, get_set_cell_input
 - `I`, get_set_selection_input
 - `d`, a_set_cell_type_empty (also known as delete)
+- `J`, expand current cell down and move cursor
+- `K`, expand current cell up and move cursor
+- `H`, expand current cell left and move cursor
+- `L`, expand current cell right and move cursor
+- `gij`, insert text and move cursor down
+- `gik`, insert text and move cursor up
+- `gih`, insert text and move cursor left
+- `gil`, insert text and move cursor right
 
 ## Input text
 

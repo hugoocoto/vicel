@@ -140,23 +140,28 @@ detect_cell_type()
 }
 
 void
+set_cell_text(Cell *c, char *text)
+{
+        if (c->value.type == TYPE_FORMULA) {
+                destroy_formula(c);
+        }
+        free(c->repr);
+        c->repr = text;
+        c->value.as.text = text;
+        c->value.type = TYPE_TEXT;
+        detect_cell_type();
+
+        for_da_each(o, c->subscribers)
+        {
+                cm_notify(c, *o);
+        }
+}
+
+void
 get_set_cell_input()
 {
         char *buf = get_input_at_cursor();
-
-        if (get_cursor_cell()->value.type == TYPE_FORMULA) {
-                destroy_formula(get_cursor_cell());
-        }
-        free(get_cursor_cell()->repr);
-        get_cursor_cell()->repr = buf;
-        get_cursor_cell()->value.as.text = buf;
-        get_cursor_cell()->value.type = TYPE_TEXT;
-        detect_cell_type();
-
-        for_da_each(o, get_cursor_cell()->subscribers)
-        {
-                cm_notify(get_cursor_cell(), *o);
-        }
+        set_cell_text(get_cursor_cell(), buf);
 }
 
 void
@@ -214,6 +219,10 @@ start_kbhandler()
         add_action(mappings, "K", ACTION(a_copy_moving_up));
         add_action(mappings, "H", ACTION(a_copy_moving_left));
         add_action(mappings, "L", ACTION(a_copy_moving_right));
+        add_action(mappings, "gij", ACTION(a_insert_moving_down));
+        add_action(mappings, "gik", ACTION(a_insert_moving_up));
+        add_action(mappings, "gih", ACTION(a_insert_moving_left));
+        add_action(mappings, "gil", ACTION(a_insert_moving_right));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();
