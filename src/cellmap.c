@@ -99,6 +99,27 @@ get_num_repr(double d)
 }
 
 char *
+get_input_repr(Value v)
+{
+        switch (v.type) {
+        case TYPE_NUMBER:
+                return get_num_repr(v.as.num);
+        case TYPE_TEXT:
+                return strdup(v.as.text);
+        case TYPE_FORMULA: {
+                char buffer[1024] = "= \0";
+                get_ast_repr(v.as.formula->body, buffer);
+                return strdup(buffer);
+        }
+        case TYPE_EMPTY:
+                return strdup("");
+        default:
+                report("No yet implemented: get_input_repr for %s", cm_type_repr(v.type));
+                return strdup("Err");
+        }
+}
+
+char *
 get_repr(Value v)
 {
         switch (v.type) {
@@ -119,14 +140,17 @@ get_repr(Value v)
 void
 cm_convert(Cell *c, CellType tnew)
 {
+        report("Call convert with %s -> %s", cm_type_repr(c->value.type), cm_type_repr(tnew));
         if (c->value.type == tnew) return;
 
         if (tnew == TYPE_EMPTY) {
                 __auto_type s = c->subscribers;
                 if (c->value.type == TYPE_FORMULA) {
                         destroy_formula(c);
-                } else
-                        free(c->repr);
+                } else {
+                }
+                free(c->repr);
+                free(c->input_repr);
                 *c = EMPTY_CELL;
                 c->subscribers = s;
                 goto notify;
@@ -143,13 +167,16 @@ cm_convert(Cell *c, CellType tnew)
                         goto no_yet_implemented;
                 }
                 break;
+
         case TYPE_TEXT:
                 switch (tnew) {
                 case TYPE_NUMBER:
                         c->value.type = tnew;
                         c->value.as.num = strtod(c->repr, NULL);
                         free(c->repr);
-                        c->repr = get_num_repr(c->value.as.num);
+                        free(c->input_repr);
+                        c->repr = get_repr(c->value);
+                        c->input_repr = get_input_repr(c->value);
                         break;
                 case TYPE_FORMULA: {
                         build_formula(c->value.as.text, c);
@@ -160,13 +187,16 @@ cm_convert(Cell *c, CellType tnew)
                         goto no_yet_implemented;
                 }
                 break;
+
         case TYPE_EMPTY:
                 switch (tnew) {
                 case TYPE_NUMBER:
                         c->value.type = tnew;
                         c->value.as.num = 0.0;
                         free(c->repr);
-                        c->repr = get_num_repr(c->value.as.num);
+                        free(c->input_repr);
+                        c->repr = get_repr(c->value);
+                        c->input_repr = get_input_repr(c->value);
                         break;
                 case TYPE_TEXT:
                         c->value.type = tnew;
@@ -183,13 +213,17 @@ cm_convert(Cell *c, CellType tnew)
                         free(c->value.as.formula);
                         c->value.as.num = 0.0;
                         free(c->repr);
-                        c->repr = get_num_repr(c->value.as.num);
+                        free(c->input_repr);
+                        c->repr = get_repr(c->value);
+                        c->input_repr = get_input_repr(c->value);
                         break;
                 case TYPE_TEXT:
                         destroy_formula(c);
                         c->value.type = tnew;
                         free(c->value.as.formula);
-                        c->value.as.text = c->repr;
+                        c->value.as.text = c->input_repr;
+                        free(c->repr);
+                        c->repr = strdup(c->input_repr);
                         break;
                 default:
                         goto no_yet_implemented;
@@ -213,6 +247,8 @@ void
 cm_clear_cell(Cell *c)
 {
         free(c->repr);
+        free(c->input_repr);
+
         switch (c->value.type) {
         case TYPE_FORMULA:
                 destroy_formula(c);
@@ -222,17 +258,11 @@ cm_clear_cell(Cell *c)
         case TYPE_EMPTY:
                 break;
         default:
-                report("No yet implemented: get_repr for %s",
+                report("No yet implemented: cm_clear_cell for %s",
                        cm_type_repr(c->value.type));
         }
 }
 
-void
-cm_free_cell(Cell *c)
-{
-        da_destroy(&c->subscribers);
-        cm_clear_cell(c);
-}
 
 void
 cm_destroy(CellMat *mat)
@@ -241,7 +271,18 @@ cm_destroy(CellMat *mat)
         {
                 for_da_each(c, *row)
                 {
-                        cm_free_cell(c);
+                        if (c->value.type == TYPE_FORMULA) {
+                                destroy_formula(c);
+                        }
+                }
+        }
+        for_da_each(row, *mat)
+        {
+                for_da_each(c, *row)
+                {
+                        da_destroy(&c->subscribers);
+                        free(c->repr);
+                        free(c->input_repr);
                 }
                 da_destroy(row);
         }
@@ -258,7 +299,7 @@ extend_row(Cell *c, Value origin, int displ)
         case TYPE_NUMBER:
                 return AS_NUMBER(origin.as.num + abs(displ));
         case TYPE_FORMULA:
-                origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
+                origin.as.formula = formula_extend(c, origin.as.formula, displ, 0);
                 return origin;
         default:
                 report("No yet implemented: extend_row for %s",
@@ -277,7 +318,7 @@ extend_col(Cell *c, Value origin, int displ)
         case TYPE_NUMBER:
                 return AS_NUMBER(origin.as.num + abs(displ));
         case TYPE_FORMULA:
-                origin.as.formula = formula_extend(c, origin.as.formula, displ, 0);
+                origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
                 return origin;
         default:
                 report("No yet implemented: extend_col for %s",
@@ -294,7 +335,9 @@ set_extended_value(Cell *c, Value v, int displ_r, int displ_c)
         if (displ_c) vnew = extend_col(c, vnew, displ_c);
         c->value = vnew;
         free(c->repr);
+        free(c->input_repr);
         c->repr = get_repr(c->value);
+        c->input_repr = get_input_repr(c->value);
 }
 
 void
@@ -320,4 +363,20 @@ cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y)
         set_extended_value(next_cell, origin, displ_r, displ_c);
 
         for_da_each(o, next_cell->subscribers) cm_notify(next_cell, *o);
+}
+
+char *
+cm_get_cell_name(CellMat *cm, Cell *c)
+{
+        int i;
+        int j;
+
+        for (i = 0; i < cm->size; i++) {
+                for (j = 0; j < cm->data->size; j++) {
+                        if (&cm->data[i].data[j] == c) {
+                                return create_id(i, j);
+                        }
+                }
+        }
+        return NULL;
 }

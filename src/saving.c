@@ -12,38 +12,6 @@
 #include <unistd.h>
 
 void
-save(Context *ctx)
-{
-        if (ctx->filename == NULL) {
-                report("Can't save unamed sheet");
-                return;
-        }
-        int fd;
-
-        fd = open(ctx->filename, O_WRONLY | O_CREAT, 0600);
-
-        if (fd < 0) {
-                report("Can't open %s to write", ctx->filename);
-                return;
-        }
-
-        for_da_each(row, *ctx->body)
-        {
-                bool first = true;
-                for_da_each(c, *row)
-                {
-                        if (first) {
-                                dprintf(fd, "%s", c->repr);
-                                first = false;
-                        } else {
-                                dprintf(fd, ",%s", c->repr);
-                        }
-                }
-                write(fd, &"\n", 1);
-        }
-}
-
-void
 load(char *filename, Context *ctx)
 {
         ctx->cursor_pos_c = 0;
@@ -67,6 +35,7 @@ load(char *filename, Context *ctx)
 
         while (fgets(line, sizeof line, f)) {
                 if ((c = strchr(line, '\n'))) *c = 0;
+                report("LOAD `%s`", line);
                 ca = (CellArr) { 0 };
                 c = r = line;
                 bool last = false;
@@ -77,15 +46,59 @@ load(char *filename, Context *ctx)
                                 last = true;
                         }
                         cell = EMPTY_CELL;
-                        set_cell_text(&cell, strdup(r));
+                        free(cell.repr);
+                        cell.repr = strdup(r);
                         da_append(&ca, cell);
                         r = c + 1;
                 } while (!last);
                 da_append(ctx->body, ca);
         }
 
+        for_da_each(row, *ctx->body)
+        {
+                for_da_each(c, *row)
+                {
+                        set_cell_text(c, strdup(c->repr));
+                }
+        }
+
         return;
 
 load_blank:
         ctx->body = cm_init();
+}
+
+void
+save(Context *ctx)
+{
+        if (ctx->filename == NULL) {
+                report("Can't save unamed sheet");
+                return;
+        }
+        int fd;
+
+        fd = open(ctx->filename, O_WRONLY | O_CREAT, 0600);
+
+        if (fd < 0) {
+                report("Can't open %s to write", ctx->filename);
+                return;
+        }
+
+        for_da_each(row, *ctx->body)
+        {
+                bool first = true;
+                for_da_each(c, *row)
+                {
+                        if (first) {
+                                first = false;
+                        } else {
+                                dprintf(fd, ",");
+                                report(",");
+                        }
+                        report("%s", c->input_repr);
+                        dprintf(fd, "%s", c->input_repr);
+                }
+                report("\\n");
+                dprintf(fd, "\n");
+        }
 }

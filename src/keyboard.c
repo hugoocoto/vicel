@@ -146,12 +146,14 @@ set_cell_text(Cell *c, char *text)
                 destroy_formula(c);
         }
 
-        report("free on c.repr = %p", c->repr);
+        // report("free on c.repr = %p", c->repr);
         free(c->repr);
+        free(c->input_repr);
 
-        c->repr = text;
         c->value.as.text = text;
+        c->repr = text;
         c->value.type = TYPE_TEXT;
+        c->input_repr = strdup(c->repr);
         detect_cell_type(c);
 
         for_da_each(o, c->subscribers)
@@ -165,30 +167,6 @@ get_set_cell_input()
 {
         char *buf = get_input_at_cursor();
         set_cell_text(get_cursor_cell(), buf);
-}
-
-void
-get_set_selection_input()
-{
-        char *buf = get_input_at_cursor();
-        for_da_each(ca, *active_ctx.body)
-        {
-                for_da_each(cell, *ca)
-                {
-                        if (cell->selected) {
-                                free(cell->repr);
-                                cell->repr = strdup(buf);
-                                cell->value.as.text = buf;
-                                cell->value.type = TYPE_TEXT;
-
-                                for_da_each(o, cell->subscribers)
-                                {
-                                        cm_notify(cell, *o);
-                                }
-                        }
-                }
-        }
-        free(buf);
 }
 
 void
@@ -213,7 +191,6 @@ start_kbhandler()
         add_action(mappings, "l", ACTION(a_move_cursor_right));
         add_action(mappings, "v", ACTION(a_select_toggle_cell));
         add_action(mappings, "i", ACTION(get_set_cell_input));
-        add_action(mappings, "I", ACTION(get_set_selection_input));
         add_action(mappings, "sd", ACTION(a_set_cell_type_numeric));
         add_action(mappings, "st", ACTION(a_set_cell_type_text));
         add_action(mappings, "d", ACTION(a_set_cell_type_empty));

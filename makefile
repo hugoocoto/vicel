@@ -10,8 +10,8 @@ OUT = $(BUILD_DIR)/00-vicel
 
 test: $(OUT)
 	rm report.log -f
-	./$(OUT)
-# gdb -ex run $(OUT)
+	./$(OUT) untitled
+# gdb -ex run $(OUT) 
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md 
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)

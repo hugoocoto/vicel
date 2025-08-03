@@ -70,8 +70,10 @@ vsub(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
-        else return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER)
+                return AS_NUMBER(-b.as.num);
+        else
+                return AS_NUMBER(0);
 
         report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -85,8 +87,10 @@ vdiv(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
-        else return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER)
+                return AS_NUMBER(0);
+        else
+                return AS_NUMBER(0);
 
         report("No yet implemented: vdiv for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -101,8 +105,10 @@ vmul(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
-        else return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER)
+                return AS_NUMBER(0);
+        else
+                return AS_NUMBER(0);
 
         report("No yet implemented: vsub for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -117,8 +123,10 @@ vpow(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER) return AS_NUMBER(0);
-        else return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER)
+                return AS_NUMBER(0);
+        else
+                return AS_NUMBER(0);
 
         report("No yet implemented: vpow for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -133,8 +141,10 @@ vadd(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER) return b;
-        else return AS_NUMBER(0);
+        if (b.type == TYPE_NUMBER)
+                return b;
+        else
+                return AS_NUMBER(0);
 
         report("No yet implemented: vadd for %s and %s",
                cm_type_repr(a.type), cm_type_repr(b.type));
@@ -284,7 +294,7 @@ get_identifier(char **c)
                 return NULL;
         }
         while ('0' <= **c && **c <= '9') {
-                report("Consume digit %c", **c);
+                // report("Consume digit %c", **c);
                 ++*c;
         }
 
@@ -295,10 +305,10 @@ get_identifier(char **c)
 
         char prev = **c;
         **c = 0;
-        report("call get_identifier id %s", id);
+        // report("call get_identifier id %s", id);
         id = strdup(id);
         **c = prev;
-        report("call get_identifier return %s", id);
+        // report("call get_identifier return %s", id);
         return id;
 }
 
@@ -398,7 +408,10 @@ get_literal(Token **t)
         case TOK_IDENTIFIER: {
                 report("get_literal from identifier %s", (*t)->as.id);
                 Cell *c = get_cell_from_coords((*t)->as.id);
-                assert(c);
+                if (c == NULL) {
+                        report("Can not get cell from id: %s", (*t)->as.id);
+                        exit(56);
+                }
                 *t = (*t)->next;
 
                 if (c == NULL) { // invalid coords
@@ -477,40 +490,43 @@ get_term(Token **t)
         return e;
 }
 
+void
+get_ast_repr(Expr *e, char *buffer)
+{
+        switch (e->type) {
+        case EXPR_LITERAL:
+                sprintf(buffer + strlen(buffer), "%g ", e->as.literal.value.as.num);
+                break;
+        case EXPR_BIN:
+                get_ast_repr(e->as.binop.lhs, buffer);
+                sprintf(buffer + strlen(buffer), "%s ", e->as.binop.op);
+                get_ast_repr(e->as.binop.rhs, buffer);
+                break;
+        case EXPR_UN:
+                sprintf(buffer + strlen(buffer), "%s ", e->as.unop.op);
+                get_ast_repr(e->as.unop.rhs, buffer);
+                break;
+        case EXPR_IDENTIFIER: {
+                char *c;
+                sprintf(buffer + strlen(buffer), "%s ",
+                        c = cm_get_cell_name(active_ctx.body, e->as.identifier.cell));
+                free(c);
+                break;
+        }
+        default:
+                report("No yet implemented: report_ast for %d", e->type);
+                exit(1);
+        }
+}
+
 Expr *
 report_ast(Expr *e)
 {
-        static int indent = 0;
-
         if (e == NULL) return e;
 
-        switch (e->type) {
-        case EXPR_LITERAL:
-                report("%-*sLIT: %g", indent, "", e->as.literal.value.as.num);
-                break;
-        case EXPR_BIN:
-                report("%-*sBINOP: %s", indent, "", e->as.binop.op);
-                indent += 4;
-                report_ast(e->as.binop.lhs);
-                report_ast(e->as.binop.rhs);
-                indent -= 4;
-                break;
-        case EXPR_UN:
-                report("%-*sUNOP: %s", indent, "", e->as.unop.op);
-                indent += 4;
-                report_ast(e->as.unop.rhs);
-                indent -= 4;
-                break;
-        case EXPR_IDENTIFIER:
-                report("%-*sIDENTIFIER:", indent, "");
-                indent += 4;
-                report("%-*scell value: %s", indent, "", e->as.identifier.cell->repr);
-                indent -= 4;
-                break;
-        default:
-                report("No yet implemented: report_ast for %d", e->type);
-                break;
-        }
+        char buffer[1024] = { 0 };
+        get_ast_repr(e, buffer);
+        report("Ast: %s", buffer);
         return e;
 }
 
@@ -588,6 +604,9 @@ build_formula(char *_str, Cell *self)
         self->value.type = TYPE_FORMULA;
         self->value.as.formula->body = parse_formula(str + 1, self);
         refresh_formula_value(self);
+
+        free(self->input_repr);
+        self->input_repr = get_input_repr(self->value);
 
         free(str);
         assert(self->value.type == TYPE_FORMULA);

@@ -20,10 +20,12 @@ typedef struct Value {
         } as;
 } Value;
 
-#define AS_NUMBER(n) (Value){ \
-        .type = TYPE_NUMBER,  \
-        .as.num = (n),        \
-}
+#define AS_NUMBER(n)                 \
+        (Value)                      \
+        {                            \
+                .type = TYPE_NUMBER, \
+                .as.num = (n),       \
+        }
 
 
 typedef struct Cell {
@@ -36,7 +38,8 @@ typedef struct Cell {
         } subscribers;
         Value value;
         int selected;
-        char *repr; // string representation
+        char *repr;       // string representation
+        char *input_repr; // string representation
 } Cell;
 
 typedef DA(Cell) CellArr;
@@ -48,10 +51,15 @@ typedef DA(CellArr) CellMat;
                 .type = TYPE_EMPTY, \
         }
 
-#define EMPTY_CELL                                                                                       \
-        (struct Cell)                                                                                    \
-        {                                                                                                \
-                .width = 20, .heigh = 1, .value = VALUE_EMPTY, .subscribers = { 0 }, .repr = strdup(""), \
+#define EMPTY_CELL                        \
+        (struct Cell)                     \
+        {                                 \
+                .width = 20,              \
+                .heigh = 1,               \
+                .value = VALUE_EMPTY,     \
+                .subscribers = { 0 },     \
+                .repr = strdup(""),       \
+                .input_repr = strdup(""), \
         }
 
 
@@ -71,12 +79,14 @@ void cm_notify(Cell *actor, Cell *observer); // implemented in observer
 void cm_convert(Cell *c, CellType tnew);
 
 void cm_destroy(CellMat *mat);
-void cm_free_cell(Cell *c);
 void cm_clear_cell(Cell *c);
 
 char *get_repr(Value v);
+char *get_input_repr(Value v);
 
 void cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y);
 const char *cm_type_repr(CellType);
+
+char *cm_get_cell_name(CellMat *cm, Cell *c);
 
 #endif

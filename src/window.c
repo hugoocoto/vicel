@@ -81,6 +81,27 @@ repeat:
         if (sscanf(buf, T_CSI "%d;%dR", x, y) != 2) goto repeat;
 }
 
+void
+print_status_bar2()
+{
+        /* Quite hardcoded for now */
+        char status[1024];
+        char buf[1024];
+
+        *status = 0;
+        strcat(status, "Text under the cursor: ");
+        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%*.*s %-*s @",
+                     (int)strlen(status), (int)strlen(status), status,
+                     active_ctx.ws.ws_col - 3 - (int)strlen(status),
+                     get_cursor_cell()->input_repr)] = 0;
+
+        assert(active_ctx.status_bar_height == 1);
+        printCUP(active_ctx.ws.ws_row, 1);
+        printf(EFFECT(BG_BLACK, FG_YELLOW, BOLD));
+        printf("%s", buf);
+        printf(EFFECT(RESET));
+}
+
 char mappings_buffer[24];
 
 void
@@ -252,7 +273,8 @@ render()
         printf(EFFECT(RESET));
         print_status_bar();
         display_add_names(active_ctx.body, 0, 0, active_ctx.ws.ws_row, active_ctx.ws.ws_col + 1, 2, 1);
-        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row, active_ctx.ws.ws_col + 1, 3, 1 + NUM_COL_WIDTH);
+        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row - 1, active_ctx.ws.ws_col + 1, 3, 1 + NUM_COL_WIDTH);
+        print_status_bar2();
         fflush(stdout);
 }
 
