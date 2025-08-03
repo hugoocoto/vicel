@@ -56,4 +56,4 @@ identifiers are one or more alpha followed by one or more numbers. FE: `= C2 + 8
 > It's kinda usable for now. 
 
 ## Latest Version
-Vicel_Unestable_Alpha_Summer_0_00_0_00000_03
+[Latest named version](./version.txt)

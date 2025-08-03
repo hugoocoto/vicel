@@ -8,6 +8,9 @@ OBJ_DIR = ./objs
 BUILD_DIR = .
 OUT = $(BUILD_DIR)/00-vicel
 
+gen: test 
+	./gen_release_version.sh
+
 test: $(OUT)
 	rm report.log -f
 	./$(OUT) untitled
