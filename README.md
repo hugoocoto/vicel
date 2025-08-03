@@ -49,11 +49,17 @@ A number with an optional decimal part separated by a dot.
 Text
 
 ### Formula
-Text that starts with a `=`. It can contain numbers, or cell identifiers. Cell 
-identifiers are one or more alpha followed by one or more numbers. FE: `= C2 + 8.5`
+Text that starts with a `=`. It can contain numbers, or cell identifiers. Cell
+identifiers are one or more alpha followed by one or more numbers. FE: `= C2 +
+8.5`
 
 > [!CAUTION]
 > It's kinda usable for now. 
 
 ## Latest Version
 [Latest named version](./version.txt)
+
+## Flexing on lines
+[Lines written](./wc.md). Little refflexion: the few lines the better, I try
+to flex on how little amount of lines my fully functional program has. (It is
+the idea).
