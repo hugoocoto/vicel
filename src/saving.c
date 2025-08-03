@@ -101,4 +101,6 @@ save(Context *ctx)
                 report("\\n");
                 dprintf(fd, "\n");
         }
+
+        ftruncate(fd, lseek(fd, 0, SEEK_CUR));
 }

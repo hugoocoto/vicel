@@ -10,7 +10,7 @@ src/keyboard.c|39|12|230
 src/aptree.c|28|4|206
 src/escape_code.h|15|17|177
 src/mappings.c|19|0|126
-src/saving.c|13|0|91
+src/saving.c|14|0|92
 src/da.h|14|14|90
 src/flag.h|15|25|87
 src/cellmap.h|20|2|70
@@ -25,4 +25,4 @@ src/keyboard.h|3|0|7
 src/saving.h|3|0|6
 src/main.c|1|5|0
 --------|--------|--------|--------
-SUM:|368|116|2564
+SUM:|369|116|2565
