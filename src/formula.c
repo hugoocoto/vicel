@@ -411,7 +411,7 @@ get_literal(Token **t)
                 Cell *c = get_cell_from_coords((*t)->as.id);
                 if (c == NULL) {
                         report("Can not get cell from id: %s", (*t)->as.id);
-                        exit(56);
+                        return NULL;
                 }
                 *t = (*t)->next;
 
@@ -427,7 +427,7 @@ get_literal(Token **t)
         case TOK_STRING:
         default:
                 report("No yet implemented: get_literal for %d", (*t)->type);
-                exit(123);
+                exit(ERR_GETLITERAL);
         }
 }
 
@@ -441,7 +441,7 @@ get_group(Token **t)
                 if (!match(t, ")")) {
                         // todo: invalid formula
                         report("Expected parenthesis at formula");
-                        exit(112);
+                        exit(ERR_EXPECT);
                 }
                 return e;
         }
@@ -494,6 +494,7 @@ get_term(Token **t)
 void
 get_ast_repr(Expr *e, char *buffer)
 {
+        if (e == NULL) return;
         switch (e->type) {
         case EXPR_LITERAL:
                 sprintf(buffer + strlen(buffer), "%g ", e->as.literal.value.as.num);
@@ -516,7 +517,7 @@ get_ast_repr(Expr *e, char *buffer)
         }
         default:
                 report("No yet implemented: report_ast for %d", e->type);
-                exit(1);
+                exit(ERR_REPAST);
         }
 }
 
@@ -597,7 +598,7 @@ build_formula(char *_str, Cell *self)
 
         if (*str != '=') {
                 report("Invalid formula: `%s` does not start with `=`", str);
-                exit(2);
+                exit(ERR_INVFORM);
         }
 
         clear_cell(self);
@@ -620,7 +621,7 @@ cm_notify(Cell *actor, Cell *observer)
         if (observer->value.type != TYPE_FORMULA) {
                 report("Invalid cm_notify for observer type %s",
                        cm_type_repr(observer->value.type));
-                exit(987);
+                exit(ERR_OBSVAL);
         }
 
         refresh_formula_value(observer);
@@ -629,6 +630,7 @@ cm_notify(Cell *actor, Cell *observer)
 void
 free_expr(Expr *e)
 {
+        if (e == NULL) return;
         switch (e->type) {
         case EXPR_BIN:
                 free_expr(e->as.binop.lhs);
@@ -686,17 +688,17 @@ dup_tokens(Token *t)
 }
 
 char *
-create_id(int x, int y)
+create_id(int r, int c)
 {
         char buf[32];
         int start = 0;
         do {
                 memcpy(buf + 1, buf, start + 1);
-                buf[start] = 'A' + y % ('Z' - 'A' + 1);
-                y /= 'Z' - 'A' + 1;
+                buf[start] = 'A' + c % ('Z' - 'A' + 1);
+                c /= 'Z' - 'A' + 1;
                 ++start;
-        } while (y);
-        snprintf(buf + start, sizeof buf - start, "%d", x);
+        } while (c);
+        snprintf(buf + start, sizeof buf - start, "%d", r);
         return strdup(buf);
 }
 
@@ -712,27 +714,29 @@ test_create_id()
         free(c2);
 }
 
-static void
+static int
 extend_identifiers(Token *t, int r, int c)
 {
+        // return 0 on success
         while (t) {
                 if (t->type == TOK_IDENTIFIER) {
                         int rr, cc;
-                        if (parse_coords(t->as.id, &rr, &cc)) {
+                        if (parse_coords(t->as.id, &cc, &rr)) {
                                 report("Impossible to parse coords at: %s", t->as.id);
-                                exit(456);
+                                return 1;
                         }
                         cc += c;
                         rr += r;
                         report("Parse coords on `%s` (%+d, %+d) -> (%d, %d) "
                                "with the following result:",
-                               t->as.id, r, c, rr, cc);
+                               t->as.id, c, r, cc, rr);
                         free(t->as.id);
                         t->as.id = create_id(rr, cc);
                         report("%s", t->as.id);
                 }
                 t = t->next;
         }
+        return 0;
 }
 
 Formula *
@@ -744,7 +748,10 @@ formula_extend(Cell *self, Formula *f, int r, int c)
         Token *t = new->tokens = dup_tokens(f->tokens);
         cell_self = self;
         report("set cell_self to %p", cell_self);
-        extend_identifiers(t, r, c);
+        if (extend_identifiers(t, r, c)) {
+                report("Can not extend formula");
+                return NULL;
+        }
         report(">>> formula extend <<<<<<<<<<<");
         new->body = report_ast(get_term(&t));
         new->value = eval_expr(new->body);

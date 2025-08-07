@@ -3,6 +3,19 @@
 
 #include "common.h"
 
+enum ErrorCode {
+        ERR_NONE = 0,
+        ERR_CELFROMID,
+        ERR_GETLITERAL,
+        ERR_EXPECT,
+        ERR_PARSECOORDS,
+        ERR_INVBODY,
+        ERR_REPAST,
+        ERR_INVFORM,
+        ERR_OBSVAL,
+        ERR_STDIN,
+};
+
 #define DEBUG_LOG "report.log"
 
 #if defined(DEBUG) && DEBUG

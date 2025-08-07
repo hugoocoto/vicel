@@ -8,7 +8,7 @@
 inline Cell *
 get_cursor_cell()
 {
-        return cm_get_cell_ptr(active_ctx.body, active_ctx.cursor_pos_r, active_ctx.cursor_pos_c);
+        return cm_get_cell_ptr(active_ctx.body, active_ctx.cursor_pos_c, active_ctx.cursor_pos_r);
 }
 
 void
@@ -101,7 +101,7 @@ a_copy_moving_up()
 {
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                  active_ctx.cursor_pos_c - 1, active_ctx.cursor_pos_r);
+                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r - 1);
         a_move_cursor_up();
 }
 
@@ -110,7 +110,7 @@ a_copy_moving_down()
 {
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                  active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r);
+                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r + 1);
         a_move_cursor_down();
 }
 
@@ -119,7 +119,7 @@ a_copy_moving_left()
 {
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r - 1);
+                  active_ctx.cursor_pos_c - 1, active_ctx.cursor_pos_r);
         a_move_cursor_left();
 }
 
@@ -128,7 +128,7 @@ a_copy_moving_right()
 {
         cm_extend(active_ctx.body,
                   active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r + 1);
+                  active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r);
         a_move_cursor_right();
 }
 

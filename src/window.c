@@ -9,22 +9,21 @@
 Context active_ctx = INIT_CONTEXT;
 
 int
-parse_coords(char *coords, int *x, int *y)
+parse_coords(char *c, int *x, int *y)
 {
-        char *c = coords;
         *x = 0;
         *y = 0;
 
         if (!isalpha(*c)) return 1;
         while (isalpha(*c)) {
-                *y *= 'Z' - 'A' + 1;
-                *y += toupper(*c) - 'A';
+                *x *= 'Z' - 'A' + 1;
+                *x += toupper(*c) - 'A';
                 ++c;
         }
         if (*c < '0' || *c > '9') return 1;
         while ('0' <= *c && *c <= '9') {
-                *x *= 10;
-                *x += *c - '0';
+                *y *= 10;
+                *y += *c - '0';
                 ++c;
         }
         return 0;
@@ -36,17 +35,17 @@ get_cell_from_coords(char *coords)
         int x, y;
         if (parse_coords(coords, &x, &y)) {
                 report("Impossible to parse coords: %s", coords);
-                exit(443);
+                return NULL;
         }
         if (active_ctx.body == NULL) {
                 report("get_cell_from_coords: using no yet initialized body", x, coords);
-                exit(444);
+                exit(ERR_INVBODY);
         }
-        if (x < 0 || x >= active_ctx.body->size) {
-                report("Invalid x coord: %d from %s", x, coords);
+        if (y < 0 || y >= active_ctx.body->size) {
+                report("Invalid y coord: %d from %s", y, coords);
                 return NULL;
         }
-        if (y < 0 || y >= active_ctx.body->data->size) {
+        if (x < 0 || x >= active_ctx.body->data->size) {
                 report("Invalid x coord: %d from %s", x, coords);
                 return NULL;
         }
@@ -64,10 +63,10 @@ get_current_position(int *x, int *y)
 repeat:
         if ((n = read(STDIN_FILENO, buf, sizeof buf - 1)) < 0) {
                 report("Error reading stdin from get_current_position");
-                exit(1);
+                exit(ERR_STDIN);
         }
         buf[n] = 0;
-        if (sscanf(buf, T_CSI "%d;%dR", x, y) != 2) goto repeat;
+        if (sscanf(buf, T_CSI "%d;%dR", y, x) != 2) goto repeat;
 }
 
 void
@@ -146,7 +145,7 @@ cursor_gotocell(int x, int y)
 {
         int first_cell_col = 1;
         int first_cell_row = 2;
-        T_CUP(first_cell_row + row_width * x, num_col_width + first_cell_col + column_width * (y - 1));
+        T_CUP(first_cell_row + row_width * y, num_col_width + first_cell_col + column_width * (x - 1));
 }
 
 void

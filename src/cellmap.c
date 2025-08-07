@@ -8,8 +8,8 @@
 bool
 cm_is_valid_pos(CellMat *mat, int x, int y)
 {
-        return x >= 0 && x < mat->size &&
-               y >= 0 && y < mat->data->size;
+        return y >= 0 && y < mat->size &&
+               x >= 0 && x < mat->data->size;
 }
 
 const char *
@@ -68,6 +68,8 @@ void
 cm_unsubscribe(Cell *actor, Cell *observer)
 {
         int i = 0;
+        if (!actor || !actor->subscribers.data) return;
+
         for (; i < actor->subscribers.size; i++) {
                 if (actor->subscribers.data[i] == observer) {
                         da_remove(&actor->subscribers, i);
@@ -81,13 +83,13 @@ cm_unsubscribe(Cell *actor, Cell *observer)
 Cell *
 cm_get_cell_ptr(CellMat *mat, int x, int y)
 {
-        return &mat->data[x].data[y];
+        return &mat->data[y].data[x];
 }
 
 Cell
 cm_get_cell(CellMat *mat, int x, int y)
 {
-        return mat->data[x].data[y];
+        return mat->data[y].data[x];
 }
 
 char *
@@ -300,6 +302,10 @@ extend_row(Cell *c, Value origin, int displ)
                 return AS_NUMBER(origin.as.num + abs(displ));
         case TYPE_FORMULA:
                 origin.as.formula = formula_extend(c, origin.as.formula, displ, 0);
+                if (origin.as.formula == NULL) {
+                        clear_cell(c);
+                        origin = c->value;
+                }
                 return origin;
         default:
                 report("No yet implemented: extend_row for %s",
@@ -319,6 +325,10 @@ extend_col(Cell *c, Value origin, int displ)
                 return AS_NUMBER(origin.as.num + abs(displ));
         case TYPE_FORMULA:
                 origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
+                if (origin.as.formula == NULL) {
+                        clear_cell(c);
+                        origin = c->value;
+                }
                 return origin;
         default:
                 report("No yet implemented: extend_col for %s",
@@ -353,8 +363,8 @@ cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y)
         }
 
         Value origin = cm_get_cell(mat, base_x, base_y).value;
-        int displ_r = next_x - base_x;
-        int displ_c = next_y - base_y;
+        int displ_c = next_x - base_x;
+        int displ_r = next_y - base_y;
         Cell *next_cell = cm_get_cell_ptr(mat, next_x, next_y);
 
         report("next_cell at cm_extend: %p", next_cell);

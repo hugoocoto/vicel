@@ -97,7 +97,7 @@ get_input_at_cursor()
         char *c;
 
         T_SCP();
-        cursor_gotocell(active_ctx.cursor_pos_r + 1, active_ctx.cursor_pos_c + 1);
+        cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         printf("%*s", column_width, "");
         T_CUB(column_width - 1);
         T_CUSHW();

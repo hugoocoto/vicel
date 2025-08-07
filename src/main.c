@@ -45,7 +45,7 @@ main(int argc, char *argv[])
         flag_set(&argc, &argv);
         if (flag_get_value(&filename, "-m", "--use-mouse")) {
                 printf("Are you idiot?\n");
-                exit(0);
+                exit(ERR_NONE);
         }
 
         if (argc == 2) {

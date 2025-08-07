@@ -26,6 +26,7 @@ else
 endif
 
 debug: $(OUT)
+	gdb -ex run $(OUT)
 
 release: $(OUT)
 
