@@ -8,7 +8,7 @@
 inline Cell *
 get_cursor_cell()
 {
-        return cm_get_cell_ptr(active_ctx.body, active_ctx.cursor_pos_c, active_ctx.cursor_pos_r);
+        return cm_get_cell_ptr(active_ctx.body, active_ctx.cursor_pos_r, active_ctx.cursor_pos_c);
 }
 
 void
@@ -25,29 +25,45 @@ a_add_col()
 void
 a_move_cursor_left()
 {
-        if (active_ctx.cursor_pos_r)
-                --active_ctx.cursor_pos_r;
+        if (active_ctx.cursor_pos_c == 0)
+                return;
+        --active_ctx.cursor_pos_c;
+        if (active_ctx.scroll_c > active_ctx.cursor_pos_c) {
+                --active_ctx.scroll_c;
+        }
 }
 
 void
 a_move_cursor_right()
 {
-        if (active_ctx.cursor_pos_r < active_ctx.body->data->size - 1)
-                ++active_ctx.cursor_pos_r;
+        if (active_ctx.cursor_pos_c >= active_ctx.body->data->size - 1)
+                return;
+        ++active_ctx.cursor_pos_c;
+        if (active_ctx.cursor_pos_c >= active_ctx.scroll_c + active_ctx.max_display_c) {
+                ++active_ctx.scroll_c;
+        }
 }
 
 void
 a_move_cursor_up()
 {
-        if (active_ctx.cursor_pos_c)
-                --active_ctx.cursor_pos_c;
+        if (active_ctx.cursor_pos_r == 0)
+                return;
+        --active_ctx.cursor_pos_r;
+        if (active_ctx.scroll_r > active_ctx.cursor_pos_r) {
+                --active_ctx.scroll_r;
+        }
 }
 
 void
 a_move_cursor_down()
 {
-        if (active_ctx.cursor_pos_c < active_ctx.body->size - 1)
-                ++active_ctx.cursor_pos_c;
+        if (active_ctx.cursor_pos_r >= active_ctx.body->size - 1)
+                return;
+        ++active_ctx.cursor_pos_r;
+        if (active_ctx.cursor_pos_r >= active_ctx.scroll_r + active_ctx.max_display_r) {
+                ++active_ctx.scroll_r;
+        }
 }
 
 void
@@ -142,4 +158,41 @@ a_insert_moving_right()
 {
         set_cell_text(get_cursor_cell(), get_input_at_cursor());
         a_move_cursor_right();
+}
+
+void
+a_goto_max_left()
+{
+        active_ctx.cursor_pos_c = 0;
+        active_ctx.scroll_c = 0;
+}
+
+void
+a_goto_max_right()
+{
+        active_ctx.cursor_pos_c = active_ctx.body->data[0].size - 1;
+        active_ctx.scroll_c = active_ctx.cursor_pos_c - active_ctx.max_display_c + 1;
+        if (active_ctx.scroll_c < 0) active_ctx.scroll_c = 0;
+}
+
+void
+a_goto_top()
+{
+        active_ctx.cursor_pos_r = 0;
+        active_ctx.scroll_r = 0;
+}
+
+void
+a_goto_bottom()
+{
+        active_ctx.cursor_pos_r = active_ctx.body->size - 1;
+        active_ctx.scroll_r = active_ctx.cursor_pos_r - active_ctx.max_display_r + 1;
+        if (active_ctx.scroll_r < 0) active_ctx.scroll_r = 0;
+}
+
+void
+a_goto_top_left()
+{
+        a_goto_top();
+        a_goto_max_left();
 }

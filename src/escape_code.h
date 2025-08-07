@@ -6,8 +6,7 @@
  * Api usage: Printf it
  *
  * Referece: https://en.wikipedia.org/wiki/ANSI_escape_code
- * */ 
-
+ * */
 
 
 /* C0 control codes */
@@ -34,45 +33,38 @@
 #define M(n, ...) __VA_OPT__(N(__VA_ARGS__))
 
 /* Control Secuente Introducer commands */
-#define T_CUU(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "A"
-#define T_CUD(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "B"
-#define T_CUF(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "C"
-#define T_CUB(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "D"
-#define T_CNL(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "E"
-#define T_CPL(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "F"
-#define T_CHA(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "G"
-#define T_CUP(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) __VA_OPT__(";" M(__VA_ARGS__)) "H"
-#define T_ED(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "J"
-#define T_EL(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "K"
-#define T_SU(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "S"
-#define T_SD(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "T"
-#define T_HVP(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) __VA_OPT__(";" M(__VA_ARGS__)) "f"
-#define T_SGR(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) ""
-#define T_APON(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "5i"
-#define T_APOFF(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "4i"
-#define T_DSR(...) T_CSI __VA_OPT__(N(__VA_ARGS__)) "6n"
+#define T_CUU(n) printf(T_CSI "%dA", n)
+#define T_CUD(n) printf(T_CSI "%dB", n)
+#define T_CUF(n) printf(T_CSI "%dC", n)
+#define T_CUB(n) printf(T_CSI "%dD", n)
+#define T_CNL(n) printf(T_CSI "%dE", n)
+#define T_CPL(n) printf(T_CSI "%dF", n)
+#define T_CHA(n) printf(T_CSI "%dG", n)
+#define T_CUP(r, c) printf(T_CSI "%d;%dH", r, c)
+#define T_ED(n) printf(T_CSI "%dJ", n)
+#define T_EL(n) printf(T_CSI "%dK", n)
+#define T_SU(n) printf(T_CSI "%dS", n)
+#define T_SD(n) printf(T_CSI "%dT", n)
+#define T_HVP(r, c) printf(T_CSI "%d;%df", r, c)
+#define T_SGR(n) printf(T_CSI "%d", n)
 
-#define printCUP(r, c) printf(T_CSI  "%d;%dH", r, c)
+#define T_APON() printf(T_CSI "5i")
+#define T_APOFF() printf(T_CSI "4i")
+#define T_DSR() printf(T_CSI "6n")
 
 /* Private sequences */
-#define T_SCP(...) T_CSI "s"       // save current cursor position
-#define T_RCP(...) T_CSI "u"       // restore saved cursor position
-#define T_CUSHW(...) T_CSI "?25h"  // show cursor
-#define T_CUHDE(...) T_CSI "?25l"  // hide cursor
-#define T_RFE(...) T_CSI "?1004h"  // enable report focus. Enter focus as `ESC [I`, exit as `ESC [O`
-#define T_RFD(...) T_CSI "?1004l"  // disable report focus.
-#define T_ASBE(...) T_CSI "?1049h" // enable alternative screen buffer
-#define T_ASBD(...) T_CSI "?1049l" // disable alternative screen buffer
-#define T_BPME(...) T_CSI "?2004h" // enable bracketed paste mode
-#define T_BPMD(...) T_CSI "?2004l" // disable bracketed paste mode
+#define T_SCP() printf(T_CSI "s")       // save current cursor position
+#define T_RCP() printf(T_CSI "u")       // restore saved cursor position
+#define T_CUSHW() printf(T_CSI "?25h")  // show cursor
+#define T_CUHDE() printf(T_CSI "?25l")  // hide cursor
+#define T_RFE() printf(T_CSI "?1004h")  // enable report focus. Enter focus as `ESC [I`, exit as `ESC [O`
+#define T_RFD() printf(T_CSI "?1004l")  // disable report focus.
+#define T_ASBE() printf(T_CSI "?1049h") // enable alternative screen buffer
+#define T_ASBD() printf(T_CSI "?1049l") // disable alternative screen buffer
+#define T_BPME() printf(T_CSI "?2004h") // enable bracketed paste mode
+#define T_BPMD() printf(T_CSI "?2004l") // disable bracketed paste mode
 
 /* Select Graphic Rendition parameters */
-
-/* API:
- *   EFFECT(FG_BLUE , BG_BLACK);  -- max 12 effects in the same call
- */
-
-#define GR_JOIN ";"
 #define _EFJOIN00(ef, ...) #ef __VA_OPT__(";" _EFJOIN01(__VA_ARGS__))
 #define _EFJOIN01(ef, ...) #ef __VA_OPT__(";" _EFJOIN02(__VA_ARGS__))
 #define _EFJOIN02(ef, ...) #ef __VA_OPT__(";" _EFJOIN03(__VA_ARGS__))
@@ -85,7 +77,9 @@
 #define _EFJOIN09(ef, ...) #ef __VA_OPT__(";" _EFJOIN10(__VA_ARGS__))
 #define _EFJOIN10(ef, ...) #ef __VA_OPT__(";" _EFJOIN11(__VA_ARGS__))
 #define _EFJOIN11(ef, ...) #ef
-#define EFFECT(...) T_CSI __VA_OPT__(_EFJOIN00(__VA_ARGS__)) "m"
+
+#define EFFECT(...) printf(T_CSI __VA_OPT__(_EFJOIN00(__VA_ARGS__)) "m")
+#define COL(c) printf(T_CSI "%dm", c)
 
 #define RESET 0
 #define NORMAL 0
@@ -199,11 +193,14 @@
 #define CYAN 6
 #define WHITE 7
 
-#define FG_IND(i) FG_SET "35:5:" #i
-#define BG_IND(i) BG_SET "45:5:" #i
 #define FG_RGB(r, g, b) FG_SET "38;2;" #r ";" #g ";" #b "m"
 #define BG_RGB(r, g, b) FG_SET "48;2;" #r ";" #g ";" #b "m"
 
-#define SET_WINDOW_TITLE(f, title) fprintf(f, T_OSC "0;%s " T_BEL, title)
-#define HYPRLINK(f, link) fprintf(f, T_OSC "8;;%s " T_ST, link)
-#define SET_PALETTE(f, n, rr, gg, bb) printf(f, T_OSC "P %d %d %d %d " ST)
+#define COL_FG_RGB(r, g, b) printf(FG_SET "38;2;%d;%d;%d;m", r, g, b)
+#define COL_BG_RGB(r, g, b) printf(FG_SET "48;2;%d;%d;%d;m", r, g, b)
+
+#define SET_WINDOW_TITLE(title) printf(T_OSC "0;%s " T_BEL, title)
+#define HYPRLINK(link) printf(T_OSC "8;;%s " T_ST, link)
+#define SET_PALETTE(n, rr, gg, bb) printf(T_OSC "P %d %d %d %d " ST, n, rr, gg, bb)
+
+#define clear_screen() printf("\033[K\033[2J"); // clear screen

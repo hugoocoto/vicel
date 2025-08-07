@@ -3,7 +3,6 @@
 
 #include "common.h"
 
-#define DEBUG 1
 #define DEBUG_LOG "report.log"
 
 #if defined(DEBUG) && DEBUG
@@ -14,7 +13,7 @@ report(char *format, ...)
         FILE *file = fopen(DEBUG_LOG, "a");
         va_start(arg, format);
         time_t t = time(0);
-        char * strt = ctime(&t);
+        char *strt = ctime(&t);
         *strchr(strt, 10) = 0;
         fprintf(file, "[%s] ", strt);
         vfprintf(file, format, arg);

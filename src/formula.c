@@ -53,6 +53,7 @@ are_valid_operands(Value a, Value b)
         case TYPE_NUMBER:
                 if (b.type == TYPE_FORMULA) return are_valid_operands(a, b.as.formula->value);
                 if (b.type == TYPE_NUMBER) return true;
+                return false;
         case TYPE_TEXT:
         case TYPE_EMPTY:
         default:
@@ -612,21 +613,10 @@ build_formula(char *_str, Cell *self)
         assert(self->value.type == TYPE_FORMULA);
 }
 
-static __attribute__((constructor)) void
-test()
-{
-        // assert(eval_expr(report_ast(parse_formula(""))).as.num == 0);
-        // assert(eval_expr(report_ast(parse_formula("1"))).as.num == 1);
-        // assert(eval_expr(report_ast(parse_formula("1.6"))).as.num == 1.6);
-        // assert(eval_expr(report_ast(parse_formula("-1.6"))).as.num == -1.6);
-        // assert(eval_expr(report_ast(parse_formula("1 + 1.6"))).as.num == 2.6);
-        // assert(eval_expr(report_ast(parse_formula("1.0 - 1.0"))).as.num == 0.0);
-        // assert(eval_expr(report_ast(parse_formula("-1.0 - 1.0 + 2.0"))).as.num == 0.0);
-}
-
 void
 cm_notify(Cell *actor, Cell *observer)
 {
+        actor = actor;
         if (observer->value.type != TYPE_FORMULA) {
                 report("Invalid cm_notify for observer type %s",
                        cm_type_repr(observer->value.type));

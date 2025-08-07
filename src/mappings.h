@@ -2,7 +2,7 @@
 #define MAPPINGS_H
 
 #include "cellmap.h"
-Cell * get_cursor_cell();
+Cell *get_cursor_cell();
 
 void a_quit();
 void a_add_row();
@@ -24,6 +24,10 @@ void a_insert_moving_up();
 void a_insert_moving_down();
 void a_insert_moving_left();
 void a_insert_moving_right();
+void a_goto_top_left();
+void a_goto_max_left();
+void a_goto_max_right();
+void a_goto_top();
+void a_goto_bottom();
 
-#endif //!MAPPINGS_H
-
+#endif //! MAPPINGS_H

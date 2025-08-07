@@ -4,18 +4,7 @@
 #include "da.h"
 #include "debug.h"
 #include "escape_code.h"
-#include "flag.h"
-#include "keyboard.h"
 #include "mappings.h"
-#include "saving.h"
-
-#define CELL_FG FG_BLUE
-#define CELL_BG BG_BLACK
-#define CELL_SELECT_FG FG_GREEN
-#define CELL_SELECT_BG BG_BLACK
-
-#define column_width 10
-#define row_width 1
 
 Context active_ctx = INIT_CONTEXT;
 
@@ -68,7 +57,7 @@ void
 get_current_position(int *x, int *y)
 {
         // starting at 1,1
-        printf(T_DSR());
+        T_DSR();
         fflush(stdout);
         char buf[1024];
         ssize_t n;
@@ -91,15 +80,15 @@ print_status_bar2()
         *status = 0;
         strcat(status, "Text under the cursor: ");
         buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%*.*s %-*s @",
-                     (int)strlen(status), (int)strlen(status), status,
-                     active_ctx.ws.ws_col - 3 - (int)strlen(status),
+                     (int) strlen(status), (int) strlen(status), status,
+                     active_ctx.ws.ws_col - 3 - (int) strlen(status),
                      get_cursor_cell()->input_repr)] = 0;
 
         assert(active_ctx.status_bar_height == 1);
-        printCUP(active_ctx.ws.ws_row, 1);
-        printf(EFFECT(BG_BLACK, FG_YELLOW, BOLD));
+        T_CUP(active_ctx.ws.ws_row, 1);
+        EFFECT(UI_BG, UI_FG, BOLD);
         printf("%s", buf);
-        printf(EFFECT(RESET));
+        EFFECT(RESET);
 }
 
 char mappings_buffer[24];
@@ -122,10 +111,10 @@ print_status_bar()
                      15, cm_type_repr(get_cursor_cell()->value.type))] = 0;
 
         assert(active_ctx.status_bar_height == 1);
-        printf(T_CUP()); // go to top left corner
-        printf(EFFECT(BG_BLACK, FG_YELLOW, BOLD));
+        T_CUP(1, 1);
+        EFFECT(UI_BG, UI_FG, BOLD);
         printf("%s", buf);
-        printf(EFFECT(RESET));
+        EFFECT(RESET);
 }
 
 void
@@ -146,196 +135,167 @@ print_mapping_buffer(char *buf, int len, int n, int repeat)
 void
 print_at(int r, int c, char *buf, int buflen, int n)
 {
-        printf(T_SCP());
-        printCUP(r, c);
+        T_SCP();
+        T_CUP(r, c);
         printf("%*.*s", n, buflen, buf);
-        printf(T_RCP());
+        T_RCP();
 }
 
-#define min(a, b) ((a) < (b) ? (a) : (b))
-
-#define NUM_COL_WIDTH 5
 void
 cursor_gotocell(int x, int y)
 {
         int first_cell_col = 1;
         int first_cell_row = 2;
-        printCUP(first_cell_row + row_width * x, NUM_COL_WIDTH + first_cell_col + column_width * (y - 1));
+        T_CUP(first_cell_row + row_width * x, num_col_width + first_cell_col + column_width * (y - 1));
 }
 
 void
-display_add_names(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w, int x0, int y0)
+display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int y0)
 {
-        int cx = x0;
-        int cy = y0;
-        int av = scr_w - cy;
-        char *col = strdup("A");
-        int n = 0;
+        int _cy = y0;
+        int _cx = x0;
+        int avx = scr_w - _cx;
+        int avy = scr_h - _cy;
+        char *col = strdup("  "); // Up to ZZ
+        int range = 'Z' - 'A' + 1;
+        int xx = 0;
+        int n;
 
-        printf(EFFECT(BG_BLACK, FG_YELLOW));
-
-        cy += NUM_COL_WIDTH;
-        av -= NUM_COL_WIDTH;
+        T_CUP(_cy, _cx);
+        EFFECT(UI_BG, UI_FG);
 
         /* The top left gap */
-        printf("%-*.*s", NUM_COL_WIDTH, NUM_COL_WIDTH, "");
+        printf("%-*.*s", num_col_width, num_col_width, "");
 
-        printCUP(cx, cy);
+        _cx += num_col_width;
+        avx -= num_col_width;
+        avy -= row_width;
+
+        col[1] = 'A' + x_off % range;
+        if (x_off / range) col[0] = 'A' + x_off / range - 1;
 
         for_da_each(cell, *mat->data)
         {
-                int wwww = min(column_width, av);
+                if (xx < x_off) {
+                        ++xx;
+                        continue;
+                }
+                int wwww = min(column_width, avx);
                 int ww = wwww / 2;
                 printf("%*.*s%*.*s", ww, ww, col,
                        wwww - ww, wwww - ww, "");
 
-                cy += column_width;
-                av -= column_width;
-                if (av <= 0) break;
-                col[0]++;
-        }
+                _cx += column_width;
+                avx -= column_width;
+                if (avx <= 0) break;
 
-        cx = x0 += row_width;
-        cy = y0;
-
-        for_da_each(_, *mat)
-        {
-                printCUP(cx, cy);
-                printf("%*d ", NUM_COL_WIDTH - 1, n);
-                cx += row_width;
-                n++;
+                if (col[1] == 'Z') {
+                        col[1] = 'A';
+                        col[0] = (col[0] == ' ') ? 'A' : col[0] + 1;
+                        if (col[0] == 'Z') {
+                                /* For now it don't support more than this */
+                                break;
+                        }
+                } else {
+                        col[1] += 1;
+                }
+                report("Column name: %s", col);
         }
 
         free(col);
-        printf(EFFECT(RESET));
+        _cy = y0 += row_width;
+        _cx = x0;
+        n = y_off;
+        int yy = 0;
+        for_da_each(_, *mat)
+        {
+                if (yy < y_off) {
+                        ++yy;
+                        continue;
+                }
+                T_CUP(_cy, _cx);
+                printf("%*d ", num_col_width - 1, n);
+                _cy += row_width;
+                avy -= row_width;
+                if (avy <= 0) break;
+                n++;
+        }
+
+        EFFECT(RESET);
 }
 
-/* Print the submatrix of mat, starting at x_off and y_off (top left) that
- * fits into the screen, starting at cursor position with the size
- * scr_x x scr_h. It doesn't need to be left neither top aligned. */
-
 void
-cm_display(CellMat *mat, int x_off, int y_off, int scr_h, int scr_w, int x0, int y0)
+cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int y0)
 {
-        printf(EFFECT(CELL_BG, CELL_FG));
-        int cx = x0;
-        int cy = y0;
-        int av = scr_w - cy;
-        int xx = 0;
+        EFFECT(CELL_BG, CELL_FG);
+        int _cy = y0;
+        int _cx;
+        int avx;
+        int avy;
+        int xx;
         int yy = 0;
+        int m_r = 0;
+        int m_c = 0;
+        avy = scr_h - _cy;
         for_da_each(ca, *mat)
         {
+                if (yy < y_off) {
+                        ++yy;
+                        continue;
+                }
+                ++m_r;
+                _cx = x0;
+                avx = scr_w - _cx;
+                xx = 0;
+                m_c = 0;
                 for_da_each(cell, *ca)
                 {
-                        printCUP(cx, cy); // can optimize this
+                        if (xx < x_off) {
+                                ++xx;
+                                continue;
+                        }
+                        ++m_c;
+                        T_CUP(_cy, _cx);
                         assert(cell->heigh == 1);
 
                         if (cell->selected)
-                                printf(EFFECT(CELL_SELECT_BG, CELL_SELECT_FG));
+                                EFFECT(CELL_SELECT_BG, CELL_SELECT_FG);
 
-                        if (active_ctx.cursor_pos_r == xx &&
-                            active_ctx.cursor_pos_c == yy)
-                                printf(EFFECT(REVERSE));
+                        if (active_ctx.cursor_pos_r == yy &&
+                            active_ctx.cursor_pos_c == xx)
+                                EFFECT(REVERSE);
 
-                        printf("[%-*.*s]", min(column_width, av) - 2, min(column_width, av) - 2, cell->repr);
+                        printf("[%-*.*s]", min(column_width, avx) - 2, min(column_width, avx) - 2, cell->repr);
 
-                        if (active_ctx.cursor_pos_r == xx &&
-                            active_ctx.cursor_pos_c == yy)
-                                printf(EFFECT(REVERSE_OFF));
+                        if (active_ctx.cursor_pos_r == yy &&
+                            active_ctx.cursor_pos_c == xx)
+                                EFFECT(REVERSE_OFF);
 
                         if (cell->selected)
-                                printf(EFFECT(CELL_BG, CELL_FG));
+                                EFFECT(CELL_BG, CELL_FG);
 
-                        cy += column_width;
-                        av -= column_width;
-                        if (av <= 0) break;
+                        _cx += column_width;
+                        avx -= column_width;
+                        if (avx <= 0) break;
                         ++xx;
                 }
-                cx += row_width;
-                cy = y0;
-                av = scr_w - cy;
-                xx = 0;
+                avy -= row_width;
+                _cy += row_width;
                 ++yy;
+                if (avy <= 0) break;
         }
-        printf(EFFECT(RESET));
-}
-
-void
-clear_screen()
-{
-        printf(T_ED() T_CUP()); // clear screen
-        fflush(stdout);
+        EFFECT(RESET);
+        active_ctx.max_display_c = m_c;
+        active_ctx.max_display_r = m_r;
 }
 
 void
 render()
 {
-        printf(EFFECT(RESET));
+        EFFECT(RESET);
         print_status_bar();
-        display_add_names(active_ctx.body, 0, 0, active_ctx.ws.ws_row, active_ctx.ws.ws_col + 1, 2, 1);
-        cm_display(active_ctx.body, 0, 0, active_ctx.ws.ws_row - 1, active_ctx.ws.ws_col + 1, 3, 1 + NUM_COL_WIDTH);
+        display_add_names(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, 1, 2);
+        cm_display(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, num_col_width + 1, 3);
         print_status_bar2();
         fflush(stdout);
-}
-
-void
-resize_handler(int _)
-{
-        if (ioctl(0, TIOCGWINSZ, &active_ctx.ws) == -1) {
-                perror("resize_handler: ioctl");
-                exit(errno);
-        }
-
-        /* render again on resize */
-        clear_screen();
-        render();
-}
-
-void
-set_resize_handler()
-{
-        signal(SIGWINCH, resize_handler);
-        resize_handler(0); // get current winsize
-}
-
-void
-reset_at_exit()
-{
-        printf(EFFECT(RESET));
-        printf(T_ASBD());
-        printf(T_CUSHW());
-        fflush(stdout);
-}
-
-int
-main(int argc, char *argv[])
-{
-        char *filename = NULL;
-
-        flag_set(&argc, &argv);
-        if (flag_get_value(&filename, "-m", "--use-mouse")) {
-                printf("Are you idiot?\n");
-                exit(0);
-        }
-
-        if (argc == 2) {
-                filename = argv[1];
-        }
-
-        report("---| Starting |---");
-        // printf(T_ASBE());
-        printf(T_CUHDE());
-        printf(EFFECT(RESET));
-        clear_screen();
-        atexit(reset_at_exit);
-        load(filename, &active_ctx);
-
-        set_resize_handler();
-        start_kbhandler();
-
-        save(&active_ctx);
-        cm_destroy(active_ctx.body);
-
-        report("---| End without error |---");
-        return 0;
 }

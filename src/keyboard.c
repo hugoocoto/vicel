@@ -93,15 +93,14 @@ add_action(APTree t, char *prefix, Action action)
 char *
 get_input_at_cursor()
 {
-        int column_width = 10;
         char buf[1024];
         char *c;
 
-        printf(T_SCP());
-        cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
+        T_SCP();
+        cursor_gotocell(active_ctx.cursor_pos_r + 1, active_ctx.cursor_pos_c + 1);
         printf("%*s", column_width, "");
-        printf(T_CUB(10));
-        printf(T_CUSHW());
+        T_CUB(column_width - 1);
+        T_CUSHW();
         toggle_raw_mode();
 
         if (fgets(buf, sizeof buf - 1, stdin)) {
@@ -113,7 +112,8 @@ get_input_at_cursor()
                 buf[0] = 0;
 
         toggle_raw_mode();
-        printf(T_CUHDE() T_RCP());
+        T_CUHDE();
+        T_RCP();
 
         return strdup(buf);
 }
@@ -203,6 +203,11 @@ start_kbhandler()
         add_action(mappings, "gik", ACTION(a_insert_moving_up));
         add_action(mappings, "gih", ACTION(a_insert_moving_left));
         add_action(mappings, "gil", ACTION(a_insert_moving_right));
+        add_action(mappings, "g0", ACTION(a_goto_top_left));
+        add_action(mappings, "^", ACTION(a_goto_max_left));
+        add_action(mappings, "$", ACTION(a_goto_max_right));
+        add_action(mappings, "gg", ACTION(a_goto_top));
+        add_action(mappings, "G", ACTION(a_goto_bottom));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

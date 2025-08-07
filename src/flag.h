@@ -124,4 +124,16 @@ __flag_get_v(char *flag1, ...)
  * so it would not be found if called again. */
 #define flag_get(value, ...) __flag_get_v(value, ##__VA_ARGS__, NULL)
 
+#ifdef DEBUG
+#include <assert.h>
+static void __attribute__((constructor))
+__avoid_unused__()
+{
+        assert(__flag_get);
+        assert(__flag_get_v);
+        assert(__flag_get_value);
+        assert(__flag_get_value_v);
+}
+#endif
+
 #endif // FLAG_H_
