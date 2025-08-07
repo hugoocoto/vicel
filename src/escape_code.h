@@ -1,13 +1,22 @@
-/* ANSI escape code
+/*
+ * VICEL - Visual Cell editor
+ * Copyright (C) 2025  Hugo Coto Florez
  *
- * Author: Hugo Coto Florez
- * Github: hugoocoto
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * Api usage: Printf it
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Referece: https://en.wikipedia.org/wiki/ANSI_escape_code
- * */
-
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * For questions or support, contact: hugo.coto@member.fsf.org
+ */
 
 /* C0 control codes */
 #define T_BEL "\x07"
