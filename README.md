@@ -1,70 +1,79 @@
+
 # Visual Cell Editor
+A terminal-based cell editor for visual spreadsheets. Create, read, and write
+cells interactively.
+![Screenshot](./image.png)
 
-## About
+## Features
+* Edit CSV-like grids interactively in your terminal
+* Supports numbers, text, and formulas
+* Keyboard-focused — Vim-style motions
+* Optional mouse support
+* Lightweight and minimal code
 
-Create, read and write cells.
+## Installation
+You can install **Visual Cell Editor** by running:
 
-![image](./image.png)
+```bash make install  # installs to ~/.local/bin ```
+Or just build locally with:
+```bash make ```
+> All sources are in the `src/` folder. You can also compile manually using
+> any C compiler.
 
-## Load files
+## Usage
+Run from the terminal:
+```bash vicel data.csv ```
+The first non-flag argument is used as the filename.
 
-From the terminal, the first argument that is not a flag would be used as 
-the filename: `vicel data.csv`
-
-## Flags - Options
-- `-m`, `--use-mouse`: Enable mouse support
+### Options
+| Flag                | Description          | | ---------------- |
+----------------- | | `-m`, `--use-mouse` | Enable mouse support |
 
 ## Mappings
+> *As of the time of writing*
 
-> At the time of writting this
+### Movement
+* `h`, `l`, `j`, `k`: Move cursor left, right, down, up
+* `$`: Go to last cell of the current row
+* `^`: Go to first cell of the current row
+* `gg`: Go to first cell of the current column
+* `G`: Go to last cell of the current column
+* `g0`: Same as `gg` and `^`
 
-- `q`, a_quit
-- `r`, render
-- `gl`, a_add_col
-- `gj`, a_add_row
-- `j`, a_move_cursor_down
-- `k`, a_move_cursor_up
-- `h`, a_move_cursor_left
-- `l`, a_move_cursor_right
-- `v`, a_select_toggle_cell
-- `i`, get_set_cell_input
-- `I`, get_set_selection_input
-- `d`, a_set_cell_type_empty (also known as delete)
-- `J`, expand current cell down and move cursor
-- `K`, expand current cell up and move cursor
-- `H`, expand current cell left and move cursor
-- `L`, expand current cell right and move cursor
-- `gij`, insert text and move cursor down
-- `gik`, insert text and move cursor up
-- `gih`, insert text and move cursor left
-- `gil`, insert text and move cursor right
-- `$`, go to the last cell of the cursor's row
-- `^`, go to the first cell of the cursor's row
-- `gg`, go to the first cell of the cursor's column
-- `G`, go to the last cell of the cursor's column
-- `g0`, same as `gg` and `^`
+### Editing
+* `i`: Input/edit current cell
+* `I`: Input/edit all selected cells
+* `d`: Delete cell (set as empty)
+* `v`: Toggle cell selection
 
-## Input text
-Place the cursor above a cell and press `i`.
+### Insert + move
+* `gij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
 
-### Numbers
-A number with an optional decimal part separated by a dot.
+### Add rows/columns
+* `gj`: Add a new row
+* `gl`: Add a new column
 
-### Text
-Text
+### Expand cells
+* `J`, `K`, `H`, `L`: Expand current cell down, up, left, right (and move)
 
-### Formula
-Text that starts with a `=`. It can contain numbers, or cell identifiers. Cell
-identifiers are one or more alpha followed by one or more numbers. FE: `= C2 +
-8.5`
+### Misc
+* `q`: Quit
+* `r`: Re-render the screen
 
-> [!CAUTION]
-> It's kinda usable for now. 
+## Input Format
+Press `i` while the cursor is on a cell.
+Supported formats:
+* **Numbers**: Decimal numbers like `10`, `3.14`
+* **Text**: Any non-number string
+* **Formula**: Starts with `=`, e.g. `=C2 + 8.5`
+>  Cell references are of the form `A1`, `B3`, etc.
 
 ## Latest Version
-[Latest named version](./version.txt)
+[See version](./version.txt)
 
-## Flexing on lines
-[Lines written](./wc.md). Little refflexion: the few lines the better, I try
-to flex on how little amount of lines my fully functional program has. (It is
-the idea).
+## Lines of Code
+[Lines written](./wc.md) A little reflection: the fewer the lines, the better.
+I like to flex on how little code is needed for a fully functional program.
+
+## Status
+> It’s **kinda usable** for now More improvements to come. Feedback welcome!
