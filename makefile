@@ -26,7 +26,7 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
 clean:
-	rm -rf $(OBJ_DIR) $(DEBUG_OUT) $(RELEASE_OUT) wc.md
+	rm -rf $(OBJ_DIR) $(DEBUG_OUT) $(RELEASE_OUT) 
 
 install: $(OUT) clean
 	mv $(OUT) ~/.local/bin/$(BIN_NAME)
