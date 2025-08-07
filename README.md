@@ -2,17 +2,17 @@
 
 ## About
 
-Create, read and write files based on cells. (<- this is the idea)
+Create, read and write cells.
 
 ![image](./image.png)
 
 ## Load files
 
-Open it with the filename as argument. (Formulas are not saved (yet))
+From the terminal, the first argument that is not a flag would be used as 
+the filename: `vicel data.csv`
 
 ## Flags - Options
 - `-m`, `--use-mouse`: Enable mouse support
-
 
 ## Mappings
 
@@ -38,6 +38,11 @@ Open it with the filename as argument. (Formulas are not saved (yet))
 - `gik`, insert text and move cursor up
 - `gih`, insert text and move cursor left
 - `gil`, insert text and move cursor right
+- `$`, go to the last cell of the cursor's row
+- `^`, go to the first cell of the cursor's row
+- `gg`, go to the first cell of the cursor's column
+- `G`, go to the last cell of the cursor's column
+- `g0`, same as `gg` and `^`
 
 ## Input text
 Place the cursor above a cell and press `i`.

@@ -12,6 +12,8 @@
 #define CELL_SELECT_BG CELL_BG
 
 #define min(a, b) ((a) < (b) ? (a) : (b))
+#define max(a, b) ((a) >= (b) ? (a) : (b))
+
 #define num_col_width 5
 #define column_width 10
 #define row_width 1

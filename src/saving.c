@@ -3,13 +3,39 @@
 #include "common.h"
 #include "da.h"
 #include "debug.h"
-#include "formula.h"
 #include "keyboard.h"
 #include "window.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+
+char *
+get_value_from_cell_literal(char *r)
+{
+        char *c;
+        char *t;
+
+        // remove left spaces
+        while (isspace(*r))
+                ++r;
+
+        // if values are between `"` then remove it
+        if (*r == '"' && (t = strrchr(r + 1, '"'))) {
+                *t = 0;
+                ++r;
+                report("Trim quote: `%s`", r);
+        }
+        c = r;
+
+        for (; *c; ++c) {
+                switch (*c) {
+                case ' ' ... 126:
+                        break;
+                default:
+                        report("Invalid char %d (%c)", *c, *c);
+                        *c = '?';
+                        break;
+                }
+        }
+        return strdup(r);
+}
 
 void
 load(char *filename, Context *ctx)
@@ -32,13 +58,15 @@ load(char *filename, Context *ctx)
         char *c;
         CellArr ca;
         Cell cell;
+        int max_size = 0;
+        bool last;
 
         while (fgets(line, sizeof line, f)) {
                 if ((c = strchr(line, '\n'))) *c = 0;
-                report("LOAD `%s`", line);
+                if ((c = strchr(line, '\r'))) *c = 0;
                 ca = (CellArr) { 0 };
                 c = r = line;
-                bool last = false;
+                last = false;
                 do {
                         if ((c = strchr(r, ','))) {
                                 *c = 0;
@@ -47,19 +75,21 @@ load(char *filename, Context *ctx)
                         }
                         cell = EMPTY_CELL;
                         free(cell.repr);
-                        cell.repr = strdup(r);
+                        cell.repr = get_value_from_cell_literal(r);
                         da_append(&ca, cell);
                         r = c + 1;
                 } while (!last);
+
                 da_append(ctx->body, ca);
+                max_size = max(max_size, ca.size);
         }
 
         for_da_each(row, *ctx->body)
         {
+                while (row->size < max_size)
+                        da_append(row, EMPTY_CELL);
                 for_da_each(c, *row)
-                {
-                        set_cell_text(c, strdup(c->repr));
-                }
+                set_cell_text(c, strdup(c->repr));
         }
 
         return;
@@ -93,12 +123,9 @@ save(Context *ctx)
                                 first = false;
                         } else {
                                 dprintf(fd, ",");
-                                report(",");
                         }
-                        report("%s", c->input_repr);
                         dprintf(fd, "%s", c->input_repr);
                 }
-                report("\\n");
                 dprintf(fd, "\n");
         }
 

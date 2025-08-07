@@ -26,7 +26,7 @@ else
 endif
 
 debug: $(OUT)
-	gdb -ex run $(OUT)
+	gdb -ex "run data.csv" $(OUT) 
 
 release: $(OUT)
 

@@ -257,6 +257,11 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         T_CUP(_cy, _cx);
                         assert(cell->heigh == 1);
 
+                        int w = min(column_width, avx) - 2;
+                        if (w <= 0) {
+                                break;
+                        }
+
                         if (cell->selected)
                                 EFFECT(CELL_SELECT_BG, CELL_SELECT_FG);
 
@@ -264,7 +269,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                             active_ctx.cursor_pos_c == xx)
                                 EFFECT(REVERSE);
 
-                        printf("[%-*.*s]", min(column_width, avx) - 2, min(column_width, avx) - 2, cell->repr);
+                        printf("[%-*.*s]", w, w, cell->repr);
 
                         if (active_ctx.cursor_pos_r == yy &&
                             active_ctx.cursor_pos_c == xx)
