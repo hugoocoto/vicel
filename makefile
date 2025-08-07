@@ -1,36 +1,15 @@
 BUILD_DIR = .
 BIN_NAME = vicel
 OBJ_DIR = ./objs
-
+OUT = $(BUILD_DIR)/$(BIN_NAME)
 INC = -I.
 LIB = -lm
-
 HEADERS = $(wildcard src/*.h)
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
+CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts
 
-.DEFAULT_GOAL := debug
-
-DEBUG_CC  = cc -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts
-DEBUG_OUT = $(BUILD_DIR)/$(BIN_NAME)_debug
-
-RELEASE_CC  = cc -std=gnu11 -O3 -DDEBUG=0 -w
-RELEASE_OUT = $(BUILD_DIR)/$(BIN_NAME)
-
-ifeq ($(MAKECMDGOALS),release)
-	CC := $(RELEASE_CC)
-	OUT := $(RELEASE_OUT)
-else
-	CC := $(DEBUG_CC)
-	OUT := $(DEBUG_OUT)
-endif
-
-debug: $(OUT) wc.md
-	gdb -ex "run data.csv" $(OUT) 
-
-release: $(OUT)
-
-$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md
+$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md gen
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
@@ -49,9 +28,8 @@ $(BUILD_DIR):
 clean:
 	rm -rf $(OBJ_DIR) $(DEBUG_OUT) $(RELEASE_OUT) wc.md
 
-install: release clean
-	mv $(RELEASE_OUT) ~/.local/bin/$(BIN_NAME)
+install: $(OUT) clean
+	mv $(OUT) ~/.local/bin/$(BIN_NAME)
 
-gen: debug
+gen: 
 	./gen_release_version.sh
-
