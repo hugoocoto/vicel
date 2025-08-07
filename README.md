@@ -14,20 +14,27 @@ cells interactively.
 ## Installation
 You can install **Visual Cell Editor** by running:
 
-```bash make install  # installs to ~/.local/bin ```
+```bash 
+make install  # installs to ~/.local/bin 
+```
 Or just build locally with:
-```bash make ```
+```bash 
+make 
+```
 > All sources are in the `src/` folder. You can also compile manually using
 > any C compiler.
 
 ## Usage
 Run from the terminal:
-```bash vicel data.csv ```
+```bash 
+vicel data.csv 
+```
 The first non-flag argument is used as the filename.
 
 ### Options
-| Flag                | Description          | | ---------------- |
------------------ | | `-m`, `--use-mouse` | Enable mouse support |
+| Flag                | Description          | 
+| ------------------- | -------------------- | 
+| `-m`, `--use-mouse` | Enable mouse support |
 
 ## Mappings
 > *As of the time of writing*
@@ -76,4 +83,5 @@ Supported formats:
 I like to flex on how little code is needed for a fully functional program.
 
 ## Status
-> It’s **kinda usable** for now More improvements to come. Feedback welcome!
+> It’s **kinda usable** for now.
+More improvements to come. Feedback welcome!
