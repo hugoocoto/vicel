@@ -25,7 +25,7 @@ else
 	OUT := $(DEBUG_OUT)
 endif
 
-debug: $(OUT)
+debug: $(OUT) wc.md
 	gdb -ex "run data.csv" $(OUT) 
 
 release: $(OUT)
