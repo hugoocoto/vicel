@@ -18,13 +18,13 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
+#include "eval.h"
+#include "builtin.h"
 #include "cellmap.h"
 #include "common.h"
 #include "debug.h"
 #include "formula.h"
 #include "window.h"
-#include "builtin.h"
-#include "eval.h"
 
 Value
 eval_identifier(Expr *e)
@@ -187,121 +187,18 @@ vadd(Value a, Value b)
 }
 
 Value
-range_map(Expr *lhs, Expr *rhs, Value (*func)(Value, Value))
-{
-        char *lhs_s;
-        char *rhs_s;
-        int lhs_x, lhs_y;
-        int rhs_x, rhs_y;
-        int i;
-        Value v;
-
-        if (rhs == NULL || lhs == NULL) {
-                report("lhs or rhs are null");
-                return VALUE_ERROR;
-        }
-
-        if (lhs->type != EXPR_IDENTIFIER) {
-                report("Left operand is not an Identifier");
-                return VALUE_ERROR;
-        }
-
-        if (rhs->type != EXPR_IDENTIFIER) {
-                report("Right operand is not an Identifier");
-                return VALUE_ERROR;
-        }
-
-        lhs_s = cm_get_cell_name(active_ctx.body, lhs->as.identifier.cell);
-        if (lhs_s == NULL) {
-                report("Left Identifier is not valid");
-                return VALUE_ERROR;
-        }
-
-        rhs_s = cm_get_cell_name(active_ctx.body, rhs->as.identifier.cell);
-        if (rhs_s == NULL) {
-                report("Right Identifier is not valid");
-                return VALUE_ERROR;
-        }
-
-        if (parse_coords(lhs_s, &lhs_x, &lhs_y)) {
-                report("Left Identifier Coords can not be parsed");
-                return VALUE_ERROR;
-        }
-
-        if (parse_coords(rhs_s, &rhs_x, &rhs_y)) {
-                report("Left Identifier Coords can not be parsed");
-                return VALUE_ERROR;
-        }
-
-        report("lhs: %s (%d, %d) ==> rhs: %s (%d, %d)",
-               lhs_s, lhs_x, lhs_y,
-               rhs_s, rhs_x, rhs_y);
-
-        if (rhs_x < lhs_x) {
-                int tmp = rhs_x;
-                rhs_x = lhs_x;
-                lhs_x = tmp;
-        }
-
-        if (rhs_y < lhs_y) {
-                int tmp = rhs_y;
-                rhs_y = lhs_y;
-                lhs_y = tmp;
-        }
-
-        v = lhs->as.identifier.cell->value;
-
-        Cell *c;
-        if (rhs_x == lhs_x) {
-                for (i = lhs_y + 1; i <= rhs_y; i++) {
-                        c = cm_get_cell_ptr(active_ctx.body, lhs_x, i);
-                        if (c == NULL) break;
-                        v = func(c->value, v);
-                }
-                return v;
-        }
-
-        if (rhs_y == lhs_y) {
-                for (i = lhs_x + 1; i <= rhs_x; i++) {
-                        c = cm_get_cell_ptr(active_ctx.body, i, lhs_y);
-                        if (c == NULL) break;
-                        v = func(c->value, v);
-                }
-                return v;
-        }
-
-        return VALUE_ERROR;
-}
-
-Value
-vadd_range(Expr *lhs, Expr *rhs)
-{
-        return range_map(lhs, rhs, vadd);
-}
-
-Value
-vmul_range(Expr *lhs, Expr *rhs)
-{
-        return range_map(lhs, rhs, vmul);
-}
-
-Value
 eval_binop(Expr *e)
 {
         Value lhs = eval_expr(e->as.binop.lhs);
         Value rhs = eval_expr(e->as.binop.rhs);
 
-        if (!e->as.binop.op[1])
-                switch (*e->as.binop.op) {
-                case '+': return vadd(lhs, rhs);
-                case '-': return vsub(lhs, rhs);
-                case '/': return vdiv(lhs, rhs);
-                case '*': return vmul(lhs, rhs);
-                case '^': return vpow(lhs, rhs);
-                }
-
-        if (!strcmp(e->as.binop.op, "++")) return vadd_range(e->as.binop.lhs, e->as.binop.rhs);
-        if (!strcmp(e->as.binop.op, "**")) return vmul_range(e->as.binop.lhs, e->as.binop.rhs);
+        switch (*e->as.binop.op) {
+        case '+': return vadd(lhs, rhs);
+        case '-': return vsub(lhs, rhs);
+        case '/': return vdiv(lhs, rhs);
+        case '*': return vmul(lhs, rhs);
+        case '^': return vpow(lhs, rhs);
+        }
 
         report("No yet implemented: binop for %s", e->as.binop.op);
         return VALUE_ERROR;

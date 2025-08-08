@@ -72,10 +72,14 @@ Supported formats:
 * **Numbers**: Decimal numbers like `10`, `3.14`
 * **Text**: Any non-number string
 * **Formula**: Starts with `=`, e.g. `=C2 + 8.5`
+
 >  Cell references are of the form `A1`, `B3`, etc.
 
-> Operators `++` and `**` works as `+` and `*` for all the cells between
-> operands.
+## Builtin functions
+Builtin functions can be called in formulas. It take numbers, text or cells as 
+arguments and return a value. 
+* **sum(...) -> v**: Sum zero or more arguments and return the result as sum it
+  using the sum operator.
 
 ## Latest Version
 [See version](./version.txt)
@@ -86,8 +90,6 @@ I like to flex on how little code is needed for a fully functional program.
 
 ## Status
 > It’s **kinda usable** for now.
-
-More improvements to come. Feedback welcome!
 
 ![](https://wakatime.com/badge/user/2a7b4567-ab1f-4fb2-98ff-2b3fdbf94654/project/98a99176-d7a4-48ba-968c-4e410787a98f.svg)
 

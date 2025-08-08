@@ -23,8 +23,8 @@
 #include "common.h"
 #include "da.h"
 #include "debug.h"
-#include "window.h"
 #include "eval.h"
+#include "window.h"
 
 Cell *cell_self = NULL;
 
@@ -187,16 +187,6 @@ lexer(char *c)
                         break;
                 case '+':
                 case '*':
-                        if (c[1] == c[0]) {
-                                last->next = TOK_AS_STR(c, 2);
-                                last = last->next;
-                                c += 2;
-                                break;
-                        }
-                        last->next = TOK_AS_STR(c, 1);
-                        last = last->next;
-                        ++c;
-                        break;
                 case '0' ... '9':
                         last->next = TOK_AS_NUM(strtod(c, &c));
                         last = last->next;
@@ -345,8 +335,7 @@ get_factor(Token **t)
 {
         Expr *e = get_power(t);
         Token *op;
-        while ((op = match(t, "/")) ||
-               (op = match(t, "*")) || (op = match(t, "**"))) {
+        while ((op = match(t, "/")) || (op = match(t, "*"))) {
                 e = new_binop(e, op->as.str, get_power(t));
         }
         return e;
@@ -357,8 +346,7 @@ get_term(Token **t)
 {
         Expr *e = get_factor(t);
         Token *op;
-        while ((op = match(t, "-")) ||
-               (op = match(t, "+")) || (op = match(t, "++"))) {
+        while ((op = match(t, "-")) || (op = match(t, "+"))) {
                 e = new_binop(e, op->as.str, get_factor(t));
         }
         return e;
