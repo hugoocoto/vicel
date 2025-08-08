@@ -660,22 +660,15 @@ test_create_id()
 static int
 extend_identifiers(Token *t, int r, int c)
 {
-        // return 0 on success
+        int rr, cc;
         while (t) {
                 if (t->type == TOK_IDENTIFIER) {
-                        int rr, cc;
-                        if (parse_coords(t->as.id, &cc, &rr)) {
-                                report("Impossible to parse coords at: %s", t->as.id);
-                                return 1;
+                        if (!parse_coords(t->as.id, &cc, &rr)) {
+                                cc += c;
+                                rr += r;
+                                free(t->as.id);
+                                t->as.id = create_id(rr, cc);
                         }
-                        cc += c;
-                        rr += r;
-                        report("Parse coords on `%s` (%+d, %+d) -> (%d, %d) "
-                               "with the following result:",
-                               t->as.id, c, r, cc, rr);
-                        free(t->as.id);
-                        t->as.id = create_id(rr, cc);
-                        report("%s", t->as.id);
                 }
                 t = t->next;
         }
