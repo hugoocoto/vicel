@@ -24,7 +24,6 @@
 #include "common.h"
 #include "debug.h"
 #include "formula.h"
-#include "window.h"
 
 Value
 eval_identifier(Expr *e)
@@ -45,7 +44,6 @@ eval_func(Expr *e)
 {
         char buf[64] = { 0 };
         get_ast_repr(e, buf);
-        report("Eval function: %s", buf);
 
         Value name = eval_expr(e->as.func.name);
         if (name.type != TYPE_TEXT) {
@@ -67,7 +65,8 @@ eval_unop(Expr *e)
         Value rhs = eval_expr(e->as.unop.rhs);
 
         if (rhs.type != TYPE_NUMBER) {
-                report("No yet implemented: unop for %s", cm_type_repr(rhs.type));
+                report("No yet implemented: unop for %s",
+                       cm_type_repr(rhs.type));
                 return VALUE_ERROR;
         }
 
@@ -85,8 +84,9 @@ are_valid_operands(Value a, Value b)
         case TYPE_FORMULA:
                 return are_valid_operands(a.as.formula->value, b);
         case TYPE_NUMBER:
-                if (b.type == TYPE_FORMULA) return are_valid_operands(a, b.as.formula->value);
                 if (b.type == TYPE_NUMBER) return true;
+                if (b.type == TYPE_FORMULA)
+                        return are_valid_operands(a, b.as.formula->value);
                 return false;
         case TYPE_TEXT:
         case TYPE_EMPTY:

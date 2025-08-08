@@ -22,6 +22,7 @@
 #include "cellmap.h"
 #include "da.h"
 #include "eval.h"
+#include "formula.h"
 
 struct Pair {
         char *name;
@@ -59,7 +60,7 @@ sum(Expr *e)
         if (e == NULL) return VALUE_ERROR;
         v = eval_expr(e);
         while ((e = e->next)) {
-                vadd(v, eval_expr(e));
+                v = vadd(v, eval_expr(e));
         }
         return v;
 }

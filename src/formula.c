@@ -121,9 +121,9 @@ TOK_AS_STR(char *c, int len)
 {
         Token *t = new_tok();
         char prev = c[len];
-        c[len] = 0;
+        if (prev) c[len] = 0;
         t->as.str = strdup(c);
-        c[len] = prev;
+        if (prev) c[len] = prev;
         t->type = TOK_STRING;
         return t;
 }
@@ -140,6 +140,7 @@ TOK_AS_NUM(double n)
 Token *
 TOK_AS_IDENTIFIER(char *id)
 {
+        report("As id: %s", id);
         Token *t = new_tok();
         t->as.id = id;
         t->type = TOK_IDENTIFIER;
@@ -154,16 +155,76 @@ get_identifier(char **c)
                 ++*c;
         }
 
-        /* without this it segfault???????? */
-        if (**c == 0) {
-                return strdup(id);
-        }
-
         char prev = **c;
-        **c = 0;
+        if (prev) **c = 0;
         id = strdup(id);
-        **c = prev;
+        if (prev) **c = prev;
         return id;
+}
+
+Token *
+early_expansion(Token *t)
+{
+        Token *start = t;
+        Token *prev = NULL;
+        Token *last;
+        int x1, x2, y1, y2;
+        int x, y;
+        int x_inc, y_inc;
+        while (t) {
+                if (t->type == TOK_STRING && strcmp(t->as.str, ":") == 0) {
+                        if (!prev || prev->type != TOK_IDENTIFIER) goto cont;
+                        if (!t->next || t->next->type != TOK_IDENTIFIER) goto cont;
+                        if (parse_coords(prev->as.id, &x1, &y1)) goto cont;
+                        if (parse_coords(t->next->as.id, &x2, &y2)) goto cont;
+
+                        if (x1 > x2) {
+                                int tmp = x1;
+                                x1 = x2;
+                                x2 = tmp;
+                        }
+
+                        if (y1 > y2) {
+                                int tmp = y1;
+                                y1 = y2;
+                                y2 = tmp;
+                        }
+
+                        /* What a chunk of code xd */
+
+                        x_inc = x2 != x1;
+                        assert(x_inc == 0 || x_inc == 1);
+                        y_inc = y2 != y1;
+                        assert(y_inc == 0 || y_inc == 1);
+                        x = x1 + x_inc;
+                        y = y1 + y_inc;
+                        last = prev;
+                        last->next = TOK_AS_STR(",", 1);
+                        last = last->next;
+
+                        while ((x1 == x2 || x < x2) &&
+                               (y1 == y2 || y < y2)) {
+                                Cell *c = cm_get_cell_ptr(active_ctx.body, x, y);
+                                if (!c) break;
+                                char *cn = cm_get_cell_name(active_ctx.body, c);
+                                last->next = TOK_AS_IDENTIFIER(cn);
+                                last = last->next;
+                                last->next = TOK_AS_STR(",", 1);
+                                last = last->next;
+                                x += x_inc;
+                                y += y_inc;
+                        }
+                        last->next = t->next;
+
+                        prev = last;
+                        t = t->next;
+                        continue;
+                }
+        cont:
+                prev = t;
+                t = t->next;
+        }
+        return start;
 }
 
 Token *
@@ -181,6 +242,7 @@ lexer(char *c)
                 case ')':
                 case ',':
                 case ';':
+                case ':':
                         last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
@@ -191,6 +253,7 @@ lexer(char *c)
                         last->next = TOK_AS_NUM(strtod(c, &c));
                         last = last->next;
                         break;
+
                 default:
                         if (isspace(*c)) {
                                 while (isspace(*c))
@@ -212,7 +275,8 @@ lexer(char *c)
 
         Token *r = zero->next;
         free(zero);
-        return r;
+
+        return early_expansion(r);
 }
 
 Token *
@@ -384,7 +448,8 @@ get_ast_repr(Expr *e, char *buffer)
         case EXPR_IDENTIFIER: {
                 char *c;
                 sprintf(buffer + strlen(buffer), "%s",
-                        c = cm_get_cell_name(active_ctx.body, e->as.identifier.cell));
+                        c = cm_get_cell_name(active_ctx.body,
+                                             e->as.identifier.cell));
                 free(c);
                 break;
         }
