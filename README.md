@@ -1,4 +1,3 @@
-
 # Visual Cell Editor
 A terminal-based cell editor for visual spreadsheets. Create, read, and write
 cells interactively.
@@ -80,6 +79,9 @@ Builtin functions can be called in formulas. It take numbers, text or cells as
 arguments and return a value. 
 * **sum(...) -> v**: Sum zero or more arguments and return the result as sum it
   using the sum operator.
+
+> Functions accept a keyword `:` that expand the operators two cells with all
+> the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.
 
 ## Latest Version
 [See version](./version.txt)
