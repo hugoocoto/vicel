@@ -72,7 +72,7 @@ main(int argc, char *argv[])
                 filename = argv[1];
         }
 
-        report("---| Starting |---");
+        report("------| Starting |------");
         T_ASBE();
         T_CUHDE();
         EFFECT(RESET);

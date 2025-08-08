@@ -24,193 +24,19 @@
 #include "da.h"
 #include "debug.h"
 #include "window.h"
-#include <assert.h>
 #include <ctype.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
 
 Cell *cell_self = NULL;
 
-// EXPR_BIN,
-// EXPR_UN,
-// EXPR_LITERAL,
 
-Value eval_expr(Expr *e);
-
-Value
-eval_identifier(Expr *e)
+void
+refresh_formula_value(Cell *cell)
 {
-        if (e->as.identifier.cell->value.type == TYPE_FORMULA)
-                return e->as.identifier.cell->value.as.formula->value;
-        return e->as.identifier.cell->value;
-}
+        cell->value.as.formula->value = eval_formula(*cell->value.as.formula);
+        free(cell->repr);
+        cell->repr = get_repr(cell->value.as.formula->value);
 
-Value
-eval_literal(Expr *e)
-{
-        return e->as.literal.value;
-}
-
-Value
-eval_unop(Expr *e)
-{
-        Value rhs = eval_expr(e->as.unop.rhs);
-
-        if (strcmp(e->as.unop.op, "-")) {
-                return AS_NUMBER(-rhs.as.num);
-        };
-        report("No yet implemented: unop for %s", e->as.unop.op);
-        return VALUE_EMPTY;
-}
-
-bool
-are_valid_operands(Value a, Value b)
-{
-        switch (a.type) {
-        case TYPE_FORMULA:
-                return are_valid_operands(a.as.formula->value, b);
-        case TYPE_NUMBER:
-                if (b.type == TYPE_FORMULA) return are_valid_operands(a, b.as.formula->value);
-                if (b.type == TYPE_NUMBER) return true;
-                return false;
-        case TYPE_TEXT:
-        case TYPE_EMPTY:
-        default:
-                report("Invalid operands %s and %s",
-                       cm_type_repr(a.type), cm_type_repr(b.type));
-                return false;
-        }
-}
-
-Value
-vsub(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num - b.as.num);
-        }
-
-        if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(-b.as.num);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vsub for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_EMPTY;
-}
-Value
-vdiv(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num / b.as.num);
-        }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vdiv for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_EMPTY;
-}
-
-Value
-vmul(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num * b.as.num);
-        }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vsub for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_EMPTY;
-}
-
-Value
-vpow(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(pow(a.as.num, b.as.num));
-        }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vpow for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_EMPTY;
-}
-
-Value
-vadd(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num + b.as.num);
-        }
-
-        if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER)
-                return b;
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vadd for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_EMPTY;
-}
-
-Value
-eval_binop(Expr *e)
-{
-        Value lhs = eval_expr(e->as.binop.lhs);
-        Value rhs = eval_expr(e->as.binop.rhs);
-
-        switch (*e->as.binop.op) {
-        case '+': return vadd(lhs, rhs);
-        case '-': return vsub(lhs, rhs);
-        case '/': return vdiv(lhs, rhs);
-        case '*': return vmul(lhs, rhs);
-        case '^': return vpow(lhs, rhs);
-        }
-
-        report("No yet implemented: binop for %s", e->as.binop.op);
-        return VALUE_EMPTY;
-}
-
-Value
-eval_expr(Expr *e)
-{
-        if (e == NULL) return AS_NUMBER(0);
-
-        switch (e->type) {
-        case EXPR_LITERAL: return eval_literal(e);
-        case EXPR_BIN: return eval_binop(e);
-        case EXPR_UN: return eval_unop(e);
-        case EXPR_IDENTIFIER: return eval_identifier(e);
-        default:
-                report("No yet implemented: eval_expr for %d", e->type);
-                return VALUE_EMPTY;
-        }
-}
-
-Value
-eval_formula(Formula f)
-{
-        if (!f.body) return VALUE_EMPTY;
-        return eval_expr(f.body);
+        for_da_each(c, cell->subscribers) cm_notify(cell, *c);
 }
 
 Expr *
@@ -271,11 +97,15 @@ new_tok()
 }
 
 Token *
-TOK_AS_STR(char *c)
+TOK_AS_STR(char *c, int len)
 {
         Token *t = new_tok();
+        char prev = c[len];
+        c[len] = 0;
         t->as.str = strdup(c);
+        c[len] = prev;
         t->type = TOK_STRING;
+        report("tok as str: %s", t->as.str);
         return t;
 }
 
@@ -341,38 +171,24 @@ lexer(char *c)
         Token *zero = last;
         while (*c) {
                 switch (*c) {
-                case '+':
-                        last->next = TOK_AS_STR("+");
-                        last = last->next;
-                        ++c;
-                        break;
                 case '-':
-                        last->next = TOK_AS_STR("-");
-                        last = last->next;
-                        ++c;
-                        break;
                 case '/':
-                        last->next = TOK_AS_STR("/");
-                        last = last->next;
-                        ++c;
-                        break;
-                case '*':
-                        last->next = TOK_AS_STR("*");
-                        last = last->next;
-                        ++c;
-                        break;
                 case '^':
-                        last->next = TOK_AS_STR("^");
-                        last = last->next;
-                        ++c;
-                        break;
                 case '(':
-                        last->next = TOK_AS_STR("(");
+                case ')':
+                        last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
                         break;
-                case ')':
-                        last->next = TOK_AS_STR(")");
+                case '+':
+                case '*':
+                        if (c[1] == c[0]) {
+                                last->next = TOK_AS_STR(c, 2);
+                                last = last->next;
+                                c += 2;
+                                break;
+                        }
+                        last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
                         break;
@@ -382,9 +198,11 @@ lexer(char *c)
                         break;
                 default:
                         if (isspace(*c)) {
-                                ++c;
+                                while (isspace(*c))
+                                        ++c;
                                 break;
                         }
+
                         char *id;
                         if ((id = get_identifier(&c))) {
                                 last->next = TOK_AS_IDENTIFIER(id);
@@ -494,7 +312,8 @@ get_factor(Token **t)
 {
         Expr *e = get_power(t);
         Token *op;
-        while ((op = match(t, "/")) || (op = match(t, "*"))) {
+        while ((op = match(t, "/")) ||
+               (op = match(t, "*")) || (op = match(t, "**"))) {
                 e = new_binop(e, op->as.str, get_power(t));
         }
         return e;
@@ -505,7 +324,8 @@ get_term(Token **t)
 {
         Expr *e = get_factor(t);
         Token *op;
-        while ((op = match(t, "-")) || (op = match(t, "+"))) {
+        while ((op = match(t, "-")) ||
+               (op = match(t, "+")) || (op = match(t, "++"))) {
                 e = new_binop(e, op->as.str, get_factor(t));
         }
         return e;
@@ -536,7 +356,7 @@ get_ast_repr(Expr *e, char *buffer)
                 break;
         }
         default:
-                report("No yet implemented: report_ast for %d", e->type);
+                report("No yet implemented: get_ast_repr for %d", e->type);
                 exit(ERR_REPAST);
         }
 }
@@ -590,16 +410,6 @@ parse_formula(char *c, Cell *self)
         Expr *e = report_ast(get_term(&t));
         self->value.as.formula->tokens = tt;
         return e;
-}
-
-void
-refresh_formula_value(Cell *cell)
-{
-        cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
-        free(cell->repr);
-        cell->repr = get_repr(cell->value.as.formula->value);
-
-        for_da_each(c, cell->subscribers) cm_notify(cell, *c);
 }
 
 void
@@ -774,7 +584,7 @@ formula_extend(Cell *self, Formula *f, int r, int c)
         }
         report(">>> formula extend <<<<<<<<<<<");
         new->body = report_ast(get_term(&t));
-        new->value = eval_expr(new->body);
+        new->value = eval_formula(*new);
         report(">>> formula extend end <<<<<<<");
         return new;
 }

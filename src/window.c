@@ -218,7 +218,6 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                 } else {
                         col[1] += 1;
                 }
-                report("Column name: %s", col);
         }
 
         free(col);

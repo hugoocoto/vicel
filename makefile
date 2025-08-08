@@ -11,10 +11,10 @@ CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md gen
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)
+	rm -f report.log
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
-	mkdir -p $(dir $@)
-	$(CC) -c $< $(INC) -o $@
+	mkdir -p $(dir $@) && $(CC) -c $< $(INC) -o $@
 
 wc.md: $(SRC) $(HEADERS)
 	cloc src --by-file --hide-rate --md > wc.md

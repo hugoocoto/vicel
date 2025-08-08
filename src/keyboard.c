@@ -131,8 +131,8 @@ get_input_at_cursor()
         } else
                 buf[0] = 0;
 
+        T_ED(1);
         toggle_raw_mode();
-        T_CUHDE();
         T_RCP();
 
         return strdup(buf);

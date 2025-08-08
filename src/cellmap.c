@@ -100,12 +100,15 @@ cm_unsubscribe(Cell *actor, Cell *observer)
         report("Fail to remove subscriber %p to %p", observer, actor);
 }
 
+/* Return NULL on overflow */
 Cell *
 cm_get_cell_ptr(CellMat *mat, int x, int y)
 {
+        if (mat->size <= y || mat->data->size <= x) return NULL;
         return &mat->data[y].data[x];
 }
 
+/* cm_get_cell_ptr is more secure */
 Cell
 cm_get_cell(CellMat *mat, int x, int y)
 {
