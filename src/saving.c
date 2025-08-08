@@ -26,6 +26,14 @@
 #include "keyboard.h"
 #include "window.h"
 
+void
+unmask_comma(char *c)
+{
+        while ((c = strchr(c, -','))) {
+                *c = ',';
+        }
+}
+
 char *
 get_value_from_cell_literal(char *r)
 {
@@ -36,11 +44,12 @@ get_value_from_cell_literal(char *r)
         while (isspace(*r))
                 ++r;
 
+        unmask_comma(r);
+
         // if values are between `"` then remove it
         if (*r == '"' && (t = strrchr(r + 1, '"'))) {
                 *t = 0;
                 ++r;
-                report("Trim quote: `%s`", r);
         }
         c = r;
 
@@ -119,6 +128,14 @@ load_blank:
 }
 
 void
+mask_comma(char *c)
+{
+        while ((c = strchr(c, ','))) {
+                *c = -',';
+        }
+}
+
+void
 save(Context *ctx)
 {
         if (ctx->filename == NULL) {
@@ -144,6 +161,7 @@ save(Context *ctx)
                         } else {
                                 dprintf(fd, ",");
                         }
+                        mask_comma(c->input_repr);
                         dprintf(fd, "%s", c->input_repr);
                 }
                 dprintf(fd, "\n");

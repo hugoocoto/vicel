@@ -57,7 +57,7 @@ Value
 sum(Expr *e)
 {
         Value v;
-        if (e == NULL) return VALUE_ERROR;
+        if (e == NULL) return VALUE_EMPTY;
         v = eval_expr(e);
         while ((e = e->next)) {
                 v = vadd(v, eval_expr(e));
@@ -65,9 +65,40 @@ sum(Expr *e)
         return v;
 }
 
+Value
+mul(Expr *e)
+{
+        Value v;
+        if (e == NULL) return VALUE_EMPTY;
+        v = eval_expr(e);
+        while ((e = e->next)) {
+                v = vmul(v, eval_expr(e));
+        }
+        return v;
+}
+
+Value
+count(Expr *e)
+{
+        double count = 1.0;
+        if (e == NULL) return AS_NUMBER(0);
+        while ((e = e->next)) {
+                if (eval_expr(e).type != TYPE_EMPTY) ++count;
+        }
+        return AS_NUMBER(count);
+}
+
+Value
+avg(Expr *e)
+{
+        return vdiv(sum(e), count(e));
+}
 
 static __attribute__((constructor)) void
 __setup__()
 {
         builtin_add("sum", sum);
+        builtin_add("avg", avg);
+        builtin_add("mul", mul);
+        builtin_add("count", count);
 }

@@ -7,7 +7,7 @@ LIB = -lm
 HEADERS = $(wildcard src/*.h)
 SRC = $(wildcard src/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
-CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts
+CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts -fsanitize=address,null
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md gen
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)

@@ -59,6 +59,7 @@ toggle_raw_mode()
         tcgetattr(STDIN_FILENO, &origin_termios);
         raw_opts = origin_termios;
         cfmakeraw(&raw_opts);
+        raw_opts.c_lflag |= ISIG; // enable C-c
         raw_opts.c_oflag |= (OPOST | ONLCR);
         tcsetattr(STDIN_FILENO, TCSANOW, &raw_opts);
         enabled = true;
@@ -147,9 +148,11 @@ detect_cell_type(Cell *c)
                 cm_convert(c, TYPE_FORMULA);
                 return;
         }
-        bool is_numeric = *buf;
+        bool is_numeric = true && *buf;
         while (*buf && is_numeric) {
                 if (('0' <= *buf && *buf <= '9') || *buf == '.')
+                        ++buf;
+                else if (buf == c->repr && (*buf == '-' || *buf == '+'))
                         ++buf;
                 else
                         is_numeric = false;
@@ -158,6 +161,8 @@ detect_cell_type(Cell *c)
                 cm_convert(c, TYPE_NUMBER);
                 return;
         }
+
+        if (*c->repr == 0) c->value.type = TYPE_EMPTY;
 }
 
 void

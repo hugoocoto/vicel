@@ -70,9 +70,14 @@ eval_unop(Expr *e)
                 return VALUE_ERROR;
         }
 
-        if (!strcmp(e->as.unop.op, "-")) {
-                return AS_NUMBER(-rhs.as.num);
-        };
+        if (e->as.unop.op[1] == 0)
+                switch (*e->as.unop.op) {
+                case '-':
+                        return AS_NUMBER(-rhs.as.num);
+                case '+':
+                        return AS_NUMBER(+rhs.as.num);
+                }
+
         report("No yet implemented: unop for `%s`", e->as.unop.op);
         return VALUE_ERROR;
 }

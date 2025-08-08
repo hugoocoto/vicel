@@ -1,0 +1,7 @@
+,,,sum,avg
+4,5,-5,= sum(A1ÔB1ÔC1),= avg(A1ÔB1ÔC1)
+5,5,9,= sum(A2ÔB2ÔC2),= avg(A2ÔB2ÔC2)
+5,= -6,,= sum(A3ÔB3ÔC3),= avg(A3ÔB3ÔC3)
+,= +6,,= sum(A4ÔB4ÔC4),= avg(A4ÔB4ÔC4)
+,,,= sum(A5ÔB5ÔC5),= avg(A5ÔB5ÔC5)
+,,,= sum(A6ÔB6ÔC6),= avg(A6ÔB6ÔC6)

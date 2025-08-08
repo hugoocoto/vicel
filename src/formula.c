@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "eval.h"
 #include "window.h"
+#include <stdlib.h>
 
 Cell *cell_self = NULL;
 
@@ -32,7 +33,7 @@ Cell *cell_self = NULL;
 void
 refresh_formula_value(Cell *cell)
 {
-        cell->value.as.formula->value = eval_formula(*cell->value.as.formula);
+        cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
         free(cell->repr);
         cell->repr = get_repr(cell->value.as.formula->value);
 
@@ -243,16 +244,22 @@ lexer(char *c)
                 case ',':
                 case ';':
                 case ':':
+                case '+':
+                case '*':
                         last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
                         break;
-                case '+':
-                case '*':
-                case '0' ... '9':
+                case '0' ... '9': {
+                        char *c0 = c;
                         last->next = TOK_AS_NUM(strtod(c, &c));
                         last = last->next;
+                        if (c0 == c) {
+                                report("Can not convert %*s to number", 5, c);
+                                exit(19);
+                        }
                         break;
+                }
 
                 default:
                         if (isspace(*c)) {
@@ -263,6 +270,10 @@ lexer(char *c)
 
                         char *id;
                         if ((id = get_identifier(&c))) {
+                                if (id[0] == 0) {
+                                        report("can not get identifier");
+                                        exit(47);
+                                }
                                 last->next = TOK_AS_IDENTIFIER(id);
                                 last = last->next;
                                 break;
@@ -377,7 +388,7 @@ Expr *
 get_unary(Token **t)
 {
         Token *op;
-        if ((op = match(t, "-"))) {
+        if ((op = match(t, "-")) || (op = match(t, "+"))) {
                 return new_unop(op->as.str, get_unary(t));
         }
         return get_group(t);
@@ -512,6 +523,7 @@ parse_formula(char *c, Cell *self)
 {
         cell_self = self;
         Token *t = lexer(c);
+        report("Out of lexer");
         Token *tt = t;
         // - term -> factor (("-" | "+") factor)*
         // - factor -> power (("/" | "\*") power)*
@@ -583,8 +595,22 @@ free_expr(Expr *e)
                 free_expr(e->as.unop.rhs);
                 break;
         case EXPR_LITERAL:
+                if (e->as.literal.value.type == TYPE_TEXT)
+                        free(e->as.literal.value.as.text);
+                break;
         case EXPR_IDENTIFIER:
                 break;
+        case EXPR_FUNC: {
+                Expr *cur = e->as.func.args;
+                Expr *next;
+                while (cur) {
+                        next = cur->next;
+                        free_expr(cur);
+                        cur = next;
+                }
+                free_expr(e->as.func.name);
+                break;
+        }
         default:
                 report("No yet implemented: free_expr for %d", e->type);
         }

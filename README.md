@@ -79,8 +79,11 @@ Builtin functions can be called in formulas. It take numbers, text or cells as
 arguments and return a value. 
 * **sum(...) -> v**: Sum zero or more arguments and return the result as sum it
   using the sum operator.
+* **mul(...) -> v**: Multiply zero or more arguments. 
+* **avg(...) -> v**: Get the average of zero or more values. Non numeric
+  arguments count as 0.
 
-> Functions accept a keyword `:` that expand the operators two cells with all
+> Functions accept the keyword `:` that expand both cell operands with all
 > the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.
 
 ## Latest Version
@@ -95,3 +98,5 @@ I like to flex on how little code is needed for a fully functional program.
 
 ![](https://wakatime.com/badge/user/2a7b4567-ab1f-4fb2-98ff-2b3fdbf94654/project/98a99176-d7a4-48ba-968c-4e410787a98f.svg)
 
+## Known issues
+* Circular references crash the program
