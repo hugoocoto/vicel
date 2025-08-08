@@ -49,9 +49,8 @@ The first non-flag argument is used as the filename.
 
 ### Editing
 * `i`: Input/edit current cell
-* `I`: Input/edit all selected cells
 * `d`: Delete cell (set as empty)
-* `v`: Toggle cell selection
+* `v`: Toggle cell selection (useless)
 
 ### Insert + move
 * `gij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
