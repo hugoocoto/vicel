@@ -3,7 +3,7 @@ cloc|github.com/AlDanial/cloc v 2.04
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
-src/formula.c|68|29|625
+src/formula.c|72|29|634
 src/cellmap.c|34|22|359
 src/window.c|35|24|265
 src/keyboard.c|41|31|240
@@ -29,4 +29,4 @@ src/builtin.h|5|19|8
 src/keyboard.h|4|19|7
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|445|559|3012
+SUM:|449|559|3021

@@ -163,6 +163,36 @@ get_identifier(char **c)
         return id;
 }
 
+void
+free_token(Token *t)
+{
+        switch (t->type) {
+        case TOK_STRING:
+                free(t->as.str);
+                break;
+        case TOK_IDENTIFIER:
+                free(t->as.id);
+                break;
+        case TOK_NUMERIC:
+                break;
+        default:
+                report("No yet implemented: free_tokens for %d", t->type);
+        }
+        free(t);
+}
+
+void
+free_tokens(Token *t)
+{
+        Token *next;
+        while (t) {
+                next = t->next;
+                free_token(t);
+                t = next;
+        }
+}
+
+
 Token *
 early_expansion(Token *t)
 {
@@ -172,6 +202,9 @@ early_expansion(Token *t)
         int x1, x2, y1, y2;
         int x, y;
         int x_inc, y_inc;
+        Cell *c;
+        char *cn;
+
         while (t) {
                 if (t->type == TOK_STRING && strcmp(t->as.str, ":") == 0) {
                         if (!prev || prev->type != TOK_IDENTIFIER) goto cont;
@@ -205,9 +238,9 @@ early_expansion(Token *t)
 
                         while ((x1 == x2 || x < x2) &&
                                (y1 == y2 || y < y2)) {
-                                Cell *c = cm_get_cell_ptr(active_ctx.body, x, y);
+                                c = cm_get_cell_ptr(active_ctx.body, x, y);
                                 if (!c) break;
-                                char *cn = cm_get_cell_name(active_ctx.body, c);
+                                cn = cm_get_cell_name(active_ctx.body, c);
                                 last->next = TOK_AS_IDENTIFIER(cn);
                                 last = last->next;
                                 last->next = TOK_AS_STR(",", 1);
@@ -215,10 +248,13 @@ early_expansion(Token *t)
                                 x += x_inc;
                                 y += y_inc;
                         }
-                        last->next = t->next;
 
+                        last->next = t->next;
+                        Token *f = t;
                         prev = last;
                         t = t->next;
+                        free_token(f);
+
                         continue;
                 }
         cont:
@@ -493,29 +529,6 @@ report_ast(Expr *e)
         get_ast_repr(e, buffer);
         report("Ast: %s", buffer);
         return e;
-}
-
-void
-free_tokens(Token *t)
-{
-        Token *prev;
-        while (t) {
-                switch (t->type) {
-                case TOK_STRING:
-                        free(t->as.str);
-                        break;
-                case TOK_IDENTIFIER:
-                        free(t->as.id);
-                        break;
-                case TOK_NUMERIC:
-                        break;
-                default:
-                        report("No yet implemented: free_tokens for %d", t->type);
-                }
-                prev = t;
-                t = t->next;
-                free(prev);
-        }
 }
 
 Expr *

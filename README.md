@@ -6,7 +6,7 @@ cells interactively.
 ## Features
 * Edit CSV-like grids interactively in your terminal
 * Supports numbers, text, and formulas
-* Keyboard-focused — Vim-style motions
+* Keyboard-focused Vim-style motions
 * Optional mouse support
 * Lightweight and minimal code
 
@@ -68,7 +68,7 @@ The first non-flag argument is used as the filename.
 ## Input Format
 Press `i` while the cursor is on a cell.
 Supported formats:
-* **Numbers**: Decimal numbers like `10`, `3.14`
+* **Numbers**: Decimal numbers like `-10`, `3.14`
 * **Text**: Any non-number string
 * **Formula**: Starts with `=`, e.g. `=C2 + 8.5`
 
@@ -80,8 +80,8 @@ arguments and return a value.
 * **sum(...) -> v**: Sum zero or more arguments and return the result as sum it
   using the sum operator.
 * **mul(...) -> v**: Multiply zero or more arguments. 
-* **avg(...) -> v**: Get the average of zero or more values. Non numeric
-  arguments count as 0.
+* **avg(...) -> v**: Get the average of zero or more values. Empty cells don't
+  count.
 
 > Functions accept the keyword `:` that expand both cell operands with all
 > the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.
@@ -100,3 +100,4 @@ I like to flex on how little code is needed for a fully functional program.
 
 ## Known issues
 * Circular references crash the program
+* Range (XX:XX) not in formula? what should do?
