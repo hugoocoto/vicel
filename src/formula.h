@@ -29,6 +29,7 @@ typedef enum ExprType {
         EXPR_IDENTIFIER,
         EXPR_BIN,
         EXPR_UN,
+        EXPR_FUNC,
         EXPRLEN,
 } ExprType;
 
@@ -40,7 +41,9 @@ typedef struct Expr {
                 struct { struct Expr *lhs; char *op; struct Expr *rhs; } binop;
                 struct { char *op; struct Expr *rhs; } unop;
                 struct { Cell *cell; } identifier;
+                struct { struct Expr* name; struct Expr* args; } func;
         } as;
+        struct Expr * next; 
 } Expr;
 /* clang-format on */
 
@@ -74,13 +77,12 @@ typedef struct Formula {
 void build_formula(char *, Cell *self);
 Formula *formula_dup(Formula *f);
 
-Value eval_formula(Formula f);
 void clear_cell(Cell *c);
 Expr *parse_formula(char *, Cell *self);
 void destroy_formula(Cell *c);
 
 Formula *formula_extend(Cell *self, Formula *f, int r, int c);
 void get_ast_repr(Expr *e, char *buffer); // get a0+3/2 from expression
-char *create_id(int x, int y); // return A + y 0 + x
+char *create_id(int x, int y);            // return A + y 0 + x
 
 #endif //! FORMULA_H_

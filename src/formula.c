@@ -24,7 +24,7 @@
 #include "da.h"
 #include "debug.h"
 #include "window.h"
-#include <ctype.h>
+#include "eval.h"
 
 Cell *cell_self = NULL;
 
@@ -46,6 +46,17 @@ new_expr()
 }
 
 Expr *
+new_function(Expr *name, Expr *args)
+{
+        report("Creating new fun call");
+        Expr *e = new_expr();
+        e->type = EXPR_FUNC;
+        e->as.func.name = name;
+        e->as.func.args = args;
+        return e;
+}
+
+Expr *
 new_binop(Expr *lhs, char *op, Expr *rhs)
 {
         Expr *e = new_expr();
@@ -63,6 +74,15 @@ new_unop(char *op, Expr *rhs)
         e->type = EXPR_UN;
         e->as.unop.op = op;
         e->as.unop.rhs = rhs;
+        return e;
+}
+
+Expr *
+new_literal_str(char *c)
+{
+        Expr *e = new_expr();
+        e->type = EXPR_LITERAL;
+        e->as.literal.value = AS_TEXT(strdup(c));
         return e;
 }
 
@@ -105,7 +125,6 @@ TOK_AS_STR(char *c, int len)
         t->as.str = strdup(c);
         c[len] = prev;
         t->type = TOK_STRING;
-        report("tok as str: %s", t->as.str);
         return t;
 }
 
@@ -130,22 +149,8 @@ TOK_AS_IDENTIFIER(char *id)
 char *
 get_identifier(char **c)
 {
-        // report("call get_identifier with %s", *c);
         char *id = *c;
-        if (!isalpha(**c)) {
-                report("get_identifier at %c do not match isalpha", **c);
-                return NULL;
-        }
-        while (isalpha(**c)) {
-                // report("Consume alpha %c", **c);
-                ++*c;
-        }
-        if (**c < '0' || **c > '9') {
-                report("get_identifier at %c do not match isdigit", **c);
-                return NULL;
-        }
-        while ('0' <= **c && **c <= '9') {
-                // report("Consume digit %c", **c);
+        while (isalnum(**c)) {
                 ++*c;
         }
 
@@ -156,10 +161,8 @@ get_identifier(char **c)
 
         char prev = **c;
         **c = 0;
-        // report("call get_identifier id %s", id);
         id = strdup(id);
         **c = prev;
-        // report("call get_identifier return %s", id);
         return id;
 }
 
@@ -176,6 +179,8 @@ lexer(char *c)
                 case '^':
                 case '(':
                 case ')':
+                case ',':
+                case ';':
                         last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
@@ -245,22 +250,20 @@ get_literal(Token **t)
                 return new_literal(n);
         }
         case TOK_IDENTIFIER: {
-                report("get_literal from identifier %s", (*t)->as.id);
-                Cell *c = get_cell_from_coords((*t)->as.id);
-                if (c == NULL) {
-                        report("Can not get cell from id: %s", (*t)->as.id);
-                        return NULL;
-                }
+                char *id = (*t)->as.id;
+
+                report("get_literal from identifier %s", id);
+                Cell *cell = get_cell_from_coords(id);
                 *t = (*t)->next;
 
-                if (c == NULL) { // invalid coords
-                        return new_literal(0);
+                if (cell == NULL) {
+                        return new_literal_str(id);
                 }
 
                 assert(cell_self);
-                cm_subscribe(c, cell_self);
+                cm_subscribe(cell, cell_self);
 
-                return new_identifier(c);
+                return new_identifier(cell);
         }
         case TOK_STRING:
         default:
@@ -270,6 +273,36 @@ get_literal(Token **t)
 }
 
 Expr *get_term(Token **);
+
+Expr *
+get_function(Token **t)
+{
+        report("get function");
+        Expr *e = get_literal(t);
+        Expr *args = NULL;
+        Expr *last;
+
+        if (match(t, "(")) {
+                while (!match(t, ")")) {
+                        if (args == NULL) {
+                                args = get_term(t);
+                                report("Adding argument");
+                                last = args;
+                                continue;
+                        }
+                        if (!match(t, ",")) {
+                                // todo: invalid formula
+                                report("Expected parenthesis at formula");
+                                exit(ERR_EXPECT);
+                        }
+                        last->next = get_term(t);
+                        report("Adding argument");
+                        last = last->next;
+                }
+                return new_function(e, args);
+        }
+        return e;
+}
 
 Expr *
 get_group(Token **t)
@@ -283,7 +316,7 @@ get_group(Token **t)
                 }
                 return e;
         }
-        return get_literal(t);
+        return get_function(t);
 }
 
 Expr *
@@ -337,22 +370,48 @@ get_ast_repr(Expr *e, char *buffer)
         if (e == NULL) return;
         switch (e->type) {
         case EXPR_LITERAL:
-                sprintf(buffer + strlen(buffer), "%g ", e->as.literal.value.as.num);
+                switch (e->as.literal.value.type) {
+                case TYPE_NUMBER:
+                        sprintf(buffer + strlen(buffer), "%g",
+                                e->as.literal.value.as.num);
+                        break;
+                case TYPE_TEXT:
+                        sprintf(buffer + strlen(buffer), "%s",
+                                e->as.literal.value.as.text);
+                        break;
+                case TYPE_EMPTY:
+                case TYPE_FORMULA:
+                default: break;
+                }
                 break;
         case EXPR_BIN:
                 get_ast_repr(e->as.binop.lhs, buffer);
-                sprintf(buffer + strlen(buffer), "%s ", e->as.binop.op);
+                sprintf(buffer + strlen(buffer), "%s", e->as.binop.op);
                 get_ast_repr(e->as.binop.rhs, buffer);
                 break;
         case EXPR_UN:
-                sprintf(buffer + strlen(buffer), "%s ", e->as.unop.op);
+                sprintf(buffer + strlen(buffer), "%s", e->as.unop.op);
                 get_ast_repr(e->as.unop.rhs, buffer);
                 break;
         case EXPR_IDENTIFIER: {
                 char *c;
-                sprintf(buffer + strlen(buffer), "%s ",
+                sprintf(buffer + strlen(buffer), "%s",
                         c = cm_get_cell_name(active_ctx.body, e->as.identifier.cell));
                 free(c);
+                break;
+        }
+        case EXPR_FUNC: {
+                get_ast_repr(e->as.func.name, buffer);
+                sprintf(buffer + strlen(buffer), "(");
+                Expr *args = e->as.func.args;
+                if (args) {
+                        get_ast_repr(args, buffer);
+                        while ((args = args->next)) {
+                                sprintf(buffer + strlen(buffer), ",");
+                                get_ast_repr(args, buffer);
+                        }
+                }
+                sprintf(buffer + strlen(buffer), ")");
                 break;
         }
         default:
@@ -405,8 +464,9 @@ parse_formula(char *c, Cell *self)
         // - factor -> power (("/" | "\*") power)*
         // - power -> unary ("^") unary)*
         // - unary -> ("!" | "-") unary | group
-        // - group -> "(" expr ")" | literal
-        // - literal -> NUM | STR | "true" | "false" | IDENTIFIER
+        // - group -> "(" expr ")" | func
+        // - func -> FUNC "(" expr? ("," expr)* ")" | literal
+        // - literal -> NUM  | IDENTIFIER
         Expr *e = report_ast(get_term(&t));
         self->value.as.formula->tokens = tt;
         return e;

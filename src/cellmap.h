@@ -40,6 +40,13 @@ typedef struct Value {
         } as;
 } Value;
 
+#define AS_TEXT(n)                 \
+        (Value)                    \
+        {                          \
+                .type = TYPE_TEXT, \
+                .as.text = (n),    \
+        }
+
 #define AS_NUMBER(n)                 \
         (Value)                      \
         {                            \

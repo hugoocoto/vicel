@@ -23,10 +23,8 @@
 #include "debug.h"
 #include "formula.h"
 #include "window.h"
-#include <unistd.h>
-
-Value eval_formula(Formula f);
-Value eval_expr(Expr *e);
+#include "builtin.h"
+#include "eval.h"
 
 Value
 eval_identifier(Expr *e)
@@ -40,6 +38,27 @@ Value
 eval_literal(Expr *e)
 {
         return e->as.literal.value;
+}
+
+Value
+eval_func(Expr *e)
+{
+        char buf[64] = { 0 };
+        get_ast_repr(e, buf);
+        report("Eval function: %s", buf);
+
+        Value name = eval_expr(e->as.func.name);
+        if (name.type != TYPE_TEXT) {
+                report("eval_func func name is not text");
+                return VALUE_ERROR;
+        }
+
+        Func f = builtin_get(name.as.text);
+        if (f == NULL) {
+                report("No builtin function for name %s", name.as.text);
+                return VALUE_ERROR;
+        }
+        return f(e->as.func.args);
 }
 
 Value
@@ -298,6 +317,7 @@ eval_expr(Expr *e)
         case EXPR_BIN: return eval_binop(e);
         case EXPR_UN: return eval_unop(e);
         case EXPR_IDENTIFIER: return eval_identifier(e);
+        case EXPR_FUNC: return eval_func(e);
         default:
                 report("No yet implemented: eval_expr for %d", e->type);
                 return VALUE_ERROR;
