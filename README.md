@@ -102,3 +102,6 @@ I like to flex on how little code is needed for a fully functional program.
 * Circular references crash the program
 * Range (XX:XX) not in formula? what should do?
 * Read csv with , " , ", Split cell at , although the quotes.
+* Support arrows for movement
+* Improve input: use prev input
+* Improve input: arrow movement
