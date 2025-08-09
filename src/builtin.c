@@ -80,11 +80,11 @@ mul(Expr *e)
 Value
 count(Expr *e)
 {
-        double count = 1.0;
+        double count = 0.0;
         if (e == NULL) return AS_NUMBER(0);
-        while ((e = e->next)) {
+        do {
                 if (eval_expr(e).type != TYPE_EMPTY) ++count;
-        }
+        } while ((e = e->next));
         return AS_NUMBER(count);
 }
 
