@@ -91,7 +91,11 @@ count(Expr *e)
 Value
 avg(Expr *e)
 {
-        return vdiv(sum(e), count(e));
+        Value a = sum(e);
+        Value b = count(e);
+        if (a.type == TYPE_NUMBER && a.as.num == 0.0 &&
+            b.type == TYPE_NUMBER && b.as.num == 0.0) return VALUE_EMPTY;
+        return vdiv(a, b);
 }
 
 static __attribute__((constructor)) void

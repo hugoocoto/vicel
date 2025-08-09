@@ -103,6 +103,17 @@ are_valid_operands(Value a, Value b)
 }
 
 Value
+vadd(Value a, Value b)
+{
+        if (are_valid_operands(a, b)) {
+                return AS_NUMBER(a.as.num + b.as.num);
+        }
+        if (a.type == TYPE_NUMBER) return a;
+        if (b.type == TYPE_NUMBER) return b;
+        return AS_NUMBER(0);
+}
+
+Value
 vsub(Value a, Value b)
 {
         if (are_valid_operands(a, b)) {
@@ -110,14 +121,8 @@ vsub(Value a, Value b)
         }
 
         if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(-b.as.num);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vsub for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_ERROR;
+        if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
+        return AS_NUMBER(0);
 }
 Value
 vdiv(Value a, Value b)
@@ -125,16 +130,7 @@ vdiv(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num / b.as.num);
         }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vdiv for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_ERROR;
+        return AS_NUMBER(0);
 }
 
 Value
@@ -143,16 +139,7 @@ vmul(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num * b.as.num);
         }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vsub for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_ERROR;
+        return AS_NUMBER(0);
 }
 
 Value
@@ -161,34 +148,7 @@ vpow(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(pow(a.as.num, b.as.num));
         }
-
-        if (a.type == TYPE_NUMBER) return AS_NUMBER(0);
-        if (b.type == TYPE_NUMBER)
-                return AS_NUMBER(0);
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vpow for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_ERROR;
-}
-
-Value
-vadd(Value a, Value b)
-{
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num + b.as.num);
-        }
-
-        if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER)
-                return b;
-        else
-                return AS_NUMBER(0);
-
-        report("No yet implemented: vadd for %s and %s",
-               cm_type_repr(a.type), cm_type_repr(b.type));
-        return VALUE_ERROR;
+        return AS_NUMBER(0);
 }
 
 Value
