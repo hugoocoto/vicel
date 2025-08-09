@@ -204,9 +204,14 @@ early_expansion(Token *t)
         int x_inc, y_inc;
         Cell *c;
         char *cn;
+        int nest = 0;
 
         while (t) {
-                if (t->type == TOK_STRING && strcmp(t->as.str, ":") == 0) {
+                /* I know I can optimize it but is better looking this way */
+                if (t->type != TOK_STRING) goto cont;
+                if (strcmp(t->as.str, ")") == 0) --nest;
+                if (strcmp(t->as.str, "(") == 0) ++nest;
+                if (strcmp(t->as.str, ":") == 0) {
                         if (!prev || prev->type != TOK_IDENTIFIER) goto cont;
                         if (!t->next || t->next->type != TOK_IDENTIFIER) goto cont;
                         if (parse_coords(prev->as.id, &x1, &y1)) goto cont;
@@ -233,7 +238,7 @@ early_expansion(Token *t)
                         x = x1 + x_inc;
                         y = y1 + y_inc;
                         last = prev;
-                        last->next = TOK_AS_STR(",", 1);
+                        last->next = TOK_AS_STR(nest ? "," : "+", 1);
                         last = last->next;
 
                         while ((x1 == x2 || x < x2) &&
@@ -243,7 +248,7 @@ early_expansion(Token *t)
                                 cn = cm_get_cell_name(active_ctx.body, c);
                                 last->next = TOK_AS_IDENTIFIER(cn);
                                 last = last->next;
-                                last->next = TOK_AS_STR(",", 1);
+                                last->next = TOK_AS_STR(nest ? "," : "+", 1);
                                 last = last->next;
                                 x += x_inc;
                                 y += y_inc;
