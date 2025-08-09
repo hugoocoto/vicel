@@ -77,11 +77,10 @@ Supported formats:
 ## Builtin functions
 Builtin functions can be called in formulas. It take numbers, text or cells as 
 arguments and return a value. 
-* **sum(...) -> v**: Sum zero or more arguments and return the result as if sum it one by one.
-  using the sum operator.
-* **mul(...) -> v**: Multiply zero or more arguments. 
-* **avg(...) -> v**: Get the average of zero or more values. Empty cells don't
-  count.
+* **sum(...)**: Sum zero or more arguments and return the result as if adding it one by one.
+* **mul(...)**: Multiply zero or more arguments. 
+* **avg(...)**: Get the average of zero or more values. 
+* **count(...)**: Get the number of non empty arguments.
 
 > Functions accept the keyword `:` that expand both cell operands with all
 > the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.
