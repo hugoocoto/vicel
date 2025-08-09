@@ -77,7 +77,7 @@ Supported formats:
 ## Builtin functions
 Builtin functions can be called in formulas. It take numbers, text or cells as 
 arguments and return a value. 
-* **sum(...) -> v**: Sum zero or more arguments and return the result as sum it
+* **sum(...) -> v**: Sum zero or more arguments and return the result as if sum it one by one.
   using the sum operator.
 * **mul(...) -> v**: Multiply zero or more arguments. 
 * **avg(...) -> v**: Get the average of zero or more values. Empty cells don't
@@ -101,3 +101,4 @@ I like to flex on how little code is needed for a fully functional program.
 ## Known issues
 * Circular references crash the program
 * Range (XX:XX) not in formula? what should do?
+* Read csv with , " , ", Split cell at , although the quotes.
