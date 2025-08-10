@@ -303,7 +303,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         if (avx <= 0) break;
                         ++xx;
                 }
-                if (avx > 0) T_EL(1);
+                if (avx > 0) T_EL(0);
                 avy -= row_width;
                 _cy += row_width;
                 ++yy;

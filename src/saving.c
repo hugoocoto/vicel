@@ -25,54 +25,109 @@
 #include "debug.h"
 #include "keyboard.h"
 #include "window.h"
+#include <ctype.h>
+#include <stdbool.h>
+#include <string.h>
+
 
 void
-unmask_comma(char *c)
+remove_spaces(char *c)
 {
-        while ((c = strchr(c, -','))) {
-                *c = ',';
+        while (*c) {
+                if (isspace(*c))
+                        memmove(c, c + 1, strlen(c));
+                else
+                        ++c;
         }
 }
 
-char *
-get_value_from_cell_literal(char *r)
+int
+get_sep(char **r, char **c, bool *last)
 {
-        char *c;
-        char *t;
-
-        // remove left spaces
-        while (isspace(*r))
-                ++r;
-
-        unmask_comma(r);
-
-        // if values are between `"` then remove it
-        if (*r == '"' && (t = strrchr(r + 1, '"'))) {
-                *t = 0;
-                ++r;
-        }
-        c = r;
-
-        for (; *c; ++c) {
-                switch (*c) {
-                case ' ' ... 126:
-                        break;
-                default:
-                        report("Invalid char %d (%c)", *c, *c);
-                        *c = '?';
-                        break;
+        if (**r == '"') {
+                if ((*c = strstr(*r + 1, "\","))) {
+                        **c = 0;
+                        ++*c;
+                        *last = false;
+                        ++*r;
+                        return 2;
+                }
+                if (!strchr(*r + 1, ',')) {
+                        if ((*c = strrchr(*r + 1, '"'))) {
+                                **c = 0;
+                                ++*r;
+                        }
+                        *last = true;
+                        return 1;
                 }
         }
-        return strdup(r);
+
+        if ((*c = strchr(*r, ','))) {
+                *last = false;
+                return 1;
+        }
+
+        *last = true;
+        *c = *r + strlen(*r);
+        return 1;
+}
+
+CellArr
+get_line_data(char *line)
+{
+        char *r;
+        char *c;
+        CellArr ca = (CellArr) { 0 };
+        Cell cell;
+        bool last = false;
+
+        report("line: `%s`", line);
+        c = r = line;
+        do {
+                get_sep(&r, &c, &last);
+                *c = 0;
+                report("=> %s", r);
+                cell = EMPTY_CELL;
+                free(cell.repr);
+                cell.repr = strdup(r);
+                da_append(&ca, cell);
+                r = c + 1;
+        } while (!last);
+        return ca;
+}
+
+int
+get_data(CellMat *cm, FILE *f)
+{
+        char line[1024];
+        int max_size = 0;
+        CellArr ca;
+        char *c;
+
+        while (fgets(line, sizeof line, f)) {
+                if ((c = strchr(line, '\n'))) *c = 0;
+                if ((c = strchr(line, '\r'))) *c = 0;
+
+                remove_spaces(line);
+                ca = get_line_data(line);
+                da_append(cm, ca);
+                max_size = max(max_size, ca.size);
+        }
+        return max_size;
 }
 
 void
 load(char *filename, Context *ctx)
 {
+        int max_size;
         ctx->cursor_pos_c = 0;
         ctx->cursor_pos_r = 0;
+        ctx->scroll_c = 0;
+        ctx->scroll_r = 0;
 
-        if (filename) ctx->filename = strdup(filename);
+        if (filename == NULL) goto load_blank;
+
+        ctx->filename = strdup(filename);
 
         FILE *f = fopen(filename, "r");
         if (f == NULL) {
@@ -81,44 +136,16 @@ load(char *filename, Context *ctx)
         }
 
         ctx->body = calloc(1, sizeof(CellMat));
-
-        char line[1024];
-        char *r;
-        char *c;
-        CellArr ca;
-        Cell cell;
-        int max_size = 0;
-        bool last;
-
-        while (fgets(line, sizeof line, f)) {
-                if ((c = strchr(line, '\n'))) *c = 0;
-                if ((c = strchr(line, '\r'))) *c = 0;
-                ca = (CellArr) { 0 };
-                c = r = line;
-                last = false;
-                do {
-                        if ((c = strchr(r, ','))) {
-                                *c = 0;
-                        } else {
-                                last = true;
-                        }
-                        cell = EMPTY_CELL;
-                        free(cell.repr);
-                        cell.repr = get_value_from_cell_literal(r);
-                        da_append(&ca, cell);
-                        r = c + 1;
-                } while (!last);
-
-                da_append(ctx->body, ca);
-                max_size = max(max_size, ca.size);
-        }
+        max_size = get_data(ctx->body, f);
 
         for_da_each(row, *ctx->body)
         {
                 while (row->size < max_size)
                         da_append(row, EMPTY_CELL);
                 for_da_each(c, *row)
-                set_cell_text(c, strdup(c->repr));
+                {
+                        set_cell_text(c, strdup(c->repr));
+                }
         }
 
         return;
@@ -128,21 +155,13 @@ load_blank:
 }
 
 void
-mask_comma(char *c)
-{
-        while ((c = strchr(c, ','))) {
-                *c = -',';
-        }
-}
-
-void
 save(Context *ctx)
 {
+        int fd;
         if (ctx->filename == NULL) {
                 report("Can't save unamed sheet");
                 return;
         }
-        int fd;
 
         fd = open(ctx->filename, O_WRONLY | O_CREAT, 0600);
 
@@ -161,8 +180,10 @@ save(Context *ctx)
                         } else {
                                 dprintf(fd, ",");
                         }
-                        mask_comma(c->input_repr);
-                        dprintf(fd, "%s", c->input_repr);
+                        if (c->input_repr && *c->input_repr)
+                                dprintf(fd, "\"%s\"", c->input_repr);
+                        else
+                                dprintf(fd, "%s", c->input_repr);
                 }
                 dprintf(fd, "\n");
         }

@@ -100,8 +100,5 @@ I like to flex on how little code is needed for a fully functional program.
 ![](https://wakatime.com/badge/user/2a7b4567-ab1f-4fb2-98ff-2b3fdbf94654/project/98a99176-d7a4-48ba-968c-4e410787a98f.svg)
 
 ## Known issues
-* Circular references crash the program
-* Read csv with , " , ", Split cell at , although the quotes.
-* Support arrows for movement
-* Improve input: use prev input
-* Improve input: arrow movement
+Issues ![here](./TODO_ISSUES.md).
+
