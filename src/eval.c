@@ -42,8 +42,8 @@ eval_literal(Expr *e)
 Value
 eval_func(Expr *e)
 {
-        char buf[64] = { 0 };
-        get_ast_repr(e, buf);
+        // char buf[64] = { 0 };
+        // get_ast_repr(e, buf, sizeof buf);
 
         Value name = eval_expr(e->as.func.name);
         if (name.type != TYPE_TEXT) {

@@ -469,19 +469,24 @@ get_term(Token **t)
 }
 
 void
-get_ast_repr(Expr *e, char *buffer)
+get_ast_repr(Expr *e, char *buffer, size_t len)
 {
+        static int recursion_level = 0;
+
         if (e == NULL) return;
+        if (strlen(buffer) >= len) return;
+
+#define MAX_RECURSION_LEVEL 5
         switch (e->type) {
         case EXPR_LITERAL:
                 switch (e->as.literal.value.type) {
                 case TYPE_NUMBER:
-                        sprintf(buffer + strlen(buffer), "%g",
-                                e->as.literal.value.as.num);
+                        snprintf(buffer + strlen(buffer), len, "%g",
+                                 e->as.literal.value.as.num);
                         break;
                 case TYPE_TEXT:
-                        sprintf(buffer + strlen(buffer), "%s",
-                                e->as.literal.value.as.text);
+                        snprintf(buffer + strlen(buffer), len, "%s",
+                                 e->as.literal.value.as.text);
                         break;
                 case TYPE_EMPTY:
                 case TYPE_FORMULA:
@@ -489,34 +494,64 @@ get_ast_repr(Expr *e, char *buffer)
                 }
                 break;
         case EXPR_BIN:
-                get_ast_repr(e->as.binop.lhs, buffer);
-                sprintf(buffer + strlen(buffer), "%s", e->as.binop.op);
-                get_ast_repr(e->as.binop.rhs, buffer);
+                if (++recursion_level == MAX_RECURSION_LEVEL) {
+                        --recursion_level;
+                        return;
+                }
+                get_ast_repr(e->as.binop.lhs, buffer, len);
+                --recursion_level;
+                snprintf(buffer + strlen(buffer), len, "%s", e->as.binop.op);
+                if (++recursion_level == MAX_RECURSION_LEVEL) {
+                        --recursion_level;
+                        return;
+                }
+                get_ast_repr(e->as.binop.rhs, buffer, len);
+                --recursion_level;
                 break;
         case EXPR_UN:
-                sprintf(buffer + strlen(buffer), "%s", e->as.unop.op);
-                get_ast_repr(e->as.unop.rhs, buffer);
+                snprintf(buffer + strlen(buffer), len, "%s", e->as.unop.op);
+                if (++recursion_level == MAX_RECURSION_LEVEL) {
+                        --recursion_level;
+                        return;
+                }
+                get_ast_repr(e->as.unop.rhs, buffer, len);
+                --recursion_level;
                 break;
         case EXPR_IDENTIFIER: {
                 char *c;
-                sprintf(buffer + strlen(buffer), "%s",
-                        c = cm_get_cell_name(active_ctx.body,
-                                             e->as.identifier.cell));
+                snprintf(buffer + strlen(buffer), len, "%s",
+                         c = cm_get_cell_name(active_ctx.body,
+                                              e->as.identifier.cell));
                 free(c);
                 break;
         }
         case EXPR_FUNC: {
-                get_ast_repr(e->as.func.name, buffer);
-                sprintf(buffer + strlen(buffer), "(");
+                if (++recursion_level == MAX_RECURSION_LEVEL) {
+                        --recursion_level;
+                        return;
+                }
+                get_ast_repr(e->as.func.name, buffer, len);
+                --recursion_level;
+                snprintf(buffer + strlen(buffer), len, "(");
                 Expr *args = e->as.func.args;
                 if (args) {
-                        get_ast_repr(args, buffer);
+                        if (++recursion_level == MAX_RECURSION_LEVEL) {
+                                --recursion_level;
+                                return;
+                        }
+                        get_ast_repr(args, buffer, len);
+                        --recursion_level;
                         while ((args = args->next)) {
-                                sprintf(buffer + strlen(buffer), ",");
-                                get_ast_repr(args, buffer);
+                                snprintf(buffer + strlen(buffer), len, ",");
+                                if (++recursion_level == MAX_RECURSION_LEVEL) {
+                                        --recursion_level;
+                                        return;
+                                }
+                                get_ast_repr(args, buffer, len);
+                                --recursion_level;
                         }
                 }
-                sprintf(buffer + strlen(buffer), ")");
+                snprintf(buffer + strlen(buffer), len, ")");
                 break;
         }
         default:
@@ -530,8 +565,8 @@ report_ast(Expr *e)
 {
         if (e == NULL) return e;
 
-        char buffer[1024] = { 0 };
-        get_ast_repr(e, buffer);
+        char buffer[128] = { 0 };
+        get_ast_repr(e, buffer, sizeof buffer - 1);
         report("Ast: %s", buffer);
         return e;
 }

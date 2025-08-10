@@ -118,7 +118,7 @@ cm_get_cell(CellMat *mat, int x, int y)
 char *
 get_num_repr(double d)
 {
-        char buf[1024];
+        char buf[16];
         buf[snprintf(buf, sizeof buf - 1, "%g", d)] = 0;
         return strdup(buf);
 }
@@ -132,8 +132,9 @@ get_input_repr(Value v)
         case TYPE_TEXT:
                 return strdup(v.as.text);
         case TYPE_FORMULA: {
-                char buffer[1024] = "= \0";
-                get_ast_repr(v.as.formula->body, buffer);
+                char buffer[128] = "= \0";
+                report("TEMP: too big buffer usage at %s:%d", __FILE_NAME__, __LINE__);
+                get_ast_repr(v.as.formula->body, buffer, sizeof buffer - 1);
                 return strdup(buffer);
         }
         case TYPE_EMPTY:

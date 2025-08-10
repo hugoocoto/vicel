@@ -41,7 +41,7 @@ remove_spaces(char *c)
         }
 }
 
-int
+void
 get_sep(char **r, char **c, bool *last)
 {
         if (**r == '"') {
@@ -50,7 +50,7 @@ get_sep(char **r, char **c, bool *last)
                         ++*c;
                         *last = false;
                         ++*r;
-                        return 2;
+                        return;
                 }
                 if (!strchr(*r + 1, ',')) {
                         if ((*c = strrchr(*r + 1, '"'))) {
@@ -58,18 +58,18 @@ get_sep(char **r, char **c, bool *last)
                                 ++*r;
                         }
                         *last = true;
-                        return 1;
+                        return;
                 }
         }
 
         if ((*c = strchr(*r, ','))) {
                 *last = false;
-                return 1;
+                return;
         }
 
         *last = true;
         *c = *r + strlen(*r);
-        return 1;
+        return;
 }
 
 CellArr
@@ -96,13 +96,13 @@ get_line_data(char *line)
         return ca;
 }
 
-int
-get_data(CellMat *cm, FILE *f)
+void
+get_data(CellMat *cm, FILE *f, int *max_size)
 {
-        char line[1024];
-        int max_size = 0;
+        char line[1024*1024];
         CellArr ca;
         char *c;
+        *max_size = 0;
 
         while (fgets(line, sizeof line, f)) {
                 if ((c = strchr(line, '\n'))) *c = 0;
@@ -111,9 +111,8 @@ get_data(CellMat *cm, FILE *f)
                 remove_spaces(line);
                 ca = get_line_data(line);
                 da_append(cm, ca);
-                max_size = max(max_size, ca.size);
+                *max_size = max(*max_size, ca.size);
         }
-        return max_size;
 }
 
 void
@@ -136,7 +135,7 @@ load(char *filename, Context *ctx)
         }
 
         ctx->body = calloc(1, sizeof(CellMat));
-        max_size = get_data(ctx->body, f);
+        get_data(ctx->body, f, &max_size);
 
         for_da_each(row, *ctx->body)
         {
