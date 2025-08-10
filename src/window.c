@@ -165,7 +165,8 @@ cursor_gotocell(int x, int y)
 {
         int first_cell_col = 1;
         int first_cell_row = 2;
-        T_CUP(first_cell_row + row_width * y, num_col_width + first_cell_col + column_width * (x - 1));
+        T_CUP(first_cell_row + row_width * y - active_ctx.scroll_r,
+              num_col_width + first_cell_col + column_width * (x - 1 - active_ctx.scroll_c));
 }
 
 void
@@ -302,11 +303,14 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         if (avx <= 0) break;
                         ++xx;
                 }
+                if (avx > 0) T_EL(1);
                 avy -= row_width;
                 _cy += row_width;
                 ++yy;
                 if (avy <= 0) break;
         }
+
+        if (avy > 0) T_ED(0);
         EFFECT(RESET);
         active_ctx.max_display_c = m_c;
         active_ctx.max_display_r = m_r;

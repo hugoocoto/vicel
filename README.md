@@ -105,4 +105,3 @@ I like to flex on how little code is needed for a fully functional program.
 * Support arrows for movement
 * Improve input: use prev input
 * Improve input: arrow movement
-* Broken on gij because of line clearing

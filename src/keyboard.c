@@ -29,6 +29,7 @@
 #include "formula.h"
 #include "mappings.h"
 #include "window.h"
+#include <stdio.h>
 #include <termios.h>
 
 #define MAX_MAPPING_LEN 6
@@ -116,6 +117,7 @@ get_input_at_cursor()
 {
         char buf[1024];
         char *c;
+        int i = 0;
 
         T_SCP();
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
@@ -132,7 +134,9 @@ get_input_at_cursor()
         } else
                 buf[0] = 0;
 
-        T_ED(1);
+        for (; buf[i]; i++)
+                putchar(*T_BS);
+
         toggle_raw_mode();
         T_CUHDE();
         T_RCP();
