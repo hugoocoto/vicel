@@ -12,10 +12,10 @@ src/escape_code.h|14|24|177
 src/mappings.c|25|19|174
 src/eval.c|22|19|153
 src/saving.c|23|21|127
+src/builtin.c|12|19|112
 src/flag.h|16|44|98
 src/da.h|15|33|90
 src/cellmap.h|23|21|82
-src/builtin.c|10|19|79
 src/main.c|13|20|58
 src/formula.h|11|22|55
 src/window.h|13|20|47
@@ -29,4 +29,4 @@ src/builtin.h|5|19|8
 src/keyboard.h|4|19|7
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|440|560|2998
+SUM:|442|560|3031

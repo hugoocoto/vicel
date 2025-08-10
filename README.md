@@ -81,6 +81,8 @@ arguments and return a value.
 * **mul(...)**: Multiply zero or more arguments. 
 * **avg(...)**: Get the average of zero or more values. 
 * **count(...)**: Get the number of non empty arguments.
+* **min(...)**: Get the min number between arguments.
+* **max(...)**: Get the max number between arguments.
 
 > Functions accept the keyword `:` that expand both cell operands with all
 > the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.

@@ -1,7 +1,9 @@
-5,,,sum,avg
-4,5,-5,= sum(A1ÔB1ÔC1),= avg(A1ÔB1ÔC1)
-5,5,9,= sum(A2ÔB2ÔC2),= avg(A2ÔB2ÔC2)
-5,= -6,,= sum(A3ÔB3ÔC3),= avg(A3ÔB3ÔC3)
-,= +6,= A0,= sum(A4ÔB4ÔC4),= avg(A4ÔB4ÔC4)
-4,5,,= sum(A5ÔB5ÔC5),= avg(A5ÔB5ÔC5)
-,,,= sum(A6ÔB6ÔC6),= avg(A6ÔB6ÔC6)
+,,,sum,avg,min,max
+0,9,42,= sum(A1ÔB1ÔC1),= avg(A1ÔB1ÔC1),= min(A1ÔB1ÔC1),= max(A1ÔB1ÔC1)
+4,= 5,= 5*4,= sum(A2ÔB2ÔC2),= avg(A2ÔB2ÔC2),= min(A2ÔB2ÔC2),= max(A2ÔB2ÔC2)
+,,,= sum(A3ÔB3ÔC3),= avg(A3ÔB3ÔC3),= min(A3ÔB3ÔC3),= max(A3ÔB3ÔC3)
+,,,= sum(A4ÔB4ÔC4),= avg(A4ÔB4ÔC4),= min(A4ÔB4ÔC4),= max(A4ÔB4ÔC4)
+,,,= sum(A5ÔB5ÔC5),= avg(A5ÔB5ÔC5),= min(A5ÔB5ÔC5),= max(A5ÔB5ÔC5)
+,,,= sum(A6ÔB6ÔC6),= avg(A6ÔB6ÔC6),= min(A6ÔB6ÔC6),= max(A6ÔB6ÔC6)
+,,sum,= sum(D1ÔD2ÔD3ÔD4ÔD5ÔD6),= sum(E1ÔE2ÔE3ÔE4ÔE5ÔE6),= sum(F1ÔF2ÔF3ÔF4ÔF5ÔF6),= sum(G1ÔG2ÔG3ÔG4ÔG5ÔG6)
+,,avg,= avg(D1ÔD2ÔD3ÔD4ÔD5ÔD6),= avg(E1ÔE2ÔE3ÔE4ÔE5ÔE6),= avg(F1ÔF2ÔF3ÔF4ÔF5ÔF6),= avg(G1ÔG2ÔG3ÔG4ÔG5ÔG6)

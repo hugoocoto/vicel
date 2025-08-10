@@ -78,11 +78,11 @@ typedef DA(CellArr) CellMat;
                 .type = TYPE_EMPTY, \
         }
 
-#define VALUE_ERROR                         \
-        (Value)                             \
-        {                                   \
-                .type = TYPE_TEXT,          \
-                .as.text = strdup("ERROR"), \
+#define VALUE_ERROR                 \
+        (Value)                     \
+        {                           \
+                .type = TYPE_TEXT,  \
+                .as.text = "ERROR", \
         }
 
 #define EMPTY_CELL                        \

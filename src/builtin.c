@@ -23,6 +23,7 @@
 #include "da.h"
 #include "eval.h"
 #include "formula.h"
+#include <string.h>
 
 struct Pair {
         char *name;
@@ -98,6 +99,38 @@ avg(Expr *e)
         return vdiv(a, b);
 }
 
+Value
+min(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+        Value min = eval_expr(e);
+        Value v;
+        while ((e = e->next)) {
+                v = eval_expr(e);
+                if (v.type != TYPE_NUMBER) continue;
+                if (min.type != TYPE_NUMBER || v.as.num < min.as.num) {
+                        min = v;
+                }
+        }
+        return min.type == TYPE_NUMBER? min : VALUE_EMPTY;
+}
+
+Value
+max(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+        Value max = eval_expr(e);
+        Value v;
+        while ((e = e->next)) {
+                v = eval_expr(e);
+                if (v.type != TYPE_NUMBER) continue;
+                if (max.type != TYPE_NUMBER || v.as.num > max.as.num) {
+                        max = v;
+                }
+        }
+        return max.type == TYPE_NUMBER? max : VALUE_EMPTY;
+}
+
 static __attribute__((constructor)) void
 __setup__()
 {
@@ -105,4 +138,6 @@ __setup__()
         builtin_add("avg", avg);
         builtin_add("mul", mul);
         builtin_add("count", count);
+        builtin_add("min", min);
+        builtin_add("max", max);
 }

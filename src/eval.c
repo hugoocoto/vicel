@@ -110,7 +110,7 @@ vadd(Value a, Value b)
         }
         if (a.type == TYPE_NUMBER) return a;
         if (b.type == TYPE_NUMBER) return b;
-        return AS_NUMBER(0);
+        return VALUE_EMPTY;
 }
 
 Value
@@ -122,7 +122,7 @@ vsub(Value a, Value b)
 
         if (a.type == TYPE_NUMBER) return a;
         if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
-        return AS_NUMBER(0);
+        return VALUE_EMPTY;
 }
 Value
 vdiv(Value a, Value b)
@@ -130,7 +130,7 @@ vdiv(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num / b.as.num);
         }
-        return AS_NUMBER(0);
+        return VALUE_EMPTY;
 }
 
 Value
@@ -139,7 +139,7 @@ vmul(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num * b.as.num);
         }
-        return AS_NUMBER(0);
+        return VALUE_EMPTY;
 }
 
 Value
@@ -148,7 +148,7 @@ vpow(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(pow(a.as.num, b.as.num));
         }
-        return AS_NUMBER(0);
+        return VALUE_EMPTY;
 }
 
 Value
