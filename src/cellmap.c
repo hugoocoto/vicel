@@ -24,6 +24,8 @@
 #include "debug.h"
 #include "formula.h"
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 bool
 cm_is_valid_pos(CellMat *mat, int x, int y)
@@ -40,6 +42,7 @@ cm_type_repr(CellType ct)
                 [TYPE_TEXT] = "TYPE_TEXT",
                 [TYPE_EMPTY] = "TYPE_EMPTY",
                 [TYPE_FORMULA] = "TYPE_FORMULA",
+                [TYPE_RANGE] = "TYPE_RANGE",
                 [TYPE_LEN] = "TYPE_LEN",
         };
         if (ct >= 0 && ct < TYPE_LEN)
@@ -137,6 +140,16 @@ get_input_repr(Value v)
                 get_ast_repr(v.as.formula->body, buffer, sizeof buffer - 1);
                 return strdup(buffer);
         }
+        case TYPE_RANGE: {
+                char buffer[128] = "";
+                char *c1, *c2;
+                snprintf(buffer, sizeof buffer, "%s:%s",
+                         c1 = create_id(v.as.range.starty, v.as.range.startx),
+                         c2 = create_id(v.as.range.endy, v.as.range.endx));
+                free(c1);
+                free(c2);
+                return strdup(buffer);
+        }
         case TYPE_EMPTY:
                 return strdup("");
         default:
@@ -157,6 +170,20 @@ get_repr(Value v)
                 return get_repr(v.as.formula->value);
         case TYPE_EMPTY:
                 return strdup("");
+        case TYPE_RANGE: {
+                char buffer[128] = "";
+                char *c1, *c2;
+                snprintf(buffer, sizeof buffer, "%s:%s",
+                         c1 = create_id(v.as.range.starty, v.as.range.startx),
+                         c2 = create_id(v.as.range.endy, v.as.range.endx));
+                free(c1);
+                free(c2);
+                report("Range for (%d,%d => %d,%d), ",
+                       v.as.range.startx, v.as.range.starty,
+                       v.as.range.endx, v.as.range.endy,
+                       buffer);
+                return strdup(buffer);
+        }
         default:
                 report("No yet implemented: get_repr for %s", cm_type_repr(v.type));
                 return strdup("Err");
@@ -166,7 +193,7 @@ get_repr(Value v)
 void
 cm_convert(Cell *c, CellType tnew)
 {
-        report("Call convert with %s -> %s", cm_type_repr(c->value.type), cm_type_repr(tnew));
+        // report("Call convert with %s -> %s", cm_type_repr(c->value.type), cm_type_repr(tnew));
         if (c->value.type == tnew) return;
 
         if (tnew == TYPE_EMPTY) {

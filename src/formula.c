@@ -25,10 +25,35 @@
 #include "debug.h"
 #include "eval.h"
 #include "window.h"
-#include <stdlib.h>
 
 Cell *cell_self = NULL;
 
+Value
+build_range(Cell *cstart, Cell *cend)
+{
+        Value r = (Value) { .type = TYPE_RANGE };
+        char *cs;
+
+        cs = cm_get_cell_name(active_ctx.body, cstart);
+        if (cs == NULL) return VALUE_ERROR;
+        if (parse_coords(cs, &r.as.range.startx, &r.as.range.starty)) {
+                free(cs);
+                return VALUE_ERROR;
+        }
+        free(cs);
+
+        cs = cm_get_cell_name(active_ctx.body, cend);
+        if (cs == NULL) return VALUE_ERROR;
+        if (parse_coords(cs, &r.as.range.endx, &r.as.range.endy)) {
+                free(cs);
+                return VALUE_ERROR;
+        }
+        free(cs);
+
+        /* should add subscribers */
+
+        return r;
+}
 
 void
 refresh_formula_value(Cell *cell)
@@ -93,6 +118,16 @@ new_literal(double value)
         Expr *e = new_expr();
         e->type = EXPR_LITERAL;
         e->as.literal.value = AS_NUMBER(value);
+        return e;
+}
+
+
+Expr *
+new_range(Cell *cstart, Cell *cend)
+{
+        Expr *e = new_expr();
+        e->type = EXPR_LITERAL;
+        e->as.literal.value = build_range(cstart, cend);
         return e;
 }
 
@@ -196,6 +231,8 @@ free_tokens(Token *t)
 Token *
 early_expansion(Token *t)
 {
+        report("Do not call early_expansion. Todo: remove this");
+        return t;
         Token *start = t;
         Token *prev = NULL;
         Token *last;
@@ -345,6 +382,8 @@ match(Token **t, char *str)
         return NULL;
 }
 
+void free_expr(Expr *e);
+
 Expr *
 get_literal(Token **t)
 {
@@ -364,6 +403,20 @@ get_literal(Token **t)
 
                 if (cell == NULL) {
                         return new_literal_str(id);
+                }
+
+                if (match(t, ":")) {
+                        Expr *e = get_literal(t);
+                        if (e->type != EXPR_IDENTIFIER) {
+                                report("Invalid range");
+                                exit(ERR_INVRANGE);
+                        }
+                        assert(cell_self);
+
+                        /* Should notify into new_range */
+                        Expr *ret = new_range(cell, e->as.identifier.cell);
+                        free_expr(e);
+                        return ret;
                 }
 
                 assert(cell_self);
@@ -471,12 +524,9 @@ get_term(Token **t)
 void
 get_ast_repr(Expr *e, char *buffer, size_t len)
 {
-        static int recursion_level = 0;
-
         if (e == NULL) return;
         if (strlen(buffer) >= len) return;
 
-#define MAX_RECURSION_LEVEL 5
         switch (e->type) {
         case EXPR_LITERAL:
                 switch (e->as.literal.value.type) {
@@ -490,32 +540,23 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                         break;
                 case TYPE_EMPTY:
                 case TYPE_FORMULA:
+                case TYPE_RANGE: {
+                        char *c = get_input_repr(e->as.literal.value);
+                        snprintf(buffer + strlen(buffer), len, "%s", c);
+                        free(c);
+                        break;
+                }
                 default: break;
                 }
                 break;
         case EXPR_BIN:
-                if (++recursion_level == MAX_RECURSION_LEVEL) {
-                        --recursion_level;
-                        return;
-                }
                 get_ast_repr(e->as.binop.lhs, buffer, len);
-                --recursion_level;
                 snprintf(buffer + strlen(buffer), len, "%s", e->as.binop.op);
-                if (++recursion_level == MAX_RECURSION_LEVEL) {
-                        --recursion_level;
-                        return;
-                }
                 get_ast_repr(e->as.binop.rhs, buffer, len);
-                --recursion_level;
                 break;
         case EXPR_UN:
                 snprintf(buffer + strlen(buffer), len, "%s", e->as.unop.op);
-                if (++recursion_level == MAX_RECURSION_LEVEL) {
-                        --recursion_level;
-                        return;
-                }
                 get_ast_repr(e->as.unop.rhs, buffer, len);
-                --recursion_level;
                 break;
         case EXPR_IDENTIFIER: {
                 char *c;
@@ -526,29 +567,14 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 break;
         }
         case EXPR_FUNC: {
-                if (++recursion_level == MAX_RECURSION_LEVEL) {
-                        --recursion_level;
-                        return;
-                }
                 get_ast_repr(e->as.func.name, buffer, len);
-                --recursion_level;
                 snprintf(buffer + strlen(buffer), len, "(");
                 Expr *args = e->as.func.args;
                 if (args) {
-                        if (++recursion_level == MAX_RECURSION_LEVEL) {
-                                --recursion_level;
-                                return;
-                        }
                         get_ast_repr(args, buffer, len);
-                        --recursion_level;
                         while ((args = args->next)) {
                                 snprintf(buffer + strlen(buffer), len, ",");
-                                if (++recursion_level == MAX_RECURSION_LEVEL) {
-                                        --recursion_level;
-                                        return;
-                                }
                                 get_ast_repr(args, buffer, len);
-                                --recursion_level;
                         }
                 }
                 snprintf(buffer + strlen(buffer), len, ")");

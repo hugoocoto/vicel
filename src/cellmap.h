@@ -28,8 +28,14 @@ typedef enum {
         TYPE_TEXT,
         TYPE_EMPTY,
         TYPE_FORMULA,
+        TYPE_RANGE,
         TYPE_LEN,
 } CellType;
+
+struct Range {
+        int startx, starty;
+        int endx, endy;
+};
 
 typedef struct Value {
         CellType type;
@@ -37,6 +43,7 @@ typedef struct Value {
                 double num;
                 char *text;
                 struct Formula *formula;
+                struct Range range;
         } as;
 } Value;
 

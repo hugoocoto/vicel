@@ -21,8 +21,10 @@
 #include "builtin.h"
 #include "cellmap.h"
 #include "da.h"
+#include "debug.h"
 #include "eval.h"
 #include "formula.h"
+#include <math.h>
 #include <string.h>
 
 struct Pair {
@@ -58,8 +60,11 @@ Value
 sum(Expr *e)
 {
         Value v;
-        if (e == NULL) return VALUE_EMPTY;
-        v = eval_expr(e);
+        if (e == NULL) {
+                report("Null first expr at sum");
+                return VALUE_EMPTY;
+        }
+        v = vadd(eval_expr(e), AS_NUMBER(0)); // for ranges
         while ((e = e->next)) {
                 v = vadd(v, eval_expr(e));
         }
@@ -71,7 +76,7 @@ mul(Expr *e)
 {
         Value v;
         if (e == NULL) return VALUE_EMPTY;
-        v = eval_expr(e);
+        v = vmul(eval_expr(e), AS_NUMBER(1)); // for ranges
         while ((e = e->next)) {
                 v = vmul(v, eval_expr(e));
         }
@@ -81,12 +86,12 @@ mul(Expr *e)
 Value
 count(Expr *e)
 {
-        double count = 0.0;
-        if (e == NULL) return AS_NUMBER(0);
+        Value v = AS_NUMBER(0);
+        if (e == NULL) return v;
         do {
-                if (eval_expr(e).type != TYPE_EMPTY) ++count;
+                v = vcountnum(v, eval_expr(e));
         } while ((e = e->next));
-        return AS_NUMBER(count);
+        return v;
 }
 
 Value
@@ -103,32 +108,22 @@ Value
 min(Expr *e)
 {
         if (e == NULL) return VALUE_EMPTY;
-        Value min = eval_expr(e);
-        Value v;
+        Value min = vmin(VALUE_EMPTY, eval_expr(e));
         while ((e = e->next)) {
-                v = eval_expr(e);
-                if (v.type != TYPE_NUMBER) continue;
-                if (min.type != TYPE_NUMBER || v.as.num < min.as.num) {
-                        min = v;
-                }
+                min = vmin(min, eval_expr(e));
         }
-        return min.type == TYPE_NUMBER? min : VALUE_EMPTY;
+        return min.type == TYPE_NUMBER ? min : VALUE_EMPTY;
 }
 
 Value
 max(Expr *e)
 {
         if (e == NULL) return VALUE_EMPTY;
-        Value max = eval_expr(e);
-        Value v;
+        Value max = vmax(VALUE_EMPTY, eval_expr(e));
         while ((e = e->next)) {
-                v = eval_expr(e);
-                if (v.type != TYPE_NUMBER) continue;
-                if (max.type != TYPE_NUMBER || v.as.num > max.as.num) {
-                        max = v;
-                }
+                max = vmax(max, eval_expr(e));
         }
-        return max.type == TYPE_NUMBER? max : VALUE_EMPTY;
+        return max.type == TYPE_NUMBER ? max : VALUE_EMPTY;
 }
 
 static __attribute__((constructor)) void

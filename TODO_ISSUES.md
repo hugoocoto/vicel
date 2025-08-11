@@ -7,6 +7,7 @@
 * Support arrows for movement
 * Improve input: use prev input
 * Improve input: arrow movement
+* Comparison
 
 # No tested at all
 * new csv reader

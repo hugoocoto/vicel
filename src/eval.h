@@ -34,6 +34,9 @@ Value vsub(Value a, Value b);
 Value vdiv(Value a, Value b);
 Value vmul(Value a, Value b);
 Value vpow(Value a, Value b);
+Value vcountnum(Value start, Value a);
+Value vmin(Value a, Value b);
+Value vmax(Value a, Value b);
 
 
 #endif //! EVAL_H_

@@ -34,6 +34,7 @@ enum ErrorCode {
         ERR_INVFORM,
         ERR_OBSVAL,
         ERR_STDIN,
+        ERR_INVRANGE,
 };
 
 #define DEBUG_LOG "report.log"

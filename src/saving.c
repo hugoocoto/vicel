@@ -81,12 +81,12 @@ get_line_data(char *line)
         Cell cell;
         bool last = false;
 
-        report("line: `%s`", line);
+        // report("line: `%s`", line);
         c = r = line;
         do {
                 get_sep(&r, &c, &last);
                 *c = 0;
-                report("=> %s", r);
+                // report("=> %s", r);
                 cell = EMPTY_CELL;
                 free(cell.repr);
                 cell.repr = strdup(r);

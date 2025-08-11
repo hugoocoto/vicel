@@ -24,6 +24,9 @@
 #include "common.h"
 #include "debug.h"
 #include "formula.h"
+#include "window.h"
+#include <assert.h>
+#include <stdbool.h>
 
 Value
 eval_identifier(Expr *e)
@@ -82,6 +85,25 @@ eval_unop(Expr *e)
         return VALUE_ERROR;
 }
 
+Value
+rangemap(Value base, Value v, Value (*f)(Value, Value))
+{
+        report("CALL RANGEMAP");
+        assert(v.type == TYPE_RANGE);
+        int x, y;
+        Value val = base;
+        Cell *c;
+
+        for (x = v.as.range.startx; x <= v.as.range.endx; x++) {
+                for (y = v.as.range.starty; y <= v.as.range.endy; y++) {
+                        c = cm_get_cell_ptr(active_ctx.body, x, y);
+                        if (!c) break;
+                        val = f(val, c->value);
+                }
+        }
+        return val;
+}
+
 bool
 are_valid_operands(Value a, Value b)
 {
@@ -93,8 +115,6 @@ are_valid_operands(Value a, Value b)
                 if (b.type == TYPE_FORMULA)
                         return are_valid_operands(a, b.as.formula->value);
                 return false;
-        case TYPE_TEXT:
-        case TYPE_EMPTY:
         default:
                 report("Invalid operands %s and %s",
                        cm_type_repr(a.type), cm_type_repr(b.type));
@@ -108,6 +128,8 @@ vadd(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num + b.as.num);
         }
+        if (a.type == TYPE_RANGE) return vadd(rangemap(AS_NUMBER(0), a, vadd), b);
+        if (b.type == TYPE_RANGE) return vadd(a, rangemap(AS_NUMBER(0), b, vadd));
         if (a.type == TYPE_NUMBER) return a;
         if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
@@ -120,6 +142,8 @@ vsub(Value a, Value b)
                 return AS_NUMBER(a.as.num - b.as.num);
         }
 
+        if (a.type == TYPE_RANGE) return vsub(rangemap(AS_NUMBER(0), a, vsub), b);
+        if (b.type == TYPE_RANGE) return vsub(a, rangemap(AS_NUMBER(0), b, vsub));
         if (a.type == TYPE_NUMBER) return a;
         if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
         return VALUE_EMPTY;
@@ -130,6 +154,8 @@ vdiv(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num / b.as.num);
         }
+        if (a.type == TYPE_RANGE) return vdiv(rangemap(AS_NUMBER(1), a, vdiv), b);
+        if (b.type == TYPE_RANGE) return vdiv(a, rangemap(AS_NUMBER(1), b, vdiv));
         return VALUE_EMPTY;
 }
 
@@ -139,6 +165,8 @@ vmul(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(a.as.num * b.as.num);
         }
+        if (a.type == TYPE_RANGE) return vmul(rangemap(AS_NUMBER(1), a, vmul), b);
+        if (b.type == TYPE_RANGE) return vmul(a, rangemap(AS_NUMBER(1), b, vmul));
         return VALUE_EMPTY;
 }
 
@@ -148,6 +176,52 @@ vpow(Value a, Value b)
         if (are_valid_operands(a, b)) {
                 return AS_NUMBER(pow(a.as.num, b.as.num));
         }
+        if (a.type == TYPE_RANGE) return vpow(rangemap(AS_NUMBER(1), a, vpow), b);
+        if (b.type == TYPE_RANGE) return vpow(a, rangemap(AS_NUMBER(1), b, vpow));
+        return VALUE_EMPTY;
+}
+
+Value
+vcountnum(Value start, Value a)
+{
+        if (a.type == TYPE_NUMBER) return vadd(start, AS_NUMBER(1));
+        if (a.type != TYPE_RANGE) return start;
+        return vadd(start, rangemap(AS_NUMBER(0), a, vcountnum));
+}
+
+Value
+vmin(Value a, Value b)
+{
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return a.as.num <= b.as.num ? a : b;
+                if (b.type == TYPE_RANGE) return rangemap(a, b, vmin);
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) {
+                if (a.type == TYPE_RANGE) return rangemap(b, a, vmin);
+                return b;
+        }
+
+        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmin);
+        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmin);
+        return VALUE_EMPTY;
+}
+
+Value
+vmax(Value a, Value b)
+{
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return a.as.num >= b.as.num ? a : b;
+                if (b.type == TYPE_RANGE) return rangemap(a, b, vmax);
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) {
+                if (a.type == TYPE_RANGE) return rangemap(b, a, vmax);
+                return b;
+        }
+
+        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmax);
+        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmax);
         return VALUE_EMPTY;
 }
 
