@@ -31,5 +31,8 @@ clean:
 install: $(OUT) clean
 	mv $(OUT) ~/.local/bin/$(BIN_NAME)
 
+uninstall: clean
+	rm ~/.local/bin/$(BIN_NAME) -f
+
 gen: 
 	./gen_release_version.sh

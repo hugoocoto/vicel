@@ -11,7 +11,7 @@ src/eval.c|29|21|218
 src/aptree.c|28|19|206
 src/escape_code.h|14|24|177
 src/mappings.c|25|19|174
-src/saving.c|24|21|146
+src/saving.c|24|21|150
 src/builtin.c|12|19|107
 src/flag.h|16|44|98
 src/da.h|15|33|90
@@ -29,4 +29,4 @@ src/builtin.h|5|19|8
 src/keyboard.h|4|19|7
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|463|566|3201
+SUM:|463|566|3205

@@ -96,10 +96,10 @@ get_line_data(char *line)
         return ca;
 }
 
-void
+int
 get_data(CellMat *cm, FILE *f, int *max_size)
 {
-        char line[1024*1024];
+        char line[1024 * 1024];
         CellArr ca;
         char *c;
         *max_size = 0;
@@ -113,6 +113,7 @@ get_data(CellMat *cm, FILE *f, int *max_size)
                 da_append(cm, ca);
                 *max_size = max(*max_size, ca.size);
         }
+        return max_size != 0;
 }
 
 void
@@ -135,7 +136,10 @@ load(char *filename, Context *ctx)
         }
 
         ctx->body = calloc(1, sizeof(CellMat));
-        get_data(ctx->body, f, &max_size);
+        if (get_data(ctx->body, f, &max_size)) {
+                free(ctx->body);
+                goto load_blank;
+        }
 
         for_da_each(row, *ctx->body)
         {
