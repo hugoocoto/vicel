@@ -66,7 +66,7 @@ reset_at_exit()
 int
 main(int argc, char *argv[])
 {
-        char *filename;
+        char *filename = NULL;
         flag_set(&argc, &argv);
         if (flag_get("-m", "--use-mouse")) {
                 printf("Are you idiot?\n");
