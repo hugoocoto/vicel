@@ -6,8 +6,11 @@
 * Support arrows for movement
 * Improve input: use prev input
 * Improve input: arrow movement
-* Comparison
 * Check buffers size
+* Improve UI and UI customization
+* Colors?
 
 # No tested at all
 * new csv reader
+* behaviour of corne cases in formulas for buitlins, 
+    ranges and comparison.
