@@ -39,10 +39,13 @@ enum ErrorCode {
 
 #define DEBUG_LOG "report.log"
 
+extern int debug_level;
+
 #if defined(DEBUG) && DEBUG
 static void
 report(char *format, ...)
 {
+        if (debug_level == 0) return;
         va_list arg;
         FILE *file = fopen(DEBUG_LOG, "a");
         va_start(arg, format);

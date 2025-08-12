@@ -26,6 +26,12 @@
 #include "saving.h"
 #include "window.h"
 
+/* default debug level
+ * 0: do not report
+ * 1: report if DEBUG is set
+ */
+int debug_level = 0;
+
 void
 resize_handler(int s)
 {
@@ -60,12 +66,14 @@ reset_at_exit()
 int
 main(int argc, char *argv[])
 {
-        char *filename = NULL;
-
+        char *filename;
         flag_set(&argc, &argv);
-        if (flag_get_value(&filename, "-m", "--use-mouse")) {
+        if (flag_get("-m", "--use-mouse")) {
                 printf("Are you idiot?\n");
                 exit(ERR_NONE);
+        }
+        if (flag_get("-D", "--debug")) {
+                debug_level = 1;
         }
 
         if (argc == 2) {
