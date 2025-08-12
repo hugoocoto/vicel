@@ -34,6 +34,7 @@ The first non-flag argument is used as the filename.
 | Flag                | Description          | 
 | ------------------- | -------------------- | 
 | `-m`, `--use-mouse` | Enable mouse support |
+| `-D`, `--debug`     | Enable debug output  |
 
 ## Mappings
 > *As of the time of writing*
