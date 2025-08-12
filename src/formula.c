@@ -774,7 +774,7 @@ dup_tokens(Token *t)
 char *
 create_id(int r, int c)
 {
-        char buf[32];
+        char buf[8];
         int start = 0;
         do {
                 memcpy(buf + 1, buf, start + 1);

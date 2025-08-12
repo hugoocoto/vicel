@@ -70,7 +70,7 @@ static void
 get_escape_sequence()
 {
         int flags;
-        char buf[32];
+        char buf[16];
         ssize_t n;
 
         flags = fcntl(STDIN_FILENO, F_GETFL, 0);
@@ -115,7 +115,7 @@ add_action(APTree t, char *prefix, Action action)
 char *
 get_input_at_cursor()
 {
-        char buf[1024];
+        char buf[64];
         char *c;
         int i = 0;
 

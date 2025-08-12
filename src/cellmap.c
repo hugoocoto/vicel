@@ -144,7 +144,7 @@ get_input_repr(Value v)
                 return strdup(buffer);
         }
         case TYPE_RANGE: {
-                char buffer[128] = "";
+                char buffer[16] = "";
                 char *c1, *c2;
                 snprintf(buffer, sizeof buffer, "%s:%s",
                          c1 = create_id(v.as.range.starty, v.as.range.startx),
@@ -176,7 +176,7 @@ get_repr(Value v)
         case TYPE_EMPTY:
                 return strdup("");
         case TYPE_RANGE: {
-                char buffer[128] = "";
+                char buffer[16] = "";
                 char *c1, *c2;
                 snprintf(buffer, sizeof buffer, "%s:%s",
                          c1 = create_id(v.as.range.starty, v.as.range.startx),

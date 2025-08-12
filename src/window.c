@@ -78,7 +78,7 @@ get_current_position(int *x, int *y)
         // starting at 1,1
         T_DSR();
         fflush(stdout);
-        char buf[1024];
+        char buf[12];
         ssize_t n;
 repeat:
         if ((n = read(STDIN_FILENO, buf, sizeof buf - 1)) < 0) {
@@ -110,7 +110,7 @@ print_status_bar2()
         EFFECT(RESET);
 }
 
-char mappings_buffer[24];
+char mappings_buffer[16];
 
 void
 print_status_bar()
