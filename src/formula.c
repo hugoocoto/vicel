@@ -330,6 +330,8 @@ lexer(char *c)
                         break;
                 case '<':
                 case '>':
+                case '!':
+                case '=':
                         if (c[1] == '=')
                                 last->next = TOK_AS_STR(c++, 2);
                         else
@@ -537,7 +539,8 @@ get_comparison(Token **t)
         Expr *e = get_term(t);
         Token *op;
         while ((op = match(t, "<")) || (op = match(t, "<=")) ||
-               (op = match(t, ">")) || (op = match(t, ">="))) {
+               (op = match(t, ">")) || (op = match(t, ">=")) ||
+               (op = match(t, "==")) || (op = match(t, "!="))) {
                 e = new_binop(e, op->as.str, get_factor(t));
         }
         return e;
@@ -626,7 +629,7 @@ parse_formula(char *c, Cell *self)
         Token *t = lexer(c);
         report("Out of lexer");
         Token *tt = t;
-        // - comparison -> term ((">" | ">=" | "<" | "<=") term)?
+        // - comparison -> term ((">" | ">=" | "<" | "<=" | "==" | "!=") term)?
         // - term -> factor (("-" | "+") factor)*
         // - factor -> power (("/" | "\*") power)*
         // - power -> unary ("^") unary)*

@@ -3,10 +3,10 @@ cloc|github.com/AlDanial/cloc v 2.04
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
-src/formula.c|84|33|707
+src/formula.c|84|33|710
 src/cellmap.c|34|23|391
+src/eval.c|36|19|294
 src/window.c|36|24|268
-src/eval.c|33|19|267
 src/keyboard.c|42|31|243
 src/aptree.c|28|19|206
 src/escape_code.h|14|24|177
@@ -29,4 +29,4 @@ src/builtin.h|5|19|8
 src/keyboard.h|4|19|7
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|474|568|3312
+SUM:|477|568|3342

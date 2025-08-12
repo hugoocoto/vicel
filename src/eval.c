@@ -220,10 +220,37 @@ vmax(Value a, Value b)
 }
 
 Value
+veq(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return veq(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return veq(a, b.as.formula->value);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num == b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
+        return VALUE_EMPTY;
+}
+
+Value
+vneq(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return vneq(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vneq(a, b.as.formula->value);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num != b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
+        return VALUE_EMPTY;
+}
+
+
+Value
 vlt(Value a, Value b)
 {
         if (a.type == TYPE_FORMULA) return vlt(a.as.formula->value, b);
-        if (b.type == TYPE_FORMULA) return vlt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vlt(a, b.as.formula->value);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num < b.as.num);
                 return AS_BOOL(true);
@@ -236,7 +263,7 @@ Value
 vleqt(Value a, Value b)
 {
         if (a.type == TYPE_FORMULA) return vleqt(a.as.formula->value, b);
-        if (b.type == TYPE_FORMULA) return vleqt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vleqt(a, b.as.formula->value);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num <= b.as.num);
                 return AS_BOOL(true);
@@ -249,7 +276,7 @@ Value
 vgt(Value a, Value b)
 {
         if (a.type == TYPE_FORMULA) return vgt(a.as.formula->value, b);
-        if (b.type == TYPE_FORMULA) return vgt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vgt(a, b.as.formula->value);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num > b.as.num);
                 return AS_BOOL(true);
@@ -262,7 +289,7 @@ Value
 vgeqt(Value a, Value b)
 {
         if (a.type == TYPE_FORMULA) return vgeqt(a.as.formula->value, b);
-        if (b.type == TYPE_FORMULA) return vgeqt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vgeqt(a, b.as.formula->value);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num >= b.as.num);
                 return AS_BOOL(true);
@@ -289,6 +316,9 @@ eval_binop(Expr *e)
         if (!strcmp(e->as.binop.op, "<=")) return vleqt(lhs, rhs);
         if (!strcmp(e->as.binop.op, ">")) return vgt(lhs, rhs);
         if (!strcmp(e->as.binop.op, ">=")) return vgeqt(lhs, rhs);
+        if (!strcmp(e->as.binop.op, "==")) return veq(lhs, rhs);
+        if (!strcmp(e->as.binop.op, "=")) return veq(lhs, rhs);
+        if (!strcmp(e->as.binop.op, "!=")) return vneq(lhs, rhs);
 
         report("No yet implemented: binop for %s", e->as.binop.op);
         return VALUE_ERROR;
