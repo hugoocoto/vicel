@@ -51,6 +51,16 @@ build_range(Cell *cstart, Cell *cend)
         free(cs);
 
         /* should add subscribers */
+        int x, y;
+        Cell *c;
+        for (x = r.as.range.startx; x <= r.as.range.endx; x++) {
+                for (y = r.as.range.starty; y <= r.as.range.endy; y++) {
+                        c = cm_get_cell_ptr(active_ctx.body, x, y);
+                        if (!c) break;
+                        assert(cell_self);
+                        cm_subscribe(c, cell_self);
+                }
+        }
 
         return r;
 }
