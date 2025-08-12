@@ -40,6 +40,7 @@ cm_type_repr(CellType ct)
         static const char *lookup[] = {
                 [TYPE_NUMBER] = "TYPE_NUMBER",
                 [TYPE_TEXT] = "TYPE_TEXT",
+                [TYPE_BOOL] = "TYPE_TEXT",
                 [TYPE_EMPTY] = "TYPE_EMPTY",
                 [TYPE_FORMULA] = "TYPE_FORMULA",
                 [TYPE_RANGE] = "TYPE_RANGE",
@@ -134,6 +135,8 @@ get_input_repr(Value v)
                 return get_num_repr(v.as.num);
         case TYPE_TEXT:
                 return strdup(v.as.text);
+        case TYPE_BOOL:
+                return strdup(v.as.bol ? "true" : "false");
         case TYPE_FORMULA: {
                 char buffer[128] = "= \0";
                 report("TEMP: too big buffer usage at %s:%d", __FILE_NAME__, __LINE__);
@@ -166,6 +169,8 @@ get_repr(Value v)
                 return get_num_repr(v.as.num);
         case TYPE_TEXT:
                 return strdup(v.as.text);
+        case TYPE_BOOL:
+                return strdup(v.as.bol ? "true" : "false");
         case TYPE_FORMULA:
                 return get_repr(v.as.formula->value);
         case TYPE_EMPTY:

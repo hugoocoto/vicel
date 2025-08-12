@@ -328,6 +328,16 @@ lexer(char *c)
                         last = last->next;
                         ++c;
                         break;
+                case '<':
+                case '>':
+                        if (c[1] == '=')
+                                last->next = TOK_AS_STR(c++, 2);
+                        else
+                                last->next = TOK_AS_STR(c, 1);
+                        last = last->next;
+                        ++c;
+                        break;
+
                 case '0' ... '9': {
                         char *c0 = c;
                         last->next = TOK_AS_NUM(strtod(c, &c));
@@ -431,7 +441,7 @@ get_literal(Token **t)
         }
 }
 
-Expr *get_term(Token **);
+Expr *get_comparison(Token **);
 
 Expr *
 get_function(Token **t)
@@ -444,7 +454,7 @@ get_function(Token **t)
         if (match(t, "(")) {
                 while (!match(t, ")")) {
                         if (args == NULL) {
-                                args = get_term(t);
+                                args = get_comparison(t);
                                 report("Adding argument");
                                 last = args;
                                 continue;
@@ -454,7 +464,7 @@ get_function(Token **t)
                                 report("Expected parenthesis at formula");
                                 exit(ERR_EXPECT);
                         }
-                        last->next = get_term(t);
+                        last->next = get_comparison(t);
                         report("Adding argument");
                         last = last->next;
                 }
@@ -467,7 +477,7 @@ Expr *
 get_group(Token **t)
 {
         if (match(t, "(")) {
-                Expr *e = get_term(t);
+                Expr *e = get_comparison(t);
                 if (!match(t, ")")) {
                         // todo: invalid formula
                         report("Expected parenthesis at formula");
@@ -516,6 +526,18 @@ get_term(Token **t)
         Expr *e = get_factor(t);
         Token *op;
         while ((op = match(t, "-")) || (op = match(t, "+"))) {
+                e = new_binop(e, op->as.str, get_factor(t));
+        }
+        return e;
+}
+
+Expr *
+get_comparison(Token **t)
+{
+        Expr *e = get_term(t);
+        Token *op;
+        while ((op = match(t, "<")) || (op = match(t, "<=")) ||
+               (op = match(t, ">")) || (op = match(t, ">="))) {
                 e = new_binop(e, op->as.str, get_factor(t));
         }
         return e;
@@ -604,6 +626,7 @@ parse_formula(char *c, Cell *self)
         Token *t = lexer(c);
         report("Out of lexer");
         Token *tt = t;
+        // - comparison -> term ((">" | ">=" | "<" | "<=") term)?
         // - term -> factor (("-" | "+") factor)*
         // - factor -> power (("/" | "\*") power)*
         // - power -> unary ("^") unary)*
@@ -611,7 +634,7 @@ parse_formula(char *c, Cell *self)
         // - group -> "(" expr ")" | func
         // - func -> FUNC "(" expr? ("," expr)* ")" | literal
         // - literal -> NUM  | IDENTIFIER
-        Expr *e = report_ast(get_term(&t));
+        Expr *e = report_ast(get_comparison(&t));
         self->value.as.formula->tokens = tt;
         return e;
 }
@@ -794,7 +817,7 @@ formula_extend(Cell *self, Formula *f, int r, int c)
                 return NULL;
         }
         report(">>> formula extend <<<<<<<<<<<");
-        new->body = report_ast(get_term(&t));
+        new->body = report_ast(get_comparison(&t));
         new->value = eval_formula(*new);
         report(">>> formula extend end <<<<<<<");
         return new;

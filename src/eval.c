@@ -45,9 +45,6 @@ eval_literal(Expr *e)
 Value
 eval_func(Expr *e)
 {
-        // char buf[64] = { 0 };
-        // get_ast_repr(e, buf, sizeof buf);
-
         Value name = eval_expr(e->as.func.name);
         if (name.type != TYPE_TEXT) {
                 report("eval_func func name is not text");
@@ -104,33 +101,18 @@ rangemap(Value base, Value v, Value (*f)(Value, Value))
         return val;
 }
 
-bool
-are_valid_operands(Value a, Value b)
-{
-        switch (a.type) {
-        case TYPE_FORMULA:
-                return are_valid_operands(a.as.formula->value, b);
-        case TYPE_NUMBER:
-                if (b.type == TYPE_NUMBER) return true;
-                if (b.type == TYPE_FORMULA)
-                        return are_valid_operands(a, b.as.formula->value);
-                return false;
-        default:
-                report("Invalid operands %s and %s",
-                       cm_type_repr(a.type), cm_type_repr(b.type));
-                return false;
-        }
-}
-
 Value
 vadd(Value a, Value b)
 {
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num + b.as.num);
-        }
+        if (a.type == TYPE_FORMULA) return vadd(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vadd(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return vadd(rangemap(AS_NUMBER(0), a, vadd), b);
         if (b.type == TYPE_RANGE) return vadd(a, rangemap(AS_NUMBER(0), b, vadd));
-        if (a.type == TYPE_NUMBER) return a;
+
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_NUMBER(a.as.num + b.as.num);
+                return a;
+        }
         if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
@@ -138,46 +120,63 @@ vadd(Value a, Value b)
 Value
 vsub(Value a, Value b)
 {
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num - b.as.num);
-        }
-
+        if (a.type == TYPE_FORMULA) return vsub(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vsub(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return vsub(rangemap(AS_NUMBER(0), a, vsub), b);
         if (b.type == TYPE_RANGE) return vsub(a, rangemap(AS_NUMBER(0), b, vsub));
-        if (a.type == TYPE_NUMBER) return a;
-        if (b.type == TYPE_NUMBER) return AS_NUMBER(-b.as.num);
+
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_NUMBER(a.as.num - b.as.num);
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
 Value
 vdiv(Value a, Value b)
 {
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num / b.as.num);
-        }
+        if (a.type == TYPE_FORMULA) return vdiv(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vdiv(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return vdiv(rangemap(AS_NUMBER(1), a, vdiv), b);
         if (b.type == TYPE_RANGE) return vdiv(a, rangemap(AS_NUMBER(1), b, vdiv));
+
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_NUMBER(a.as.num / b.as.num);
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
 
 Value
 vmul(Value a, Value b)
 {
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(a.as.num * b.as.num);
-        }
+        if (a.type == TYPE_FORMULA) return vmul(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vmul(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return vmul(rangemap(AS_NUMBER(1), a, vmul), b);
         if (b.type == TYPE_RANGE) return vmul(a, rangemap(AS_NUMBER(1), b, vmul));
+
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_NUMBER(a.as.num * b.as.num);
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
 
 Value
 vpow(Value a, Value b)
 {
-        if (are_valid_operands(a, b)) {
-                return AS_NUMBER(pow(a.as.num, b.as.num));
-        }
+        if (a.type == TYPE_FORMULA) return vpow(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vpow(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return vpow(rangemap(AS_NUMBER(1), a, vpow), b);
         if (b.type == TYPE_RANGE) return vpow(a, rangemap(AS_NUMBER(1), b, vpow));
+
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_NUMBER(pow(a.as.num, b.as.num));
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
 
@@ -185,6 +184,7 @@ Value
 vcountnum(Value start, Value a)
 {
         if (a.type == TYPE_NUMBER) return vadd(start, AS_NUMBER(1));
+        if (a.type == TYPE_FORMULA) return vadd(start, a.as.formula->value);
         if (a.type != TYPE_RANGE) return start;
         return vadd(start, rangemap(AS_NUMBER(0), a, vcountnum));
 }
@@ -192,36 +192,82 @@ vcountnum(Value start, Value a)
 Value
 vmin(Value a, Value b)
 {
-        if (a.type == TYPE_NUMBER) {
-                if (b.type == TYPE_NUMBER) return a.as.num <= b.as.num ? a : b;
-                if (b.type == TYPE_RANGE) return rangemap(a, b, vmin);
-                return a;
-        }
-        if (b.type == TYPE_NUMBER) {
-                if (a.type == TYPE_RANGE) return rangemap(b, a, vmin);
-                return b;
-        }
-
+        if (a.type == TYPE_FORMULA) return vmin(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vmin(a, b.as.formula->value);
         if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmin);
         if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmin);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return a.as.num <= b.as.num ? a : b;
+                return a;
+        }
+        if (b.type == TYPE_NUMBER) return b;
         return VALUE_EMPTY;
 }
 
 Value
 vmax(Value a, Value b)
 {
+        if (a.type == TYPE_FORMULA) return vmin(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vmin(a, b.as.formula->value);
+        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmin);
+        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmin);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return a.as.num >= b.as.num ? a : b;
-                if (b.type == TYPE_RANGE) return rangemap(a, b, vmax);
                 return a;
         }
-        if (b.type == TYPE_NUMBER) {
-                if (a.type == TYPE_RANGE) return rangemap(b, a, vmax);
-                return b;
-        }
+        if (b.type == TYPE_NUMBER) return b;
+        return VALUE_EMPTY;
+}
 
-        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmax);
-        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmax);
+Value
+vlt(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return vlt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vlt(a.as.formula->value, b);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num < b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
+        return VALUE_EMPTY;
+}
+
+Value
+vleqt(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return vleqt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vleqt(a.as.formula->value, b);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num <= b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
+        return VALUE_EMPTY;
+}
+
+Value
+vgt(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return vgt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vgt(a.as.formula->value, b);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num > b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
+        return VALUE_EMPTY;
+}
+
+Value
+vgeqt(Value a, Value b)
+{
+        if (a.type == TYPE_FORMULA) return vgeqt(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vgeqt(a.as.formula->value, b);
+        if (a.type == TYPE_NUMBER) {
+                if (b.type == TYPE_NUMBER) return AS_BOOL(a.as.num >= b.as.num);
+                return AS_BOOL(true);
+        }
+        if (b.type == TYPE_NUMBER) return AS_BOOL(false);
         return VALUE_EMPTY;
 }
 
@@ -231,13 +277,18 @@ eval_binop(Expr *e)
         Value lhs = eval_expr(e->as.binop.lhs);
         Value rhs = eval_expr(e->as.binop.rhs);
 
-        switch (*e->as.binop.op) {
-        case '+': return vadd(lhs, rhs);
-        case '-': return vsub(lhs, rhs);
-        case '/': return vdiv(lhs, rhs);
-        case '*': return vmul(lhs, rhs);
-        case '^': return vpow(lhs, rhs);
-        }
+        if (!e->as.binop.op[1])
+                switch (*e->as.binop.op) {
+                case '+': return vadd(lhs, rhs);
+                case '-': return vsub(lhs, rhs);
+                case '/': return vdiv(lhs, rhs);
+                case '*': return vmul(lhs, rhs);
+                case '^': return vpow(lhs, rhs);
+                }
+        if (!strcmp(e->as.binop.op, "<")) return vlt(lhs, rhs);
+        if (!strcmp(e->as.binop.op, "<=")) return vleqt(lhs, rhs);
+        if (!strcmp(e->as.binop.op, ">")) return vgt(lhs, rhs);
+        if (!strcmp(e->as.binop.op, ">=")) return vgeqt(lhs, rhs);
 
         report("No yet implemented: binop for %s", e->as.binop.op);
         return VALUE_ERROR;

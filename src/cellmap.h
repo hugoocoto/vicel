@@ -22,9 +22,11 @@
 #define CELLMAP_H
 
 #include "da.h"
+#include <stdbool.h>
 
 typedef enum {
         TYPE_NUMBER = 0,
+        TYPE_BOOL,
         TYPE_TEXT,
         TYPE_EMPTY,
         TYPE_FORMULA,
@@ -41,6 +43,7 @@ typedef struct Value {
         CellType type;
         union {
                 double num;
+                bool bol;
                 char *text;
                 struct Formula *formula;
                 struct Range range;
@@ -59,6 +62,13 @@ typedef struct Value {
         {                            \
                 .type = TYPE_NUMBER, \
                 .as.num = (n),       \
+        }
+
+#define AS_BOOL(n)                 \
+        (Value)                    \
+        {                          \
+                .type = TYPE_BOOL, \
+                .as.bol = (n),    \
         }
 
 

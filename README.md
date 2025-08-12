@@ -83,6 +83,7 @@ arguments and return a value.
 * **count(...)**: Get the number of non empty arguments.
 * **min(...)**: Get the min number between arguments.
 * **max(...)**: Get the max number between arguments.
+* **if(cond, iftrue [, else])**: Get the value depending on the condition.
 
 > Functions accept the keyword `:` that expand both cell operands with all
 > the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.

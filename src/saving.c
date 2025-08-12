@@ -113,7 +113,7 @@ get_data(CellMat *cm, FILE *f, int *max_size)
                 da_append(cm, ca);
                 *max_size = max(*max_size, ca.size);
         }
-        return max_size != 0;
+        return max_size == 0;
 }
 
 void

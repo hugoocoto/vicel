@@ -26,6 +26,7 @@
 #include "formula.h"
 #include <math.h>
 #include <string.h>
+#include <unistd.h>
 
 struct Pair {
         char *name;
@@ -126,6 +127,24 @@ max(Expr *e)
         return max.type == TYPE_NUMBER ? max : VALUE_EMPTY;
 }
 
+Value
+builtin_if(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+        Value cond = eval_expr(e);
+        if (cond.type != TYPE_BOOL) return VALUE_EMPTY;
+
+        if (cond.as.bol) {
+                if (e->next == NULL) return VALUE_EMPTY;
+                return eval_expr(e->next);
+        } else {
+                if (e->next == NULL) return VALUE_EMPTY;
+                if (e->next->next == NULL) return VALUE_EMPTY;
+                return eval_expr(e->next->next);
+        }
+}
+
+
 static __attribute__((constructor)) void
 __setup__()
 {
@@ -135,4 +154,5 @@ __setup__()
         builtin_add("count", count);
         builtin_add("min", min);
         builtin_add("max", max);
+        builtin_add("if", builtin_if);
 }

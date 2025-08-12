@@ -73,7 +73,7 @@ main(int argc, char *argv[])
         }
 
         report("------| Starting |------");
-        // T_ASBE();
+        T_ASBE();
         T_CUHDE();
         EFFECT(RESET);
         clear_screen();
