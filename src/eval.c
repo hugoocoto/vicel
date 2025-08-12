@@ -207,10 +207,10 @@ vmin(Value a, Value b)
 Value
 vmax(Value a, Value b)
 {
-        if (a.type == TYPE_FORMULA) return vmin(a.as.formula->value, b);
-        if (b.type == TYPE_FORMULA) return vmin(a, b.as.formula->value);
-        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmin);
-        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmin);
+        if (a.type == TYPE_FORMULA) return vmax(a.as.formula->value, b);
+        if (b.type == TYPE_FORMULA) return vmax(a, b.as.formula->value);
+        if (a.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, a, vmax);
+        if (b.type == TYPE_RANGE) return rangemap(VALUE_EMPTY, b, vmax);
         if (a.type == TYPE_NUMBER) {
                 if (b.type == TYPE_NUMBER) return a.as.num >= b.as.num ? a : b;
                 return a;
