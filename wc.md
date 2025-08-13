@@ -15,6 +15,7 @@ src/saving.c|24|21|150
 src/builtin.c|15|19|124
 src/cellmap.h|25|21|99
 src/flag.h|16|44|98
+src/hm.c|28|23|92
 src/da.h|15|33|90
 src/main.c|13|24|62
 src/formula.h|11|22|55
@@ -22,6 +23,7 @@ src/window.h|13|20|47
 src/debug.h|8|19|39
 src/mappings.h|4|19|30
 src/aptree.h|7|19|23
+src/hm.h|6|21|19
 src/common.h|1|19|16
 src/eval.h|7|20|15
 src/action.h|6|19|12
@@ -29,4 +31,4 @@ src/keyboard.h|6|19|12
 src/builtin.h|5|19|8
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|476|567|3354
+SUM:|510|611|3465
