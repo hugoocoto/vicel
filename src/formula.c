@@ -25,6 +25,7 @@
 #include "debug.h"
 #include "eval.h"
 #include "window.h"
+#include <stdbool.h>
 
 Cell *cell_self = NULL;
 
@@ -68,11 +69,17 @@ build_range(Cell *cstart, Cell *cend)
 void
 refresh_formula_value(Cell *cell)
 {
+        if (cell->updated) {
+                cell->value.as.formula->value = VALUE_ERROR;
+                return;
+        };
+        cell->updated = true;
         cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
         free(cell->repr);
         cell->repr = get_repr(cell->value.as.formula->value);
 
         for_da_each(c, cell->subscribers) cm_notify(cell, *c);
+        cell->updated = false;
 }
 
 Expr *
@@ -687,7 +694,7 @@ build_formula(char *_str, Cell *self)
 void
 cm_notify(Cell *actor, Cell *observer)
 {
-        actor = actor;
+        if (actor == observer) return;
         if (observer->value.type != TYPE_FORMULA) {
                 report("Invalid cm_notify for observer type %s",
                        cm_type_repr(observer->value.type));

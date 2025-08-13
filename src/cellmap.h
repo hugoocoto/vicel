@@ -68,7 +68,7 @@ typedef struct Value {
         (Value)                    \
         {                          \
                 .type = TYPE_BOOL, \
-                .as.bol = (n),    \
+                .as.bol = (n),     \
         }
 
 
@@ -82,8 +82,9 @@ typedef struct Cell {
         } subscribers;
         Value value;
         int selected;
+        bool updated;     // updated in this cicle
         char *repr;       // string representation
-        char *input_repr; // string representation
+        char *input_repr; // input representation
 } Cell;
 
 typedef DA(Cell) CellArr;
@@ -111,6 +112,7 @@ typedef DA(CellArr) CellMat;
                 .subscribers = { 0 },     \
                 .repr = strdup(""),       \
                 .input_repr = strdup(""), \
+                .updated = false,         \
         }
 
 

@@ -1,5 +1,4 @@
 # Issues
-* Circular references crash the program
 * use after free in some formulas, irreguar: I cant reproduce
 
 # Todo
