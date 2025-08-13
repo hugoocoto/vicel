@@ -24,7 +24,7 @@
 #include "action.h"
 #include "common.h"
 
-#define AP_ENTRIES 127
+#define AP_ENTRIES 256 // this is not efficient at all
 
 typedef struct __APTree {
         Action action;

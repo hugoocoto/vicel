@@ -30,9 +30,8 @@
 #include "mappings.h"
 #include "window.h"
 #include <stdio.h>
+#include <string.h>
 #include <termios.h>
-
-#define MAX_MAPPING_LEN 6
 
 bool quit = false;
 
@@ -66,12 +65,13 @@ toggle_raw_mode()
         enabled = true;
 }
 
-static void
+static char
 get_escape_sequence()
 {
         int flags;
         char buf[16];
         ssize_t n;
+        char ret = 0;
 
         flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
@@ -82,10 +82,12 @@ get_escape_sequence()
                 break;
         default:
                 buf[n] = 0;
-                report("[KB] Escape sequence: \033%s", buf);
+                if (buf[0] == '[')
+                        ret = 128 + buf[1];
         }
-
+        report("[KB] Escape sequence: \033%s", buf);
         fcntl(STDIN_FILENO, F_SETFL, flags);
+        return ret;
 }
 
 static inline bool
@@ -219,6 +221,10 @@ start_kbhandler()
         add_action(mappings, "k", ACTION(a_move_cursor_up));
         add_action(mappings, "h", ACTION(a_move_cursor_left));
         add_action(mappings, "l", ACTION(a_move_cursor_right));
+        add_action(mappings, KEY_DOWN, ACTION(a_move_cursor_down));
+        add_action(mappings, KEY_UP, ACTION(a_move_cursor_up));
+        add_action(mappings, KEY_LEFT, ACTION(a_move_cursor_left));
+        add_action(mappings, KEY_RIGHT, ACTION(a_move_cursor_right));
         add_action(mappings, "v", ACTION(a_select_toggle_cell));
         add_action(mappings, "i", ACTION(get_set_cell_input));
         add_action(mappings, "sd", ACTION(a_set_cell_type_numeric));
@@ -255,7 +261,6 @@ start_kbhandler()
                         strncpy(buf, saved_buf, MAX_MAPPING_LEN);
                         read_index = saved_read_index;
                         repeat = saved_repeat;
-                        // have to fall down (out of else-if)
                 }
 
                 if (buf[0] >= '0' && buf[0] <= '9') {
@@ -264,14 +269,16 @@ start_kbhandler()
                         repeat += buf[0] - '0';
                 }
 
-                else if (buf[read_index - 1] == '\033') {
-                        get_escape_sequence();
-                        read_index = 0;
-                        repeat = 0;
+                if (read_index && buf[read_index - 1] == '\033') {
+                        buf[read_index - 1] = get_escape_sequence();
+                        if (buf[read_index - 1] == 0) {
+                                read_index = 0;
+                                repeat = 0;
+                        }
                 }
 
                 /* Buffer contains a valid action whose prefix is unique */
-                else if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
+                if ((action_is_valid(action = find_action(mappings, buf, read_index)))) {
                         strncpy(saved_buf, buf, read_index);
                         saved_read_index = read_index;
                         saved_repeat = repeat;

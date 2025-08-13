@@ -23,6 +23,13 @@
 
 #include "cellmap.h"
 
+#define MAX_MAPPING_LEN 6
+
+#define KEY_UP "\xC1"
+#define KEY_DOWN "\xC2"
+#define KEY_RIGHT "\xC3"
+#define KEY_LEFT "\xC4"
+
 void start_kbhandler();
 void set_cell_text(Cell *c, char *text);
 char * get_input_at_cursor();

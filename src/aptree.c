@@ -21,19 +21,6 @@
 #include "aptree.h"
 #include "action.h"
 #include "common.h"
-#include "debug.h"
-#include <string.h>
-
-void
-check_prefix(char *prefix, int length)
-{
-        for (int i = 0; i < length; i++) {
-                if (prefix[i] < ' ' || prefix[i] >= 127) {
-                        report("Invalid prefix: `%.*s`", length, prefix);
-                        return;
-                }
-        }
-}
 
 APTree
 ap_init()
@@ -44,16 +31,15 @@ ap_init()
 void
 ap_add(APTree t, char *prefix, Action action)
 {
-        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[*cchar] == NULL) {
-                        ct->after[*cchar] = ap_init();
+                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL) {
+                        ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] = ap_init();
                         ++ct->descents;
                 }
 
-                ct = ct->after[*cchar];
+                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
         }
         ct->action = action;
 }
@@ -61,14 +47,13 @@ ap_add(APTree t, char *prefix, Action action)
 bool
 ap_has_descents(APTree t, char *prefix)
 {
-        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[*cchar] == NULL)
+                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return false;
 
-                ct = ct->after[*cchar];
+                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
         }
         return ct->descents > 0;
 }
@@ -76,14 +61,13 @@ ap_has_descents(APTree t, char *prefix)
 bool
 ap_has_descentsl(APTree t, char *prefix, int len)
 {
-        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         for (; i < len; i++) {
-                if (ct->after[prefix[i]] == NULL)
+                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return false;
 
-                ct = ct->after[prefix[i]];
+                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
         }
         return ct->descents > 0;
 }
@@ -91,14 +75,13 @@ ap_has_descentsl(APTree t, char *prefix, int len)
 Action
 ap_get(APTree t, char *prefix)
 {
-        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[*cchar] == NULL)
+                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return NoAction;
 
-                ct = ct->after[*cchar];
+                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
         }
         return ct->action;
 }
@@ -106,14 +89,13 @@ ap_get(APTree t, char *prefix)
 Action
 ap_getl(APTree t, char *prefix, int len)
 {
-        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         for (; i < len; i++) {
-                if (ct->after[prefix[i]] == NULL)
+                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return NoAction;
 
-                ct = ct->after[prefix[i]];
+                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
         }
         return ct->action;
 }
@@ -121,14 +103,13 @@ ap_getl(APTree t, char *prefix, int len)
 Action
 ap_get_unique(APTree t, char *prefix)
 {
-        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[*cchar] == NULL)
+                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return NoAction;
 
-                ct = ct->after[*cchar];
+                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
         }
         return ct->descents == 0 ? ct->action : NoAction;
 }
@@ -136,14 +117,13 @@ ap_get_unique(APTree t, char *prefix)
 Action
 ap_getl_unique(APTree t, char *prefix, int len)
 {
-        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         for (; i < len; i++) {
-                if (ct->after[prefix[i]] == NULL)
+                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return NoAction;
 
-                ct = ct->after[prefix[i]];
+                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
         }
 
         return ct->descents == 0 ? ct->action : NoAction;
@@ -152,15 +132,14 @@ ap_getl_unique(APTree t, char *prefix, int len)
 Action
 ap_get_last(APTree t, char *prefix)
 {
-        check_prefix(prefix, strlen(prefix));
         char *cchar;
         APTree ct = t;
         Action last = NoAction;
         for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[*cchar] == NULL)
+                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return last;
 
-                ct = ct->after[*cchar];
+                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
                 if (action_is_valid(ct->action)) last = ct->action;
         }
         return last;
@@ -169,15 +148,14 @@ ap_get_last(APTree t, char *prefix)
 Action
 ap_getl_last(APTree t, char *prefix, int len)
 {
-        check_prefix(prefix, len);
         APTree ct = t;
         int i = 0;
         Action last = NoAction;
         for (; i < len; i++) {
-                if (ct->after[prefix[i]] == NULL)
+                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
                         return last;
 
-                ct = ct->after[prefix[i]];
+                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
                 if (action_is_valid(ct->action)) last = ct->action;
         }
         return last;
@@ -186,17 +164,16 @@ ap_getl_last(APTree t, char *prefix, int len)
 void
 ap_remove(APTree t, char *prefix)
 {
-        check_prefix(prefix, strlen(prefix));
-        if (t->after[*prefix] == NULL) return;
+        if (t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES] == NULL) return;
 
-        ap_remove(t->after[*prefix], prefix + 1);
-        if (t->after[*prefix]->descents <= 0) {
-                free(t->after[*prefix]);
-                t->after[*prefix] = NULL;
+        ap_remove(t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES], prefix + 1);
+        if (t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]->descents <= 0) {
+                free(t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]);
+                t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES] = NULL;
                 return;
         }
         if (prefix[1] == 0)
-                t->after[*prefix]->action = NoAction;
+                t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]->action = NoAction;
 }
 
 void
@@ -206,10 +183,10 @@ ap_print_branch(APTree t, int indent)
         int len = sizeof(t->after) / sizeof(*t->after);
         printf("%p (descents %d)\n", t->action.action, t->descents);
         for (; i < len; i++) {
-                if (t->after[i]) {
+                if (t->after[(i + AP_ENTRIES) % AP_ENTRIES]) {
                         indent += 4;
                         printf("%-*s%c: ", indent, "", i);
-                        ap_print_branch(t->after[i], indent);
+                        ap_print_branch(t->after[(i + AP_ENTRIES) % AP_ENTRIES], indent);
                 }
         }
 }
@@ -226,8 +203,8 @@ ap_destroy(APTree t)
 {
         int i = 0;
         for (; i < AP_ENTRIES; ++i) {
-                if (t->after[i]) {
-                        ap_destroy(t->after[i]);
+                if (t->after[(i + AP_ENTRIES) % AP_ENTRIES]) {
+                        ap_destroy(t->after[(i + AP_ENTRIES) % AP_ENTRIES]);
                 }
         }
         free(t);

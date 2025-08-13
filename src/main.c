@@ -81,7 +81,7 @@ main(int argc, char *argv[])
         }
 
         report("------| Starting |------");
-        // T_ASBE();
+        if (debug_level == 0) T_ASBE();
         T_CUHDE();
         EFFECT(RESET);
         clear_screen();
