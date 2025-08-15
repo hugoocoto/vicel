@@ -96,21 +96,31 @@ void
 print_status_bar2()
 {
 #define UI_CELLTEXT_L_SEP "Cell text: "
-#define UI_CELLTEXT_R_SEP ""
-#define UI_STATUS_BOTTOM_END "github: hugoocoto/vicel"
+#define UI_CELLTEXT_M_SEP " ("
+#define UI_CELLTEXT_R_SEP ")"
+#define UI_STATUS_BOTTOM_END "(Report issues to hugo.coto@member.fsf.org)"
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(active_ctx.ws.ws_row, 1);
 
         apply_color("ui_cell_text");
-        printf("%s%s%-*.*s",
+        cm_type_repr(get_cursor_cell()->value.type);
+        printf("%s%s%s%s%-*.*s",
                UI_CELLTEXT_L_SEP,
                get_cursor_cell()->input_repr,
-               (int) (active_ctx.ws.ws_col - strlen(UI_CELLTEXT_L_SEP) -
+               UI_CELLTEXT_M_SEP,
+               cm_type_repr(get_cursor_cell()->value.type),
+               (int) (active_ctx.ws.ws_col -
+                      +strlen(UI_CELLTEXT_L_SEP) -
+                      +strlen(UI_CELLTEXT_M_SEP) -
                       +strlen(get_cursor_cell()->input_repr) -
+                      +strlen(cm_type_repr(get_cursor_cell()->value.type)) -
                       +strlen(UI_STATUS_BOTTOM_END)),
-               (int) (active_ctx.ws.ws_col - strlen(UI_CELLTEXT_L_SEP) -
+               (int) (active_ctx.ws.ws_col -
+                      +strlen(UI_CELLTEXT_L_SEP) -
+                      +strlen(UI_CELLTEXT_M_SEP) -
                       +strlen(get_cursor_cell()->input_repr) -
+                      +strlen(cm_type_repr(get_cursor_cell()->value.type)) -
                       +strlen(UI_STATUS_BOTTOM_END)),
                UI_CELLTEXT_R_SEP);
 
@@ -123,24 +133,26 @@ char mappings_buffer[16];
 void
 print_status_bar()
 {
-        /* Quite hardcoded for now */
-        char status[1024];
-        char buf[1024];
-
-        *status = 0;
-        strcat(status, "vicel");
-        strcat(status, " | ");
-        strcat(status, "filename: ");
-        strcat(status, active_ctx.filename ?: "(unnamed)");
-        strcat(status, mappings_buffer);
-        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%-*s %*s @",
-                     active_ctx.ws.ws_col - 3 - 15, status,
-                     15, cm_type_repr(get_cursor_cell()->value.type))] = 0;
+#define STATUS_L_STUFF "vicel | "
+#define STATUS_FILENAME "filename: "
+#define STATUS_R_END "github: hugoocoto/vicel"
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(1, 1);
         apply_color("ui");
-        printf("%s", buf);
+        printf("%s%s%-*.*s%s",
+               STATUS_L_STUFF,
+               STATUS_FILENAME,
+               (int) (active_ctx.ws.ws_col -
+                      +strlen(STATUS_L_STUFF) -
+                      +strlen(STATUS_FILENAME) -
+                      +strlen(STATUS_R_END)),
+               (int) (active_ctx.ws.ws_col -
+                      +strlen(STATUS_L_STUFF) -
+                      +strlen(STATUS_FILENAME) -
+                      +strlen(STATUS_R_END)),
+               active_ctx.filename ?: "(unnamed)",
+               STATUS_R_END);
         apply_color(C_RESET);
 }
 

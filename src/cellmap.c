@@ -35,13 +35,13 @@ cm_is_valid_pos(CellMat *mat, int x, int y)
 }
 
 const char *lookup[] = {
-        [TYPE_NUMBER] = "TYPE_NUMBER",
-        [TYPE_TEXT] = "TYPE_TEXT",
-        [TYPE_BOOL] = "TYPE_TEXT",
-        [TYPE_EMPTY] = "TYPE_EMPTY",
-        [TYPE_FORMULA] = "TYPE_FORMULA",
-        [TYPE_RANGE] = "TYPE_RANGE",
-        [TYPE_LEN] = "TYPE_LEN",
+        [TYPE_NUMBER] = "number",
+        [TYPE_TEXT] = "text",
+        [TYPE_BOOL] = "boolean",
+        [TYPE_EMPTY] = "empty",
+        [TYPE_FORMULA] = "formula",
+        [TYPE_RANGE] = "range",
+        [TYPE_LEN] = "should not display this",
 };
 
 const char *

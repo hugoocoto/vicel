@@ -5,8 +5,8 @@ File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/formula.c|84|33|727
 src/cellmap.c|35|23|391
+src/window.c|46|22|316
 src/escape_code.h|19|24|302
-src/window.c|47|23|302
 src/eval.c|36|19|294
 src/keyboard.c|40|29|253
 src/dhm.c|36|19|195
@@ -37,4 +37,4 @@ src/builtin.h|5|19|8
 src/color.h|5|19|7
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|579|743|3840
+SUM:|578|742|3854
