@@ -27,5 +27,6 @@
 
 extern Hmap colors;
 void apply_color(char *key);
+char *get_color(char *key);
 
 #endif // !COLOR_H_

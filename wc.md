@@ -5,7 +5,7 @@ File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/formula.c|84|33|727
 src/cellmap.c|35|23|391
-src/window.c|46|22|316
+src/window.c|48|22|326
 src/escape_code.h|19|24|302
 src/eval.c|36|19|294
 src/keyboard.c|40|29|253
@@ -20,8 +20,8 @@ src/da.h|15|33|90
 src/flag.c|11|37|80
 src/main.c|12|20|61
 src/formula.h|11|22|55
+src/color.c|8|31|46
 src/window.h|12|20|43
-src/color.c|6|19|39
 src/mappings.h|4|19|30
 src/debug.c|5|23|27
 src/debug.h|5|19|20
@@ -34,7 +34,7 @@ src/flag.h|8|39|15
 src/action.h|6|19|12
 src/keyboard.h|6|19|12
 src/builtin.h|5|19|8
-src/color.h|5|19|7
+src/color.h|5|19|8
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|578|742|3854
+SUM:|582|754|3872

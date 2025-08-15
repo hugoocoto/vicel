@@ -18,10 +18,12 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
+#include "color.h"
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
 #include "hm.h"
+#include <unistd.h>
 
 Hmap colors;
 
@@ -47,18 +49,37 @@ set_default_colors()
         hmadd(&colors, "sheet_ui_over", C(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD));
         hmadd(&colors, "sheet_ui_selected", C(C_BG_MAGENTA, C_FG_GREEN));
         hmadd(&colors, "ui_cell_text", C(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD));
+
+        // #define pc(s) printf("%s%s%s\n", get_color(s), s, get_color(NULL))
+        //         pc("ui");
+        //         pc("cell");
+        //         pc("cell_over");
+        //         pc("cell_selected");
+        //         pc("ln_over");
+        //         pc("ln");
+        //         pc("sheet_ui");
+        //         pc("sheet_ui_over");
+        //         pc("sheet_ui_selected");
+        //         pc("ui_cell_text");
+        //         exit(0);
+}
+
+char *
+get_color(char *key)
+{
+        char *col;
+        if (key == NULL) return C(C_NORMAL);
+        hmget(colors, key, (void *) &col);
+        if (col == NULL) {
+                report("Invalid color key: %s", key);
+                return C(C_NORMAL);
+        }
+        return col;
 }
 
 void
 apply_color(char *key)
 {
-        char *col;
-        printf(T_CSI "0m");
-        if (key == NULL) return;
-        hmget(colors, key, (void *) &col);
-        if (col == NULL) {
-                report("Invalid color key: %s", key);
-                return;
-        }
-        printf(T_CSI "%sm", col);
+        printf("%s", get_color(NULL));
+        printf("%s", get_color(key));
 }

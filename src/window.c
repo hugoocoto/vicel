@@ -95,37 +95,50 @@ repeat:
 void
 print_status_bar2()
 {
+        char buf[1024];
 #define UI_CELLTEXT_L_SEP "Cell text: "
 #define UI_CELLTEXT_M_SEP " ("
 #define UI_CELLTEXT_R_SEP ")"
 #define UI_STATUS_BOTTOM_END "(Report issues to hugo.coto@member.fsf.org)"
 
+        int asize = strlen(UI_CELLTEXT_L_SEP) +
+                    strlen(get_cursor_cell()->input_repr) +
+                    strlen(UI_CELLTEXT_M_SEP) +
+                    strlen(cm_type_repr(get_cursor_cell()->value.type)) +
+                    strlen(UI_CELLTEXT_R_SEP) >
+                    active_ctx.ws.ws_col ?
+                    0 :
+                    strlen(get_color("ui"));
+
+        buf[snprintf(buf, active_ctx.ws.ws_col + 1 + asize,
+                     "%s%s%s%s%s%s%*.*s",
+                     UI_CELLTEXT_L_SEP,
+                     get_cursor_cell()->input_repr,
+                     UI_CELLTEXT_M_SEP,
+                     cm_type_repr(get_cursor_cell()->value.type),
+                     UI_CELLTEXT_R_SEP,
+                     get_color("ui"),
+                     max((int) (active_ctx.ws.ws_col -
+                                +strlen(UI_CELLTEXT_L_SEP) -
+                                +strlen(UI_CELLTEXT_M_SEP) -
+                                +strlen(UI_CELLTEXT_R_SEP) -
+                                +strlen(get_cursor_cell()->input_repr) -
+                                +strlen(cm_type_repr(get_cursor_cell()->value.type))),
+                         0),
+                     max((int) (active_ctx.ws.ws_col -
+                                +strlen(UI_CELLTEXT_L_SEP) -
+                                +strlen(UI_CELLTEXT_M_SEP) -
+                                +strlen(UI_CELLTEXT_R_SEP) -
+                                +strlen(get_cursor_cell()->input_repr) -
+                                +strlen(cm_type_repr(get_cursor_cell()->value.type))),
+                         0),
+                     UI_STATUS_BOTTOM_END)] = 0;
+
         assert(active_ctx.status_bar_height == 1);
         T_CUP(active_ctx.ws.ws_row, 1);
 
         apply_color("ui_cell_text");
-        cm_type_repr(get_cursor_cell()->value.type);
-        printf("%s%s%s%s%-*.*s",
-               UI_CELLTEXT_L_SEP,
-               get_cursor_cell()->input_repr,
-               UI_CELLTEXT_M_SEP,
-               cm_type_repr(get_cursor_cell()->value.type),
-               (int) (active_ctx.ws.ws_col -
-                      +strlen(UI_CELLTEXT_L_SEP) -
-                      +strlen(UI_CELLTEXT_M_SEP) -
-                      +strlen(get_cursor_cell()->input_repr) -
-                      +strlen(cm_type_repr(get_cursor_cell()->value.type)) -
-                      +strlen(UI_STATUS_BOTTOM_END)),
-               (int) (active_ctx.ws.ws_col -
-                      +strlen(UI_CELLTEXT_L_SEP) -
-                      +strlen(UI_CELLTEXT_M_SEP) -
-                      +strlen(get_cursor_cell()->input_repr) -
-                      +strlen(cm_type_repr(get_cursor_cell()->value.type)) -
-                      +strlen(UI_STATUS_BOTTOM_END)),
-               UI_CELLTEXT_R_SEP);
-
-        apply_color("ui");
-        printf("%s", UI_STATUS_BOTTOM_END);
+        printf("%s", buf);
 }
 
 char mappings_buffer[16];
@@ -133,27 +146,30 @@ char mappings_buffer[16];
 void
 print_status_bar()
 {
+        char buf[1024];
 #define STATUS_L_STUFF "vicel | "
 #define STATUS_FILENAME "filename: "
 #define STATUS_R_END "github: hugoocoto/vicel"
 
+        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%s%s%s%*.*s",
+                     STATUS_L_STUFF,
+                     STATUS_FILENAME,
+                     active_ctx.filename ?: "(unnamed)",
+                     (int) (active_ctx.ws.ws_col -
+                            +strlen(STATUS_L_STUFF) -
+                            +strlen(active_ctx.filename ?: "(unnamed)") -
+                            +strlen(STATUS_FILENAME)),
+                     (int) (active_ctx.ws.ws_col -
+                            +strlen(STATUS_L_STUFF) -
+                            +strlen(active_ctx.filename ?: "(unnamed)") -
+                            +strlen(STATUS_FILENAME)),
+                     STATUS_R_END)] = 0;
+
         assert(active_ctx.status_bar_height == 1);
         T_CUP(1, 1);
+
         apply_color("ui");
-        printf("%s%s%-*.*s%s",
-               STATUS_L_STUFF,
-               STATUS_FILENAME,
-               (int) (active_ctx.ws.ws_col -
-                      +strlen(STATUS_L_STUFF) -
-                      +strlen(STATUS_FILENAME) -
-                      +strlen(STATUS_R_END)),
-               (int) (active_ctx.ws.ws_col -
-                      +strlen(STATUS_L_STUFF) -
-                      +strlen(STATUS_FILENAME) -
-                      +strlen(STATUS_R_END)),
-               active_ctx.filename ?: "(unnamed)",
-               STATUS_R_END);
-        apply_color(C_RESET);
+        printf("%s", buf);
 }
 
 void
@@ -272,8 +288,6 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                 n++;
                 yy++;
         }
-
-        apply_color(C_RESET);
 }
 
 void
@@ -367,7 +381,6 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
         }
 
         if (avy > 0) T_ED(0);
-        apply_color(C_RESET);
         active_ctx.max_display_c = m_c;
         active_ctx.max_display_r = m_r;
 }
@@ -375,7 +388,6 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
 void
 render()
 {
-        apply_color(C_RESET);
         print_status_bar();
         display_add_names(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, 1, 2);
         cm_display(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, num_col_width + 1, 3);

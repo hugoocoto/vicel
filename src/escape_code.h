@@ -103,7 +103,7 @@
 #define _CJOIN10(ef, ...) ef __VA_OPT__(";" _CJOIN11(__VA_ARGS__))
 #define _CJOIN11(ef, ...) ef
 
-#define C(...) _CJOIN00(__VA_ARGS__)
+#define C(...) T_CSI _CJOIN00(__VA_ARGS__) "m"
 #define EFFECT(...) printf(T_CSI __VA_OPT__(_EFJOIN00(__VA_ARGS__)) "m")
 #define COL(c) printf(T_CSI "%dm", c)
 
