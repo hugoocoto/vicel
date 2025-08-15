@@ -7,6 +7,7 @@
 * Improve input: arrow movement
 * Improve UI and UI customization
 * Colors?
+* Add color to input
 
 # No tested at all
 * new csv reader
