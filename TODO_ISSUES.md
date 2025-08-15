@@ -1,6 +1,7 @@
 # Issues
 * use after free in some formulas, irreguar: I cant reproduce
 * a formula without closing parenthesis falls into an inf loop
+* set digit from forula breaks it
 
 # Todo
 * Improve input: use prev input
