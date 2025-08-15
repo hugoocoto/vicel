@@ -6,7 +6,7 @@ File|blank|comment|code
 src/formula.c|84|33|727
 src/cellmap.c|35|23|391
 src/eval.c|36|19|294
-src/window.c|36|24|268
+src/window.c|43|24|274
 src/keyboard.c|40|29|253
 src/dhm.c|36|19|195
 src/escape_code.h|14|24|177
@@ -35,4 +35,4 @@ src/keyboard.h|6|19|12
 src/builtin.h|5|19|8
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|552|706|3622
+SUM:|559|706|3628

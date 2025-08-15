@@ -200,13 +200,19 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                         ++xx;
                         continue;
                 }
+
+                if (xx == active_ctx.cursor_pos_c) EFFECT(REVERSE);
+
                 int wwww = min(column_width, avx);
                 int ww = wwww / 2;
                 printf("%*.*s%*.*s", ww, ww, col,
                        wwww - ww, wwww - ww, "");
 
+                if (xx == active_ctx.cursor_pos_c) EFFECT(REVERSE_OFF);
+
                 _cx += column_width;
                 avx -= column_width;
+                xx++;
                 if (avx <= 0) break;
 
                 if (col[1] == 'Z') {
@@ -233,11 +239,18 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                         continue;
                 }
                 T_CUP(_cy, _cx);
+
+                if (yy == active_ctx.cursor_pos_r) EFFECT(REVERSE);
+
                 printf("%*d ", num_col_width - 1, n);
+
+                if (yy == active_ctx.cursor_pos_r) EFFECT(REVERSE_OFF);
+
                 _cy += row_width;
                 avy -= row_width;
                 if (avy <= 0) break;
                 n++;
+                yy++;
         }
 
         EFFECT(RESET);
