@@ -38,29 +38,7 @@ enum ErrorCode {
 };
 
 #define DEBUG_LOG "report.log"
-
+void report(char *format, ...);
 extern int debug_level;
-
-#if defined(DEBUG) && DEBUG
-static void
-report(char *format, ...)
-{
-        if (debug_level == 0) return;
-        va_list arg;
-        FILE *file = fopen(DEBUG_LOG, "a");
-        va_start(arg, format);
-        time_t t = time(0);
-        char *strt = ctime(&t);
-        *strchr(strt, 10) = 0;
-        fprintf(file, "[%s] ", strt);
-        vfprintf(file, format, arg);
-        putc(10, file);
-        va_end(arg);
-        fclose(file);
-}
-
-#else
-#define report(...)
-#endif
 
 #endif //! DEBUG_H

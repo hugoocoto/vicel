@@ -18,20 +18,25 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
-#ifndef ACTION_H
-#define ACTION_H
+#ifndef DHM_H_
+#define DHM_H_
 
-#include <stdlib.h>
-typedef struct Action {
-        void (*action)(void);
-} Action;
+typedef struct {
+        char *key;
+        void *value;
+        int d;
+} DHnode;
 
-#define NOACTION ((struct Action) { \
-.action = NULL,                     \
-})
+typedef struct {
+        int d;
+        DHnode **data;
+} DHmap;
 
-#define action_is_valid(a) ((a).action != NULL)
+void dhmadd(DHmap *, char *key, void *value);
+void dhmremove(DHmap *, char *key);
+void *dhmget(DHmap *, char *key);
+void dhmdestroy(DHmap *);
+void dhmprint(DHmap hm);
+void dhmdestroya(DHmap *hm, void (*destra)(void *));
 
-#define ACTION(f) ((struct Action) { .action = (f) })
-
-#endif // !ACTION_H
+#endif //! DHM_H_

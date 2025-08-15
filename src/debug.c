@@ -18,20 +18,38 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
-#ifndef ACTION_H
-#define ACTION_H
+#include "debug.h"
+#include <assert.h>
 
-#include <stdlib.h>
-typedef struct Action {
-        void (*action)(void);
-} Action;
+/* default debug level
+ * 0: do not report
+ * 1: report if DEBUG is set
+ */
+int debug_level = 0;
 
-#define NOACTION ((struct Action) { \
-.action = NULL,                     \
-})
+#if defined(DEBUG) && DEBUG
+void
+report(char *format, ...)
+{
+        if (debug_level == 0) return;
+        va_list arg;
+        FILE *file = fopen(DEBUG_LOG, "a");
+        va_start(arg, format);
+        time_t t = time(0);
+        char *strt = ctime(&t);
+        *strchr(strt, 10) = 0;
+        fprintf(file, "[%s] ", strt);
+        vfprintf(file, format, arg);
+        putc(10, file);
+        va_end(arg);
+        fclose(file);
+}
 
-#define action_is_valid(a) ((a).action != NULL)
+#else
+void
+report(char *format, ...)
+{
+        assert(format);
+}
 
-#define ACTION(f) ((struct Action) { .action = (f) })
-
-#endif // !ACTION_H
+#endif

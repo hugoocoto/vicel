@@ -21,210 +21,158 @@
 #include "aptree.h"
 #include "action.h"
 #include "common.h"
+#include "dhm.h"
+#include <assert.h>
+#include <unistd.h>
 
 APTree
 ap_init()
 {
-        return calloc(1, sizeof(struct __APTree));
+        APTree aptree = calloc(1, sizeof(*aptree));
+        if (!aptree) {
+                perror("calloc");
+                exit(EXIT_FAILURE);
+        }
+        return aptree;
 }
 
 void
-ap_add(APTree t, char *prefix, Action action)
+ap_add(APTree t, char *prefix, int len, Action action)
 {
-        char *cchar;
-        APTree ct = t;
-        for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL) {
-                        ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] = ap_init();
-                        ++ct->descents;
+        if (!t || !prefix || len <= 0) return;
+
+        int i;
+        APTree node = t;
+        APTree next;
+        char s[2] = { 0, 0 }; // un solo carácter + '\0'
+
+        for (i = 0; i < len; i++) {
+                s[0] = prefix[i];
+
+                /* Si no está inicializado */
+                if (!node->node)
+                        node->node = calloc(1, sizeof(DHmap));
+
+                /* Obtener siguiente entrada */
+                next = dhmget(node->node, s);
+
+                /* Si no existe, crearlo */
+                if (!next) {
+                        next = ap_init();
+                        dhmadd(node->node, s, next);
                 }
 
-                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
+                ++node->descents;
+                node = next;
         }
-        ct->action = action;
+
+        node->action = action;
+}
+
+APTree
+ap_get(APTree t, char *prefix, int len)
+{
+        if (t == NULL) return NULL;
+        if (prefix == NULL) return NULL;
+        if (len <= 0) return NULL;
+
+        APTree node = t;
+        char s[2] = { 0, 0 };
+
+        for (int i = 0; i < len; i++) {
+                s[0] = prefix[i];
+
+                /* If not initialized */
+                if (node->node == NULL) return NULL;
+
+                /* Get next entry */
+                APTree next = dhmget(node->node, s);
+
+                /* If entry doesn't exist */
+                if (next == NULL) return NULL;
+
+                node = next;
+        }
+        return node;
+}
+
+void
+ap_destroyv(void *t)
+{
+        if (!t) return;
+        APTree self = (APTree) t;
+        if (self->node) {
+                dhmdestroya(self->node, ap_destroyv); /* destruye recursivamente los hijos */
+                free(self->node);
+                self->node = NULL;
+        }
+        free(self);
+}
+
+Action
+ap_get_last(APTree t, char *prefix, int len)
+{
+        int i = len;
+        for (; i > 0; i--) {
+                APTree node = ap_get(t, prefix, i);
+                if (node == NULL) continue;
+                if (action_is_valid(node->action)) return node->action;
+        }
+        return NOACTION;
+}
+
+Action
+ap_get_unique(APTree t, char *prefix, int len)
+{
+        /* Not sure what "unique" was */
+        APTree node = ap_get(t, prefix, len);
+        if (node == NULL) return NOACTION;
+        return node->descents == 0 ? node->action : NOACTION;
 }
 
 bool
-ap_has_descents(APTree t, char *prefix)
+ap_has_descents(APTree t, char *prefix, int len)
 {
-        char *cchar;
-        APTree ct = t;
-        for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return false;
-
-                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
-        }
-        return ct->descents > 0;
-}
-
-bool
-ap_has_descentsl(APTree t, char *prefix, int len)
-{
-        APTree ct = t;
-        int i = 0;
-        for (; i < len; i++) {
-                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return false;
-
-                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
-        }
-        return ct->descents > 0;
-}
-
-Action
-ap_get(APTree t, char *prefix)
-{
-        char *cchar;
-        APTree ct = t;
-        for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return NoAction;
-
-                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
-        }
-        return ct->action;
-}
-
-Action
-ap_getl(APTree t, char *prefix, int len)
-{
-        APTree ct = t;
-        int i = 0;
-        for (; i < len; i++) {
-                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return NoAction;
-
-                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
-        }
-        return ct->action;
-}
-
-Action
-ap_get_unique(APTree t, char *prefix)
-{
-        char *cchar;
-        APTree ct = t;
-        for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return NoAction;
-
-                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
-        }
-        return ct->descents == 0 ? ct->action : NoAction;
-}
-
-Action
-ap_getl_unique(APTree t, char *prefix, int len)
-{
-        APTree ct = t;
-        int i = 0;
-        for (; i < len; i++) {
-                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return NoAction;
-
-                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
-        }
-
-        return ct->descents == 0 ? ct->action : NoAction;
-}
-
-Action
-ap_get_last(APTree t, char *prefix)
-{
-        char *cchar;
-        APTree ct = t;
-        Action last = NoAction;
-        for (cchar = prefix; *cchar; cchar++) {
-                if (ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return last;
-
-                ct = ct->after[(*cchar + AP_ENTRIES) % AP_ENTRIES];
-                if (action_is_valid(ct->action)) last = ct->action;
-        }
-        return last;
-}
-
-Action
-ap_getl_last(APTree t, char *prefix, int len)
-{
-        APTree ct = t;
-        int i = 0;
-        Action last = NoAction;
-        for (; i < len; i++) {
-                if (ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES] == NULL)
-                        return last;
-
-                ct = ct->after[(prefix[i] + AP_ENTRIES) % AP_ENTRIES];
-                if (action_is_valid(ct->action)) last = ct->action;
-        }
-        return last;
+        APTree node = ap_get(t, prefix, len);
+        if (node == NULL) return false;
+        return node->descents > 0;
 }
 
 void
-ap_remove(APTree t, char *prefix)
+ap_remove(APTree t, char *prefix, int len)
 {
-        if (t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES] == NULL) return;
-
-        ap_remove(t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES], prefix + 1);
-        if (t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]->descents <= 0) {
-                free(t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]);
-                t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES] = NULL;
-                return;
-        }
-        if (prefix[1] == 0)
-                t->after[(*prefix + AP_ENTRIES) % AP_ENTRIES]->action = NoAction;
-}
-
-void
-ap_print_branch(APTree t, int indent)
-{
-        int i = 0;
-        int len = sizeof(t->after) / sizeof(*t->after);
-        printf("%p (descents %d)\n", t->action.action, t->descents);
-        for (; i < len; i++) {
-                if (t->after[(i + AP_ENTRIES) % AP_ENTRIES]) {
-                        indent += 4;
-                        printf("%-*s%c: ", indent, "", i);
-                        ap_print_branch(t->after[(i + AP_ENTRIES) % AP_ENTRIES], indent);
-                }
-        }
-}
-
-void
-ap_print(APTree t)
-{
-        printf("Default: ");
-        ap_print_branch(t, 0);
+        assert("No yet implemented: ap_remove" && 0);
+        assert(t);
+        assert(prefix);
+        assert(len);
 }
 
 void
 ap_destroy(APTree t)
 {
-        int i = 0;
-        for (; i < AP_ENTRIES; ++i) {
-                if (t->after[(i + AP_ENTRIES) % AP_ENTRIES]) {
-                        ap_destroy(t->after[(i + AP_ENTRIES) % AP_ENTRIES]);
-                }
-        }
-        free(t);
+        ap_destroyv(t);
 }
 
 static __attribute__((constructor)) void
 test()
 {
         APTree t = ap_init();
-        assert(t);
-        ap_add(t, "hugo", (Action) { .action = (void *) 0x3 });
-        ap_add(t, "hugoL", (Action) { .action = (void *) 0x4 });
-        ap_add(t, "hu", (Action) { .action = (void *) 0x5 });
-        assert(ap_get_last(t, "hul").action == (void *) 0x5);
-        assert(ap_get(t, "hugo").action == (void *) 0x3);
-        assert(ap_get(t, "hugoL").action == (void *) 0x4);
-        assert(ap_get(t, "hu").action == (void *) 0x5);
-        ap_remove(t, "hu");
-        assert(ap_get(t, "hu").action == NoAction.action);
-        ap_add(t, "hu", (Action) { .action = (void *) 0x6 });
-        assert(ap_get(t, "hu").action == (void *) 0x6);
+        APTree n;
+        ap_add(t, "hello", 4, (Action) { .action = (void *) 1 });
+        ap_add(t, "h", 1, (Action) { .action = (void *) 2 });
+        ap_add(t, "hola", 4, (Action) { .action = (void *) 3 });
+        n = ap_get(t, "hello", 4);
+        assert(n && "hello");
+        assert(n->action.action == (void *) 1);
+        n = ap_get(t, "h", 1);
+        assert(n && "h");
+        assert(n->action.action == (void *) 2);
+        n = ap_get(t, "hola", 4);
+        assert(n && "hola");
+        assert(n->action.action == (void *) 3);
+        assert(ap_get_unique(t, "hello", 4).action == (void *) 1);
+        assert(ap_get_unique(t, "h", 1).action == NULL);
+        assert(ap_get_unique(t, "hola", 4).action == (void *) 3);
+        assert(ap_get_last(t, "hel", 3).action == (void *) 2);
         ap_destroy(t);
 }

@@ -26,12 +26,6 @@
 #include "saving.h"
 #include "window.h"
 
-/* default debug level
- * 0: do not report
- * 1: report if DEBUG is set
- */
-int debug_level = 0;
-
 void
 resize_handler(int s)
 {

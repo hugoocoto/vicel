@@ -93,25 +93,25 @@ get_escape_sequence()
 static inline bool
 has_descents(APTree t, char *prefix, int len)
 {
-        return ap_has_descentsl(t, prefix, len);
+        return ap_has_descents(t, prefix, len);
 }
 
 static inline Action
 find_action(APTree t, char *prefix, int len)
 {
-        return ap_getl_unique(t, prefix, len);
+        return ap_get_unique(t, prefix, len);
 }
 
 static inline Action
 find_action_force(APTree t, char *prefix, int len)
 {
-        return ap_getl_last(t, prefix, len);
+        return ap_get_last(t, prefix, len);
 }
 
 static inline void
 add_action(APTree t, char *prefix, Action action)
 {
-        ap_add(t, prefix, action);
+        ap_add(t, prefix, strlen(prefix), action);
 }
 
 char *
@@ -178,7 +178,6 @@ set_cell_text(Cell *c, char *text)
                 destroy_formula(c);
         }
 
-        // report("free on c.repr = %p", c->repr);
         free(c->repr);
         free(c->input_repr);
 

@@ -1,4 +1,4 @@
-cloc|github.com/AlDanial/cloc v 2.04
+cloc|github.com/AlDanial/cloc v 2.06
 --- | ---
 
 File|blank|comment|code
@@ -7,23 +7,26 @@ src/formula.c|84|33|727
 src/cellmap.c|34|23|391
 src/eval.c|36|19|294
 src/window.c|36|24|268
-src/keyboard.c|40|30|253
-src/aptree.c|27|19|184
+src/keyboard.c|40|29|253
+src/dhm.c|36|19|195
 src/escape_code.h|14|24|177
 src/mappings.c|25|19|174
 src/saving.c|24|21|150
+src/aptree.c|24|26|128
 src/builtin.c|15|19|124
 src/cellmap.h|25|21|99
 src/flag.h|16|44|98
 src/hm.c|28|23|92
 src/da.h|15|33|90
-src/main.c|13|24|62
+src/main.c|12|20|61
 src/formula.h|11|22|55
 src/window.h|13|20|47
-src/debug.h|8|19|39
 src/mappings.h|4|19|30
-src/aptree.h|7|19|23
+src/debug.c|5|23|27
+src/debug.h|5|19|20
+src/aptree.h|6|19|19
 src/hm.h|6|21|19
+src/dhm.h|5|19|18
 src/common.h|1|19|16
 src/eval.h|7|20|15
 src/action.h|6|19|12
@@ -31,4 +34,4 @@ src/keyboard.h|6|19|12
 src/builtin.h|5|19|8
 src/saving.h|4|19|6
 --------|--------|--------|--------
-SUM:|510|611|3465
+SUM:|548|674|3625
