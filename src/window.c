@@ -20,11 +20,14 @@
 
 #include "window.h"
 #include "cellmap.h"
+#include "color.h"
 #include "common.h"
 #include "da.h"
 #include "debug.h"
 #include "escape_code.h"
 #include "mappings.h"
+#include <stdio.h>
+#include <string.h>
 
 Context active_ctx = INIT_CONTEXT;
 
@@ -92,22 +95,27 @@ repeat:
 void
 print_status_bar2()
 {
-        /* Quite hardcoded for now */
-        char status[1024];
-        char buf[1024];
-
-        *status = 0;
-        strcat(status, "Text under the cursor: ");
-        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%*.*s %-*s @",
-                     (int) strlen(status), (int) strlen(status), status,
-                     active_ctx.ws.ws_col - 3 - (int) strlen(status),
-                     get_cursor_cell()->input_repr)] = 0;
+#define UI_CELLTEXT_L_SEP "Cell text: "
+#define UI_CELLTEXT_R_SEP ""
+#define UI_STATUS_BOTTOM_END "github: hugoocoto/vicel"
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(active_ctx.ws.ws_row, 1);
-        EFFECT(UI_BG, UI_FG, BOLD);
-        printf("%s", buf);
-        EFFECT(RESET);
+
+        apply_color("ui_cell_text");
+        printf("%s%s%-*.*s",
+               UI_CELLTEXT_L_SEP,
+               get_cursor_cell()->input_repr,
+               (int) (active_ctx.ws.ws_col - strlen(UI_CELLTEXT_L_SEP) -
+                      +strlen(get_cursor_cell()->input_repr) -
+                      +strlen(UI_STATUS_BOTTOM_END)),
+               (int) (active_ctx.ws.ws_col - strlen(UI_CELLTEXT_L_SEP) -
+                      +strlen(get_cursor_cell()->input_repr) -
+                      +strlen(UI_STATUS_BOTTOM_END)),
+               UI_CELLTEXT_R_SEP);
+
+        apply_color("ui");
+        printf("%s", UI_STATUS_BOTTOM_END);
 }
 
 char mappings_buffer[16];
@@ -131,9 +139,9 @@ print_status_bar()
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(1, 1);
-        EFFECT(UI_BG, UI_FG, BOLD);
+        apply_color("ui");
         printf("%s", buf);
-        EFFECT(RESET);
+        apply_color(C_RESET);
 }
 
 void
@@ -142,11 +150,11 @@ print_mapping_buffer(char *buf, int len, int n, int repeat)
         if (repeat == 0) {
                 mappings_buffer[snprintf(
                 mappings_buffer, sizeof mappings_buffer,
-                " [%-*.*s  ] ", n, len, buf)] = 0;
+                " [%-*.*s   ] ", n, len, buf)] = 0;
         } else {
                 mappings_buffer[snprintf(
                 mappings_buffer, sizeof mappings_buffer,
-                " [x%d %-*.*s] ", repeat, n, len, buf)] = 0;
+                " [x%2d %-*.*s] ", repeat, n, len, buf)] = 0;
         }
         print_status_bar();
 }
@@ -182,7 +190,7 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
         int n;
 
         T_CUP(_cy, _cx);
-        EFFECT(UI_BG, UI_FG);
+        apply_color("ln");
 
         /* The top left gap */
         printf("%-*.*s", num_col_width, num_col_width, "");
@@ -201,14 +209,14 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                         continue;
                 }
 
-                if (xx == active_ctx.cursor_pos_c) EFFECT(REVERSE);
+                if (xx == active_ctx.cursor_pos_c) apply_color("ln_over");
 
                 int wwww = min(column_width, avx);
-                int ww = wwww / 2;
+                int ww = (wwww + 1) / 2;
                 printf("%*.*s%*.*s", ww, ww, col,
                        wwww - ww, wwww - ww, "");
 
-                if (xx == active_ctx.cursor_pos_c) EFFECT(REVERSE_OFF);
+                if (xx == active_ctx.cursor_pos_c) apply_color("ln");
 
                 _cx += column_width;
                 avx -= column_width;
@@ -240,11 +248,11 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                 }
                 T_CUP(_cy, _cx);
 
-                if (yy == active_ctx.cursor_pos_r) EFFECT(REVERSE);
+                if (yy == active_ctx.cursor_pos_r) apply_color("ln_over");
 
                 printf("%*d ", num_col_width - 1, n);
 
-                if (yy == active_ctx.cursor_pos_r) EFFECT(REVERSE_OFF);
+                if (yy == active_ctx.cursor_pos_r) apply_color("ln");
 
                 _cy += row_width;
                 avy -= row_width;
@@ -253,13 +261,12 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                 yy++;
         }
 
-        EFFECT(RESET);
+        apply_color(C_RESET);
 }
 
 void
 cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int y0)
 {
-        EFFECT(CELL_BG, CELL_FG);
         int _cy = y0;
         int _cx;
         int avx;
@@ -286,36 +293,60 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                                 ++xx;
                                 continue;
                         }
-                        ++m_c;
                         T_CUP(_cy, _cx);
                         assert(cell->heigh == 1);
 
-                        int w = min(column_width, avx) - 2;
+                        int w = min(column_width, avx) -
+                                strlen(CELL_L_SEP CELL_R_SEP);
+
                         if (w <= 0) {
                                 break;
                         }
+                        ++m_c;
 
-                        if (cell->selected)
-                                EFFECT(CELL_SELECT_BG, CELL_SELECT_FG);
+                        if (cell->selected) {
+                                apply_color("sheet_ui_selected");
+                                printf(CELL_L_SEP);
+                                apply_color("cell_selected");
+                        }
+
+                        else if (active_ctx.cursor_pos_r == yy &&
+                                 active_ctx.cursor_pos_c == xx) {
+                                apply_color("sheet_ui_over");
+                                printf(CELL_L_SEP);
+                                apply_color("cell_over");
+                        }
+
+                        else {
+                                apply_color("sheet_ui");
+                                printf(CELL_L_SEP);
+                                apply_color("cell");
+                        }
+
+                        printf("%-*.*s", w, w, cell->repr);
 
                         if (active_ctx.cursor_pos_r == yy &&
-                            active_ctx.cursor_pos_c == xx)
-                                EFFECT(REVERSE);
+                            active_ctx.cursor_pos_c == xx) {
+                                apply_color("sheet_ui_over");
+                                printf(CELL_R_SEP);
+                        }
 
-                        printf("[%-*.*s]", w, w, cell->repr);
+                        else if (cell->selected) {
+                                apply_color("sheet_ui_selected");
+                                printf(CELL_R_SEP);
+                        }
 
-                        if (active_ctx.cursor_pos_r == yy &&
-                            active_ctx.cursor_pos_c == xx)
-                                EFFECT(REVERSE_OFF);
-
-                        if (cell->selected)
-                                EFFECT(CELL_BG, CELL_FG);
+                        else {
+                                apply_color("sheet_ui");
+                                printf(CELL_R_SEP);
+                        }
 
                         _cx += column_width;
                         avx -= column_width;
                         if (avx <= 0) break;
                         ++xx;
                 }
+                apply_color(C_RESET);
                 if (avx > 0) T_EL(0);
                 avy -= row_width;
                 _cy += row_width;
@@ -324,7 +355,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
         }
 
         if (avy > 0) T_ED(0);
-        EFFECT(RESET);
+        apply_color(C_RESET);
         active_ctx.max_display_c = m_c;
         active_ctx.max_display_r = m_r;
 }
@@ -332,7 +363,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
 void
 render()
 {
-        EFFECT(RESET);
+        apply_color(C_RESET);
         print_status_bar();
         display_add_names(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, 1, 2);
         cm_display(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, num_col_width + 1, 3);

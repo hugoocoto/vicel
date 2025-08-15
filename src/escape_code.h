@@ -18,6 +18,9 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
+#ifndef ESC_CODE_H_
+#define ESC_CODE_H_
+
 /* C0 control codes */
 #define T_BEL "\x07"
 #define T_BS "\x08"
@@ -87,6 +90,20 @@
 #define _EFJOIN10(ef, ...) #ef __VA_OPT__(";" _EFJOIN11(__VA_ARGS__))
 #define _EFJOIN11(ef, ...) #ef
 
+#define _CJOIN00(ef, ...) ef __VA_OPT__(";" _CJOIN01(__VA_ARGS__))
+#define _CJOIN01(ef, ...) ef __VA_OPT__(";" _CJOIN02(__VA_ARGS__))
+#define _CJOIN02(ef, ...) ef __VA_OPT__(";" _CJOIN03(__VA_ARGS__))
+#define _CJOIN03(ef, ...) ef __VA_OPT__(";" _CJOIN04(__VA_ARGS__))
+#define _CJOIN04(ef, ...) ef __VA_OPT__(";" _CJOIN05(__VA_ARGS__))
+#define _CJOIN05(ef, ...) ef __VA_OPT__(";" _CJOIN06(__VA_ARGS__))
+#define _CJOIN06(ef, ...) ef __VA_OPT__(";" _CJOIN07(__VA_ARGS__))
+#define _CJOIN07(ef, ...) ef __VA_OPT__(";" _CJOIN08(__VA_ARGS__))
+#define _CJOIN08(ef, ...) ef __VA_OPT__(";" _CJOIN09(__VA_ARGS__))
+#define _CJOIN09(ef, ...) ef __VA_OPT__(";" _CJOIN10(__VA_ARGS__))
+#define _CJOIN10(ef, ...) ef __VA_OPT__(";" _CJOIN11(__VA_ARGS__))
+#define _CJOIN11(ef, ...) ef
+
+#define C(...) _CJOIN00(__VA_ARGS__)
 #define EFFECT(...) printf(T_CSI __VA_OPT__(_EFJOIN00(__VA_ARGS__)) "m")
 #define COL(c) printf(T_CSI "%dm", c)
 
@@ -208,8 +225,121 @@
 #define COL_FG_RGB(r, g, b) printf(FG_SET "38;2;%d;%d;%d;m", r, g, b)
 #define COL_BG_RGB(r, g, b) printf(FG_SET "48;2;%d;%d;%d;m", r, g, b)
 
+#define C_NORMAL "0"
+#define C_BOLD "1"
+#define C_FAINT "2"
+#define C_ITALIC "3"
+#define C_UNDERLINE "4"
+#define C_SBLINK "5"
+#define C_RBLINK "6"
+#define C_INVERT "7"
+#define C_REVERSE "7"
+#define C_REVERSED "7"
+#define C_CONCEAL "8"
+#define C_STRIKE "9"
+#define C_FONT_1 "10"
+#define C_FONT_2 "11"
+#define C_FONT_3 "12"
+#define C_FONT_4 "13"
+#define C_FONT_5 "14"
+#define C_FONT_6 "15"
+#define C_FONT_7 "16"
+#define C_FONT_8 "17"
+#define C_FONT_9 "18"
+#define C_FONT_10 "19"
+#define C_FRAKTUR "20"
+#define C_DOUBLY_UNDERLINE "21"
+#define C_DISABLE_BOLD "21"
+#define C_BOLD_OFF "22"
+#define C_ITALIC_OFF "23"
+#define C_UNDERLINE_OFF "24"
+#define C_BLINK_OFF "25"
+#define C_PROPOTIONAL_SPACING "26"
+#define C_REVERSED_OFF "27"
+#define C_REVERSE_OFF "27"
+#define C_CONCEAL_OFF "28"
+#define C_STRIKE_OFF "29"
+#define C_FG "30"
+#define C_FG_BLACK "30"
+#define C_FG_RED "31"
+#define C_FG_GREEN "32"
+#define C_FG_YELLOW "33"
+#define C_FG_BLUE "34"
+#define C_FG_MAGENTA "35"
+#define C_FG_CYAN "36"
+#define C_FG_WHITE "37"
+#define C_FG_SET "38"
+#define C_FG_DEFAULT "39"
+#define C_BG "40"
+#define C_BG_BLACK "40"
+#define C_BG_RED "41"
+#define C_BG_GREEN "42"
+#define C_BG_YELLOW "43"
+#define C_BG_BLUE "44"
+#define C_BG_MAGENTA "45"
+#define C_BG_CYAN "46"
+#define C_BG_WHITE "47"
+#define C_BG_SET "48"
+#define C_BG_DEFAULT "49"
+#define C_PROPOTIONAL_SPACING_OFF "50"
+#define C_FRAMED "51"
+#define C_ENCIRCLED "52"
+#define C_OVERLINED "53"
+#define C_FRAMED_OFF "54"
+#define C_ENCIRCLED_OFF "54"
+#define C_OVERLINED_OFF "55"
+#define C_UNDERLINE_SET "58"
+#define C_UNDERLINE_DEFAULT "59"
+#define C_IDEOGRAM_UNDERLINE "60"
+#define C_RIGHT_SIDE_LINE "60"
+#define C_IDEOGRAM_DOUBLE_UNDERLINE "61"
+#define C_RIGHT_SIDE_DOUBLE_LINE "61"
+#define C_IDEOGRAM_OVERLINE "62"
+#define C_LEFT_SIDE_LINE "62"
+#define C_IDEOGRAM_DOUBLE_OVERLINE "63"
+#define C_LEFT_SIDE_DOUBLE_LINE "63"
+#define C_IDEOGRAM_STRESS_MARKING "64"
+#define C_NO_IDEOGRAM_ATTRS "65"
+#define C_SUPERSCRIPT "73"
+#define C_SUBSCRIPT "74"
+#define C_SUPERSCRIPT_OFF "75"
+#define C_SUBSCRIPT_OFF "75"
+#define C_BRFG "90"
+#define C_BRFG_BLACK "90"
+#define C_BRFG_RED "91"
+#define C_BRFG_GREEN "92"
+#define C_BRFG_YELLOW "93"
+#define C_BRFG_BLUE "94"
+#define C_BRFG_MAGENTA "95"
+#define C_BRFG_CYAN "96"
+#define C_BRFG_WHITE "97"
+#define C_BRFG_SET "98"
+#define C_BRFG_DEFAULT "99"
+#define C_BRBG "100"
+#define C_BRBG_BLACK "100"
+#define C_BRBG_RED "101"
+#define C_BRBG_GREEN "102"
+#define C_BRBG_YELLOW "103"
+#define C_BRBG_BLUE "104"
+#define C_BRBG_MAGENTA "105"
+#define C_BRBG_CYAN "106"
+#define C_BRBG_WHITE "107"
+#define C_BRBG_SET "108"
+#define C_BRBG_DEFAULT "109"
+
+#define C_BLACK "0"
+#define C_RED "1"
+#define C_GREEN "2"
+#define C_YELLOW "3"
+#define C_BLUE "4"
+#define C_MAGENTA "5"
+#define C_CYAN "6"
+#define C_WHITE "7"
+
 #define SET_WINDOW_TITLE(title) printf(T_OSC "0;%s " T_BEL, title)
 #define HYPRLINK(link) printf(T_OSC "8;;%s " T_ST, link)
 #define SET_PALETTE(n, rr, gg, bb) printf(T_OSC "P %d %d %d %d " ST, n, rr, gg, bb)
 
 #define clear_screen() printf("\033[K\033[2J"); // clear screen
+
+#endif // !ESC_CODE_H_

@@ -20,6 +20,8 @@
 
 #include "hm.h"
 #include "common.h"
+#include <assert.h>
+#include <sys/cdefs.h>
 
 void
 hmnew(Hmap *table, int size)
@@ -126,13 +128,11 @@ hmdestroy(Hmap *table)
         for (int i = 0; i < table->size; i++) {
                 node = table->node_arr + i;
                 free(node->key);
-                free(node->value);
                 next = node->next;
 
                 while ((node = next)) {
                         next = node->next;
                         free(node->key);
-                        free(node->value);
                         free(node);
                 }
         }
@@ -140,4 +140,22 @@ hmdestroy(Hmap *table)
         free(table->node_arr);
         table->node_arr = NULL;
         table->size = 0;
+}
+
+static __attribute__((constructor)) void
+test()
+{
+        Hmap h;
+        hmnew(&h, 32);
+        hmadd(&h, "1", (void *) 1);
+        hmadd(&h, "2", (void *) 2);
+        hmadd(&h, "3", (void *) 3);
+        void *v;
+        hmget(h, "1", &v);
+        assert(v == (void *) 1);
+        hmget(h, "2", &v);
+        assert(v == (void *) 2);
+        hmget(h, "3", &v);
+        assert(v == (void *) 3);
+        hmdestroy(&h);
 }

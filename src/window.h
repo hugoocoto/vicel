@@ -24,20 +24,15 @@
 #include "cellmap.h" /* shut up */
 #include "common.h"
 
-#define UI_FG FG_YELLOW
-#define UI_BG BG_DEFAULT
-#define CELL_FG FG_BLUE
-#define CELL_BG BG_DEFAULT
-#define CELL_SELECT_FG FG_GREEN
-#define CELL_SELECT_BG CELL_BG
-
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) >= (b) ? (a) : (b))
 
 #define num_col_width 5
-#define column_width 10
+#define column_width 14
 #define row_width 1
 
+#define CELL_L_SEP " "
+#define CELL_R_SEP " "
 
 typedef struct Context {
         struct winsize ws;
