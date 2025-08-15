@@ -86,8 +86,9 @@ arguments and return a value.
 * **max(...)**: Get the max number between arguments.
 * **if(cond, iftrue [, else])**: Get the value depending on the condition.
 
-> Functions accept the keyword `:` that expand both cell operands with all
-> the cells in between. For example, `A0:A2` is the same as `A0,A1,A2`.
+> Functions accept ranges as parameters. They are two valid cells separated by
+> a `:`. For example, `sum(A0:A9)` is the same as sum the 10 first numbers in
+> row `A`.
 
 ## Latest Version
 [See version](./version.txt)
