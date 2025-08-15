@@ -34,18 +34,19 @@ cm_is_valid_pos(CellMat *mat, int x, int y)
                x >= 0 && x < mat->data->size;
 }
 
+const char *lookup[] = {
+        [TYPE_NUMBER] = "TYPE_NUMBER",
+        [TYPE_TEXT] = "TYPE_TEXT",
+        [TYPE_BOOL] = "TYPE_TEXT",
+        [TYPE_EMPTY] = "TYPE_EMPTY",
+        [TYPE_FORMULA] = "TYPE_FORMULA",
+        [TYPE_RANGE] = "TYPE_RANGE",
+        [TYPE_LEN] = "TYPE_LEN",
+};
+
 const char *
 cm_type_repr(CellType ct)
 {
-        static const char *lookup[] = {
-                [TYPE_NUMBER] = "TYPE_NUMBER",
-                [TYPE_TEXT] = "TYPE_TEXT",
-                [TYPE_BOOL] = "TYPE_TEXT",
-                [TYPE_EMPTY] = "TYPE_EMPTY",
-                [TYPE_FORMULA] = "TYPE_FORMULA",
-                [TYPE_RANGE] = "TYPE_RANGE",
-                [TYPE_LEN] = "TYPE_LEN",
-        };
         if (ct >= 0 && ct < TYPE_LEN)
                 return lookup[ct];
         report("Invalid access to type lookup: %d", ct);

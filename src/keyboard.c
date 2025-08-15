@@ -90,25 +90,25 @@ get_escape_sequence()
         return ret;
 }
 
-static inline bool
+bool
 has_descents(APTree t, char *prefix, int len)
 {
         return ap_has_descents(t, prefix, len);
 }
 
-static inline Action
+Action
 find_action(APTree t, char *prefix, int len)
 {
         return ap_get_unique(t, prefix, len);
 }
 
-static inline Action
+Action
 find_action_force(APTree t, char *prefix, int len)
 {
         return ap_get_last(t, prefix, len);
 }
 
-static inline void
+void
 add_action(APTree t, char *prefix, Action action)
 {
         ap_add(t, prefix, strlen(prefix), action);
