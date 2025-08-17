@@ -8,13 +8,13 @@ src/cellmap.c|35|23|391
 src/window.c|48|22|321
 src/escape_code.h|19|24|302
 src/eval.c|36|19|294
-src/keyboard.c|39|29|246
+src/keyboard.c|39|29|244
 src/dhm.c|36|19|195
 src/mappings.c|25|19|174
+src/readlain.c|29|27|151
 src/saving.c|24|21|150
 src/aptree.c|24|26|128
 src/builtin.c|15|19|124
-src/readlain.c|24|25|114
 src/hm.c|29|23|109
 src/cellmap.h|25|21|99
 src/da.h|15|33|90
@@ -39,4 +39,4 @@ src/color.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|610|800|3980
+SUM:|615|802|4015

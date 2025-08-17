@@ -122,7 +122,6 @@ get_input_at_cursor()
         printf("%*s", column_width, "");
         T_CUB(column_width - 1);
         T_CUSHW();
-        toggle_raw_mode();
 
         rlain_insert(get_cursor_cell()->input_repr);
         buf = readlain("");
@@ -132,7 +131,6 @@ get_input_at_cursor()
         if ((c = strchr(buf, '\r'))) *c = 0;   // trim cr
         if ((c = strchr(buf, '\t'))) *c = ' '; // change tab by space
 
-        toggle_raw_mode();
         T_CUHDE();
 
         return buf;

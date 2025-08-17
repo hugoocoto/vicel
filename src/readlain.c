@@ -23,7 +23,6 @@
 #include "escape_code.h"
 #include "keyboard.h"
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 
@@ -67,8 +66,14 @@ rlinsert(char c)
                 return;
         }
 
-        report("Invalid insert case");
-        exit(0);
+        if (strlen(rline) >= sizeof rline - 1) {
+                report("rline is full");
+                return;
+        }
+
+        memmove(rline + rlindex + 1, rline + rlindex, strlen(rline + rlindex) + 1);
+        rline[rlindex] = c;
+        ++rlindex;
 }
 
 static void
@@ -76,7 +81,38 @@ line_refresh()
 {
         T_RCP();
         printf("%s%s", lprompt, rline);
-        fflush(stdout);
+        T_RCP();
+        T_CUF((int) rlindex);
+}
+
+static void
+handle_esc()
+{
+        char buf[16];
+        ssize_t n;
+        switch (n = read(STDIN_FILENO, buf, sizeof buf - 1)) {
+        case 0:
+                return;
+        case -1:
+                report("Exit from handle_esc due to invalid read");
+                return;
+        default:
+                buf[n] = 0;
+                report("Esc buffer: %s", buf);
+                if (!strcmp(buf, "[D")) {
+                        if (rlindex) {
+                                --rlindex;
+                                T_CUB(1);
+                        }
+                }
+                if (!strcmp(buf, "[C")) {
+                        if (rline[rlindex]) {
+                                ++rlindex;
+                                T_CUF(1);
+                        };
+                }
+                break;
+        }
 }
 
 static void
@@ -87,7 +123,6 @@ handle_char(char c)
 
                 if (rline[rlindex] == 0) {
                         putchar(c);
-                        fflush(stdout);
                         return;
                 }
 
@@ -110,16 +145,23 @@ handle_char(char c)
                         T_CUB(1);
                         putchar(' ');
                         T_CUB(1);
-                        fflush(stdout);
                         /* ******************************** */
                         break;
                 }
 
-                memcpy(rline + rlindex - 1,
-                       rline + rlindex,
-                       strlen(rline + rlindex) + 1);
+                memmove(rline + rlindex - 1,
+                        rline + rlindex,
+                        strlen(rline + rlindex) + 1);
+
+                T_CUF((int) strlen(rline + rlindex));
+                putchar(' ');
                 --rlindex;
+
                 line_refresh();
+                break;
+
+        case 27: /* ESC */
+                handle_esc();
                 break;
 
         default:
@@ -131,7 +173,7 @@ handle_char(char c)
 char *
 readlain(char *prompt)
 {
-        toggle_raw_mode();
+        // toggle_raw_mode(); as this is yet enabled
         lprompt = prompt;
         T_SCP();
         line_refresh();
@@ -141,6 +183,7 @@ readlain(char *prompt)
         quit = false;
 
         while (!quit) {
+                fflush(stdout);
                 switch (read(STDIN_FILENO, &c, 1)) {
                 case 0:
                 case -1:
@@ -153,9 +196,10 @@ readlain(char *prompt)
                         break;
                 }
         }
+        fflush(stdout);
 
         /* end get line */
-        toggle_raw_mode();
+        // toggle_raw_mode();
 
         char *l = strdup(rline);
         reset_line();
