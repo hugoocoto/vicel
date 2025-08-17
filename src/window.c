@@ -99,16 +99,11 @@ print_status_bar2()
 #define UI_CELLTEXT_L_SEP "Cell text: "
 #define UI_CELLTEXT_M_SEP " ("
 #define UI_CELLTEXT_R_SEP ")"
-#define UI_STATUS_BOTTOM_END "(Report issues to hugo.coto@member.fsf.org)"
+        char *UI_STATUS_BOTTOM_END =
+        (debug_level == 0) ? "" :
+                             "(Report issues to hugo.coto@member.fsf.org)";
 
-        int asize = strlen(UI_CELLTEXT_L_SEP) +
-                    strlen(get_cursor_cell()->input_repr) +
-                    strlen(UI_CELLTEXT_M_SEP) +
-                    strlen(cm_type_repr(get_cursor_cell()->value.type)) +
-                    strlen(UI_CELLTEXT_R_SEP) >
-                    active_ctx.ws.ws_col ?
-                    0 :
-                    strlen(get_color("ui"));
+        int asize = strlen(UI_CELLTEXT_L_SEP) + strlen(get_cursor_cell()->input_repr) + strlen(UI_CELLTEXT_M_SEP) + strlen(cm_type_repr(get_cursor_cell()->value.type)) + strlen(UI_CELLTEXT_R_SEP) > active_ctx.ws.ws_col ? 0 : strlen(get_color("ui"));
 
         buf[snprintf(buf, active_ctx.ws.ws_col + 1 + asize,
                      "%s%s%s%s%s%s%*.*s",
