@@ -9,6 +9,7 @@
 * Colors?
 * Add color to input
 * Improve input: handle special chars other than bs and cr
+* maybe move from ast-walking to vm in formulas
 
 # No tested at all
 * new csv reader
