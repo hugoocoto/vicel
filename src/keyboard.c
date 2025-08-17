@@ -28,10 +28,8 @@
 #include "escape_code.h"
 #include "formula.h"
 #include "mappings.h"
+#include "readlain.h"
 #include "window.h"
-#include <stdio.h>
-#include <string.h>
-#include <termios.h>
 
 bool quit = false;
 
@@ -117,33 +115,27 @@ add_action(APTree t, char *prefix, Action action)
 char *
 get_input_at_cursor()
 {
-        char buf[64];
+        char *buf;
         char *c;
-        int i = 0;
 
-        T_SCP();
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         printf("%*s", column_width, "");
         T_CUB(column_width - 1);
         T_CUSHW();
         toggle_raw_mode();
 
-        if (fgets(buf, sizeof buf - 1, stdin)) {
-                if ((c = strchr(buf, '\n'))) *c = 0;   // trim newline
-                if ((c = strchr(buf, '\r'))) *c = 0;   // trim cr
-                if ((c = strchr(buf, '\t'))) *c = ' '; // change tab by space
+        rlain_insert(get_cursor_cell()->input_repr);
+        buf = readlain("");
 
-        } else
-                buf[0] = 0;
-
-        for (; buf[i]; i++)
-                putchar(*T_BS);
+        if (buf == NULL) return strdup("");
+        if ((c = strchr(buf, '\n'))) *c = 0;   // trim newline
+        if ((c = strchr(buf, '\r'))) *c = 0;   // trim cr
+        if ((c = strchr(buf, '\t'))) *c = ' '; // change tab by space
 
         toggle_raw_mode();
         T_CUHDE();
-        T_RCP();
 
-        return strdup(buf);
+        return buf;
 }
 
 void

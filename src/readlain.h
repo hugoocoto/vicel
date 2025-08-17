@@ -18,21 +18,14 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef READLAIN_H_
+#define READLAIN_H_
 
-#include "cellmap.h"
+/* Append text to line BEFORE call readline */
+void rlain_insert(char *text);
 
-#define MAX_MAPPING_LEN 6
+/* Return the heap allocated representation of the writen text */
+char *readlain(char *prompt);
 
-#define KEY_UP "\xC1"
-#define KEY_DOWN "\xC2"
-#define KEY_RIGHT "\xC3"
-#define KEY_LEFT "\xC4"
 
-void start_kbhandler();
-void set_cell_text(Cell *c, char *text);
-char * get_input_at_cursor();
-void toggle_raw_mode();
-
-#endif //! KEYBOARD_H
+#endif // !READLAIN_H_
