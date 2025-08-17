@@ -146,17 +146,20 @@ print_status_bar()
 #define STATUS_FILENAME "filename: "
 #define STATUS_R_END "github: hugoocoto/vicel"
 
-        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%s%s%s%*.*s",
+        buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%s%s%s%s%*.*s",
                      STATUS_L_STUFF,
                      STATUS_FILENAME,
                      active_ctx.filename ?: "(unnamed)",
+                     mappings_buffer,
                      (int) (active_ctx.ws.ws_col -
                             +strlen(STATUS_L_STUFF) -
                             +strlen(active_ctx.filename ?: "(unnamed)") -
+                            +strlen(mappings_buffer) -
                             +strlen(STATUS_FILENAME)),
                      (int) (active_ctx.ws.ws_col -
                             +strlen(STATUS_L_STUFF) -
                             +strlen(active_ctx.filename ?: "(unnamed)") -
+                            +strlen(mappings_buffer) -
                             +strlen(STATUS_FILENAME)),
                      STATUS_R_END)] = 0;
 

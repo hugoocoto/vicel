@@ -126,7 +126,7 @@ get_input_at_cursor()
         rlain_insert(get_cursor_cell()->input_repr);
         buf = readlain("");
 
-        if (buf == NULL) return strdup("");
+        if (buf == NULL) buf = strdup("");
         if ((c = strchr(buf, '\n'))) *c = 0;   // trim newline
         if ((c = strchr(buf, '\r'))) *c = 0;   // trim cr
         if ((c = strchr(buf, '\t'))) *c = ' '; // change tab by space
@@ -298,7 +298,7 @@ start_kbhandler()
                 }
 
                 /* If buffer has no actions and no descents, invalidate buffer */
-                else if (!has_descents(mappings, buf, read_index)) {
+                else if (read_index && !has_descents(mappings, buf, read_index)) {
                         read_index = 0;
                         repeat = 0;
                 }

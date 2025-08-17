@@ -10,6 +10,7 @@
 * Add color to input
 * Improve input: handle special chars other than bs and cr
 * maybe move from ast-walking to vm in formulas
+* improve update screen when it isn't needed to update the full screen
 
 # No tested at all
 * new csv reader
