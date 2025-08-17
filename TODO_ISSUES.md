@@ -4,11 +4,11 @@
 * set digit from forula breaks it
 
 # Todo
-* Improve input: use prev input
 * Improve input: arrow movement
 * Improve UI and UI customization
 * Colors?
 * Add color to input
+* Improve input: handle special chars other than bs and cr
 
 # No tested at all
 * new csv reader
