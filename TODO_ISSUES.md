@@ -4,7 +4,6 @@
 * set digit from forula breaks it
 
 # Todo
-* Improve input: arrow movement
 * Improve UI and UI customization
 * Colors?
 * Add color to input
@@ -13,6 +12,6 @@
 * improve update screen when it isn't needed to update the full screen
 
 # No tested at all
-* new csv reader
+* csv reader
 * behaviour of corne cases in formulas for buitlins, 
     ranges and comparison.

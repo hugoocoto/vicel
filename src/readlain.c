@@ -80,9 +80,11 @@ static void
 line_refresh()
 {
         T_RCP();
-        printf("%s%s", lprompt, rline);
+        printf("%s%s ", lprompt, rline);
         T_RCP();
-        T_CUF((int) rlindex);
+        if (rlindex) {
+                T_CUF((int) rlindex);
+        }
 }
 
 static void
@@ -121,10 +123,10 @@ handle_char(char c)
         if (isprint(c)) {
                 rlinsert(c);
 
-                if (rline[rlindex] == 0) {
-                        putchar(c);
-                        return;
-                }
+                // if (rline[rlindex] == 0) {
+                //         putchar(c);
+                //         return;
+                // }
 
                 line_refresh();
                 return;
@@ -139,24 +141,13 @@ handle_char(char c)
         case 127: /* DEL as BS */
                 if (rlindex == 0) break;
                 if (rline[rlindex] == 0) {
-                        --rlindex;
-                        rline[rlindex] = 0;
-                        /* BS but it doesn't work by default */
-                        T_CUB(1);
-                        putchar(' ');
-                        T_CUB(1);
-                        /* ******************************** */
-                        break;
+                        rline[rlindex - 1] = 0;
+                } else {
+                        memmove(rline + rlindex - 1,
+                                rline + rlindex,
+                                strlen(rline + rlindex) + 1);
                 }
-
-                memmove(rline + rlindex - 1,
-                        rline + rlindex,
-                        strlen(rline + rlindex) + 1);
-
-                T_CUF((int) strlen(rline + rlindex));
-                putchar(' ');
                 --rlindex;
-
                 line_refresh();
                 break;
 
@@ -176,6 +167,7 @@ readlain(char *prompt)
         // toggle_raw_mode(); as this is yet enabled
         lprompt = prompt;
         T_SCP();
+        line_refresh();
         line_refresh();
 
         /* get line */

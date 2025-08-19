@@ -11,8 +11,8 @@ src/eval.c|36|19|294
 src/keyboard.c|39|29|244
 src/dhm.c|36|19|195
 src/mappings.c|25|19|174
-src/readlain.c|29|27|151
 src/saving.c|24|21|150
+src/readlain.c|26|29|144
 src/aptree.c|24|26|128
 src/builtin.c|15|19|124
 src/hm.c|29|23|109
@@ -39,4 +39,4 @@ src/color.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|615|802|4018
+SUM:|612|804|4011
