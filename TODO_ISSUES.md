@@ -10,6 +10,7 @@
 * Improve input: handle special chars other than BS and Cr.
 * Maybe move from ast-walking to VM in formulas.
 * Improve update screen when it isn't needed to update the full screen.
+* Function as function argument 's name appears between `'`s. 
 
 # No tested at all
 * CSV reader.
