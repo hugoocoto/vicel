@@ -22,11 +22,19 @@
 #define COLOR_H_
 
 #include "hm.h"
+#include "common.h"
 
 #define C_RESET NULL
 
+typedef struct Color {
+        bool active;
+        char *scolor;
+} Color;
+
 extern Hmap colors;
 void apply_color(char *key);
+void apply_color_custom(char *color);
 char *get_color(char *key);
+void add_color(char *c);
 
 #endif // !COLOR_H_

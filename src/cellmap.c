@@ -23,8 +23,6 @@
 #include "da.h"
 #include "debug.h"
 #include "formula.h"
-#include <assert.h>
-#include <stdio.h>
 #include <string.h>
 
 bool

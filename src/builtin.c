@@ -20,11 +20,14 @@
 
 #include "builtin.h"
 #include "cellmap.h"
+#include "color.h"
+#include "common.h"
 #include "da.h"
 #include "debug.h"
 #include "eval.h"
 #include "formula.h"
-#include <math.h>
+#include "window.h"
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -58,7 +61,7 @@ builtin_add(char *name, Func f)
 }
 
 Value
-sum(Expr *e)
+builtin_sum(Expr *e)
 {
         Value v;
         if (e == NULL) {
@@ -73,7 +76,7 @@ sum(Expr *e)
 }
 
 Value
-mul(Expr *e)
+builtin_mul(Expr *e)
 {
         Value v;
         if (e == NULL) return VALUE_EMPTY;
@@ -85,7 +88,7 @@ mul(Expr *e)
 }
 
 Value
-count(Expr *e)
+builtin_count(Expr *e)
 {
         Value v = AS_NUMBER(0);
         if (e == NULL) return v;
@@ -96,17 +99,17 @@ count(Expr *e)
 }
 
 Value
-avg(Expr *e)
+builtin_avg(Expr *e)
 {
-        Value a = sum(e);
-        Value b = count(e);
+        Value a = builtin_sum(e);
+        Value b = builtin_count(e);
         if (a.type == TYPE_NUMBER && a.as.num == 0.0 &&
             b.type == TYPE_NUMBER && b.as.num == 0.0) return VALUE_EMPTY;
         return vdiv(a, b);
 }
 
 Value
-min(Expr *e)
+builtin_min(Expr *e)
 {
         if (e == NULL) return VALUE_EMPTY;
         Value min = vmin(VALUE_EMPTY, eval_expr(e));
@@ -117,7 +120,7 @@ min(Expr *e)
 }
 
 Value
-max(Expr *e)
+builtin_max(Expr *e)
 {
         if (e == NULL) return VALUE_EMPTY;
         Value max = vmax(VALUE_EMPTY, eval_expr(e));
@@ -144,15 +147,67 @@ builtin_if(Expr *e)
         }
 }
 
+static void
+set_color(Cell *cell, char *col)
+{
+        char *c = get_color(col);
+        if (c == NULL) {
+                add_color(col);
+                c = get_color(col);
+        }
+        assert(c);
+        char *name = cm_get_cell_name(active_ctx.body, cell);
+        report("changing color for `%s` to `%s`", name, c == NULL ? col : c);
+        free(name);
+        cell->color = (Color) {
+                .active = true,
+                .scolor = c,
+        };
+}
+
+Value
+builtin_color(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+
+        char *col = NULL;
+        Value v = eval_expr(e);
+
+        if (v.type == TYPE_TEXT || v.type == TYPE_NUMBER) col = get_repr(v);
+
+        while ((e = e->next)) {
+                if (e->type == EXPR_IDENTIFIER) {
+                        set_color(e->as.identifier.cell, col);
+                }
+                if (e->type == EXPR_LITERAL) {
+                        if (e->as.literal.value.type == TYPE_RANGE) {
+                                int x, y;
+                                Cell *c;
+                                __auto_type r = e->as.literal.value.as.range;
+
+                                for (x = r.startx; x <= r.endx; x++) {
+                                        for (y = r.starty; y <= r.endy; y++) {
+                                                c = cm_get_cell_ptr(active_ctx.body, x, y);
+                                                if (!c) break;
+                                                set_color(c, col);
+                                        }
+                                }
+                        }
+                }
+        }
+        free(col);
+        return VALUE_EMPTY;
+}
 
 static __attribute__((constructor)) void
 __setup__()
 {
-        builtin_add("sum", sum);
-        builtin_add("avg", avg);
-        builtin_add("mul", mul);
-        builtin_add("count", count);
-        builtin_add("min", min);
-        builtin_add("max", max);
+        builtin_add("sum", builtin_sum);
+        builtin_add("avg", builtin_avg);
+        builtin_add("mul", builtin_mul);
+        builtin_add("count", builtin_count);
+        builtin_add("min", builtin_min);
+        builtin_add("max", builtin_max);
         builtin_add("if", builtin_if);
+        builtin_add("color", builtin_color);
 }

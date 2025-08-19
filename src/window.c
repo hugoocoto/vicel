@@ -76,6 +76,16 @@ get_cell_from_coords(char *coords)
 }
 
 void
+set_cell_color(Cell *cell)
+{
+        if (cell->color.active) {
+                apply_color(cell->color.scolor);
+                return;
+        }
+        apply_color("cell");
+}
+
+void
 get_current_position(int *x, int *y)
 {
         // starting at 1,1
@@ -344,7 +354,7 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         else {
                                 apply_color("sheet_ui");
                                 printf(CELL_L_SEP);
-                                apply_color("cell");
+                                set_cell_color(cell);
                         }
 
                         printf("%-*.*s", w, w, cell->repr);

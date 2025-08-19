@@ -116,6 +116,14 @@ hmhash(Hmap table, const char *key)
         return sum % table.size;
 }
 
+static void (*ondestroy)(Hnode *) = NULL;
+
+void
+hm_set_ondestroy(void (*f)(Hnode *))
+{
+        ondestroy = f;
+}
+
 void
 hmdestroy(Hmap *table)
 {
@@ -127,11 +135,13 @@ hmdestroy(Hmap *table)
 
         for (int i = 0; i < table->size; i++) {
                 node = table->node_arr + i;
+                if (ondestroy) ondestroy(node);
                 free(node->key);
                 next = node->next;
 
                 while ((node = next)) {
                         next = node->next;
+                        if (ondestroy) ondestroy(node);
                         free(node->key);
                         free(node);
                 }

@@ -26,6 +26,7 @@
 #include "eval.h"
 #include "window.h"
 #include <stdbool.h>
+#include <string.h>
 #include <unistd.h>
 
 Cell *cell_self = NULL;
@@ -174,10 +175,15 @@ Token *
 TOK_AS_STR(char *c, int len)
 {
         Token *t = new_tok();
-        char prev = c[len];
-        if (prev) c[len] = 0;
-        t->as.str = strdup(c);
-        if (prev) c[len] = prev;
+
+        if (len > 0) {
+                char prev = c[len];
+                if (prev) c[len] = 0;
+                t->as.str = strdup(c);
+                if (prev) c[len] = prev;
+        } else
+                t->as.str = strdup("");
+
         t->type = TOK_STRING;
         return t;
 }
@@ -358,6 +364,14 @@ lexer(char *c)
                         ++c;
                         break;
 
+                case '\'': {
+                        size_t len = strcspn(c + 1, "'");
+                        last->next = TOK_AS_STR(c + 1, len);
+                        last = last->next;
+                        c += len + 2;
+                        break;
+                }
+
                 case '0' ... '9': {
                         char *c0 = c;
                         last->next = TOK_AS_NUM(strtod(c, &c));
@@ -423,11 +437,18 @@ get_literal(Token **t)
 {
         if (*t == NULL) return NULL;
         switch ((*t)->type) {
+        case TOK_STRING: {
+                char *s = (*t)->as.str;
+                *t = (*t)->next;
+                return new_literal_str(s);
+        }
+
         case TOK_NUMERIC: {
                 double n = (*t)->as.num;
                 *t = (*t)->next;
                 return new_literal(n);
         }
+
         case TOK_IDENTIFIER: {
                 char *id = (*t)->as.id;
 
@@ -458,7 +479,6 @@ get_literal(Token **t)
 
                 return new_identifier(cell);
         }
-        case TOK_STRING:
         default:
                 report("No yet implemented: get_literal for %d", (*t)->type);
                 exit(ERR_GETLITERAL);
@@ -582,6 +602,7 @@ get_comparison(Token **t)
 void
 get_ast_repr(Expr *e, char *buffer, size_t len)
 {
+        static bool is_func_param = false;
         if (e == NULL) return;
         if (strlen(buffer) >= len) return;
 
@@ -593,7 +614,8 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                                  e->as.literal.value.as.num);
                         break;
                 case TYPE_TEXT:
-                        snprintf(buffer + strlen(buffer), len, "%s",
+                        snprintf(buffer + strlen(buffer), len,
+                                 is_func_param ? "'%s'" : "%s",
                                  e->as.literal.value.as.text);
                         break;
                 case TYPE_EMPTY:
@@ -629,11 +651,13 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 snprintf(buffer + strlen(buffer), len, "(");
                 Expr *args = e->as.func.args;
                 if (args) {
+                        is_func_param = true;
                         get_ast_repr(args, buffer, len);
                         while ((args = args->next)) {
                                 snprintf(buffer + strlen(buffer), len, ",");
                                 get_ast_repr(args, buffer, len);
                         }
+                        is_func_param = false;
                 }
                 snprintf(buffer + strlen(buffer), len, ")");
                 break;

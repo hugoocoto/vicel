@@ -78,7 +78,8 @@ Supported formats:
 ## Builtin functions
 Builtin functions can be called in formulas. It take numbers, text or cells as 
 arguments and return a value. 
-* **sum(...)**: Sum zero or more arguments and return the result as if adding it one by one.
+* **sum(...)**: Sum zero or more arguments and return the result as if adding it
+  one by one.
 * **mul(...)**: Multiply zero or more arguments. 
 * **avg(...)**: Get the average of zero or more values. 
 * **count(...)**: Get the number of non empty arguments.
@@ -89,6 +90,13 @@ arguments and return a value.
 > Functions accept ranges as parameters. They are two valid cells separated by
 > a `:`. For example, `sum(A0:A9)` is the same as sum the 10 first numbers in
 > row `A`.
+
+### Weirdest Color setter
+There is a builtin function called **color()** that changes the color of a cell.
+It can be used as: **color(color, cell [, cell]\* )**. Color can be a number, as
+ascii colors work: 30-37 for fg and 40-47 for bg to summarize. Also it can be
+set to more than one if using the formula string introducer, `'` as follow:
+**'35;42;1'** for magenta bold text in green background.
 
 ## Latest Version
 [See version](./version.txt)

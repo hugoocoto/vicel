@@ -42,5 +42,6 @@ void hmpop(Hmap *table, const char *key);
 void *hmget(Hmap table, const char *key, void **value);
 int hmhash(Hmap table, const char *key);
 void hmdestroy(Hmap *table);
+void hm_set_ondestroy(void (*f)(Hnode *));
 
 #endif // !HM_H_

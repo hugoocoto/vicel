@@ -23,13 +23,22 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "hm.h"
+#include <stdio.h>
 #include <unistd.h>
 
 Hmap colors;
 
 static void
+free_value(Hnode *n)
+{
+        if (n == NULL) return;
+        if (n->value) free(n->value);
+}
+
+static void
 del_default_colors()
 {
+        hm_set_ondestroy(free_value);
         hmdestroy(&colors);
 }
 
@@ -39,16 +48,24 @@ set_default_colors()
         hmnew(&colors, 32); // random size
         atexit(del_default_colors);
 
-        hmadd(&colors, "ui", C(C_BG_DEFAULT, C_FG_BLACK));
-        hmadd(&colors, "cell", C(C_BG_DEFAULT, C_FG_DEFAULT));
-        hmadd(&colors, "cell_over", C(C_BG_DEFAULT, C_FG_DEFAULT, C_REVERSE, C_BOLD));
-        hmadd(&colors, "cell_selected", C(C_BG_DEFAULT, C_FG_GREEN));
-        hmadd(&colors, "ln_over", C(C_BG_DEFAULT, C_FG_GREEN, C_REVERSE, C_BOLD));
-        hmadd(&colors, "ln", C(C_BG_DEFAULT, C_FG_GREEN));
-        hmadd(&colors, "sheet_ui", C(C_BG_DEFAULT, C_FG_DEFAULT));
-        hmadd(&colors, "sheet_ui_over", C(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD));
-        hmadd(&colors, "sheet_ui_selected", C(C_BG_MAGENTA, C_FG_GREEN));
-        hmadd(&colors, "ui_cell_text", C(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD));
+        hmadd(&colors, "ui", Cdup(C_BG_DEFAULT, C_FG_BLACK));
+        hmadd(&colors, "cell", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
+        hmadd(&colors, "cell_over", Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_REVERSE, C_BOLD));
+        hmadd(&colors, "cell_selected", Cdup(C_BG_DEFAULT, C_FG_GREEN));
+        hmadd(&colors, "ln_over", Cdup(C_BG_DEFAULT, C_FG_GREEN, C_REVERSE, C_BOLD));
+        hmadd(&colors, "ln", Cdup(C_BG_DEFAULT, C_FG_GREEN));
+        hmadd(&colors, "sheet_ui", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
+        hmadd(&colors, "sheet_ui_over", Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD));
+        hmadd(&colors, "sheet_ui_selected", Cdup(C_BG_MAGENTA, C_FG_GREEN));
+        hmadd(&colors, "ui_cell_text", Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD));
+
+#define basecolor(c) hmadd(&colors, #c, Cdup(C_BG_DEFAULT, C_FG_##c));
+        basecolor(RED);
+        basecolor(GREEN);
+        basecolor(YELLOW);
+        basecolor(BLUE);
+        basecolor(MAGENTA);
+        basecolor(CYAN);
 
         // #define pc(s) printf("%s%s%s\n", get_color(s), s, get_color(NULL))
         //         pc("ui");
@@ -72,14 +89,23 @@ get_color(char *key)
         hmget(colors, key, (void *) &col);
         if (col == NULL) {
                 report("Invalid color key: %s", key);
-                return C(C_NORMAL);
+                return NULL;
         }
         return col;
+}
+
+void
+add_color(char *c)
+{
+        char buf[128];
+        snprintf(buf, sizeof buf, T_CSI "%sm", c);
+        hmadd(&colors, buf, strdup(buf));
+        hmadd(&colors, c, strdup(buf));
 }
 
 void
 apply_color(char *key)
 {
         printf("%s", get_color(NULL));
-        printf("%s", get_color(key));
+        printf("%s", get_color(key) ?: get_color(NULL));
 }

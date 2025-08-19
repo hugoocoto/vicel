@@ -21,8 +21,9 @@
 #ifndef CELLMAP_H
 #define CELLMAP_H
 
+#include "color.h"
+#include "common.h"
 #include "da.h"
-#include <stdbool.h>
 
 typedef enum {
         TYPE_NUMBER = 0,
@@ -85,6 +86,7 @@ typedef struct Cell {
         bool updated;     // updated in this cicle
         char *repr;       // string representation
         char *input_repr; // input representation
+        Color color;
 } Cell;
 
 typedef DA(Cell) CellArr;
@@ -113,6 +115,7 @@ typedef DA(CellArr) CellMat;
                 .repr = strdup(""),       \
                 .input_repr = strdup(""), \
                 .updated = false,         \
+                .color = { 0 },           \
         }
 
 

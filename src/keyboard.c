@@ -174,7 +174,7 @@ set_cell_text(Cell *c, char *text)
         c->value.as.text = text;
         c->repr = text;
         c->value.type = TYPE_TEXT;
-        c->input_repr = strdup(c->repr);
+        c->input_repr = get_input_repr(c->value);
         detect_cell_type(c);
 
         for_da_each(o, c->subscribers)
