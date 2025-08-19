@@ -97,7 +97,7 @@ It can be used as: **color(color, cell [, cell]\* )**. Color can be a number, as
 ascii colors work: 30-37 for fg and 40-47 for bg to summarize. Also it can be
 set to more than one if using the formula string introducer, `'` as follow:
 **'35;42;1'** for magenta bold text in green background.
-![Color showcase](./image.png)
+![Color showcase](./image2.png)
 
 ## Latest Version
 [See version](./version.txt)
