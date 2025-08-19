@@ -266,20 +266,23 @@ cm_convert(Cell *c, CellType tnew)
                 break;
         case TYPE_FORMULA:
                 switch (tnew) {
-                case TYPE_NUMBER:
+                case TYPE_NUMBER: {
+                        double n = 0.0f;
+                        /* should be recursive */
+                        if (c->value.as.formula->value.type == TYPE_NUMBER)
+                                n = c->value.as.formula->value.as.num;
                         destroy_formula(c);
+                        c->value.as.num = n;
                         c->value.type = tnew;
-                        free(c->value.as.formula);
-                        c->value.as.num = 0.0;
                         free(c->repr);
                         free(c->input_repr);
                         c->repr = get_repr(c->value);
                         c->input_repr = get_input_repr(c->value);
                         break;
+                }
                 case TYPE_TEXT:
                         destroy_formula(c);
                         c->value.type = tnew;
-                        free(c->value.as.formula);
                         c->value.as.text = c->input_repr;
                         free(c->repr);
                         c->repr = strdup(c->input_repr);
