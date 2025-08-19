@@ -30,7 +30,7 @@
 #define num_col_width 5
 #define column_width 14
 #define row_width 1
-
+#define USE_CELL_COLOR_FOR_SEP true
 #define CELL_L_SEP " "
 #define CELL_R_SEP " "
 

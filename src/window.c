@@ -352,9 +352,14 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         }
 
                         else {
-                                apply_color("sheet_ui");
-                                printf(CELL_L_SEP);
+                                if (!USE_CELL_COLOR_FOR_SEP) {
+                                        apply_color("sheet_ui");
+                                        printf(CELL_L_SEP);
+                                }
                                 set_cell_color(cell);
+                                if (USE_CELL_COLOR_FOR_SEP) {
+                                        printf(CELL_L_SEP);
+                                }
                         }
 
                         printf("%-*.*s", w, w, cell->repr);
@@ -371,7 +376,9 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         }
 
                         else {
-                                apply_color("sheet_ui");
+                                if (!USE_CELL_COLOR_FOR_SEP) {
+                                        apply_color("sheet_ui");
+                                }
                                 printf(CELL_R_SEP);
                         }
 
