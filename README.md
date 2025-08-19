@@ -97,6 +97,7 @@ It can be used as: **color(color, cell [, cell]\* )**. Color can be a number, as
 ascii colors work: 30-37 for fg and 40-47 for bg to summarize. Also it can be
 set to more than one if using the formula string introducer, `'` as follow:
 **'35;42;1'** for magenta bold text in green background.
+![Color showcase](./image.png)
 
 ## Latest Version
 [See version](./version.txt)
@@ -111,5 +112,5 @@ I like to flex on how little code is needed for a fully functional program.
 ![](https://wakatime.com/badge/user/2a7b4567-ab1f-4fb2-98ff-2b3fdbf94654/project/98a99176-d7a4-48ba-968c-4e410787a98f.svg)
 
 ## Known issues
-Issues ![here](./TODO_ISSUES.md).
+Issues [here](./TODO_ISSUES.md).
 
