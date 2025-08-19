@@ -3,14 +3,14 @@ cloc|github.com/AlDanial/cloc v 2.06
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
-src/formula.c|84|33|727
+src/formula.c|84|34|742
 src/cellmap.c|35|24|393
 src/window.c|48|22|324
 src/escape_code.h|19|24|302
 src/eval.c|36|19|294
 src/keyboard.c|39|29|244
-src/dhm.c|36|19|195
 src/mappings.c|25|19|174
+src/dhm.c|35|20|165
 src/saving.c|24|21|150
 src/readlain.c|26|29|144
 src/aptree.c|24|26|128
@@ -39,4 +39,4 @@ src/color.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|612|805|4013
+SUM:|611|807|3998

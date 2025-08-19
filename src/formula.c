@@ -26,6 +26,7 @@
 #include "eval.h"
 #include "window.h"
 #include <stdbool.h>
+#include <unistd.h>
 
 Cell *cell_self = NULL;
 
@@ -362,6 +363,7 @@ lexer(char *c)
                         last->next = TOK_AS_NUM(strtod(c, &c));
                         last = last->next;
                         if (c0 == c) {
+                                /* should never happen */
                                 report("Can not convert %*s to number", 5, c);
                                 exit(19);
                         }
@@ -377,9 +379,12 @@ lexer(char *c)
 
                         char *id;
                         if ((id = get_identifier(&c))) {
-                                if (id[0] == 0) {
+                                if (*id == 0) {
+                                        free(id);
                                         report("can not get identifier");
-                                        exit(47);
+                                        last->next = TOK_AS_IDENTIFIER("Error");
+                                        last = last->next;
+                                        break;
                                 }
                                 last->next = TOK_AS_IDENTIFIER(id);
                                 last = last->next;
@@ -474,14 +479,24 @@ get_function(Token **t)
                 while (!match(t, ")")) {
                         if (args == NULL) {
                                 args = get_comparison(t);
+                                if (args == NULL) {
+                                        free_expr(e);
+                                        return new_literal_str("Error");
+                                }
                                 report("Adding argument");
                                 last = args;
                                 continue;
                         }
                         if (!match(t, ",")) {
+                                while (args) {
+                                        last = args->next;
+                                        free_expr(args);
+                                        args = last;
+                                }
                                 // todo: invalid formula
                                 report("Expected parenthesis at formula");
-                                exit(ERR_EXPECT);
+                                free_expr(e);
+                                return new_literal_str("Error");
                         }
                         last->next = get_comparison(t);
                         report("Adding argument");
@@ -500,7 +515,8 @@ get_group(Token **t)
                 if (!match(t, ")")) {
                         // todo: invalid formula
                         report("Expected parenthesis at formula");
-                        exit(ERR_EXPECT);
+                        free_expr(e);
+                        return new_literal_str("Error");
                 }
                 return e;
         }

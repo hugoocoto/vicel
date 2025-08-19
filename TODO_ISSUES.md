@@ -1,7 +1,7 @@
 # Issues
-* use after free in some formulas, irreguar: I cant reproduce
-* a formula without closing parenthesis falls into an inf loop
-* set digit from forula breaks it
+* use after free in some formulas, irregular: I cant reproduce
+* a formula without closing parenthesis falls into an inf loop (I think this is
+  not correct but it exits and should set cell as error 
 
 # Todo
 * Improve UI and UI customization
@@ -13,5 +13,5 @@
 
 # No tested at all
 * csv reader
-* behaviour of corne cases in formulas for buitlins, 
-    ranges and comparison.
+* behaviour of corner cases in formulas for builtin, ranges and comparison.
+* possible leak at return Error from invalid stuff

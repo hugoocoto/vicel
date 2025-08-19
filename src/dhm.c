@@ -19,11 +19,7 @@
  */
 
 #include "dhm.h"
-#include <assert.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "common.h"
 
 void dhmadd(DHmap *, char *key, void *value);
 void dhmremove(DHmap *, char *key);
@@ -47,13 +43,8 @@ grow(DHmap *hm)
 
         size_t new_size = sizeof(*hm->data) * (size_t) new_entries;
         hm->data = realloc(hm->data, new_size);
-        if (!hm->data) {
-                perror("realloc");
-                exit(EXIT_FAILURE);
-        }
 
-        memmove(hm->data + old_entries,
-                hm->data,
+        memmove(hm->data + old_entries, hm->data,
                 sizeof(*hm->data) * (size_t) old_entries);
 }
 
@@ -73,7 +64,7 @@ static int
 hashmask(int hash, int bits)
 {
         assert(bits >= 0);
-        if (bits == 0) return 0;
+        // if (bits == 0) return 0;
         return hash & ((1 << bits) - 1);
 }
 
@@ -85,15 +76,7 @@ dhmadd(DHmap *hm, char *key, void *value)
 
         if (!hm->data) {
                 hm->data = calloc(1, sizeof(DHnode *));
-                if (!hm->data) {
-                        perror("calloc");
-                        exit(EXIT_FAILURE);
-                }
                 hm->data[0] = calloc(1, sizeof(DHnode));
-                if (!hm->data[0]) {
-                        perror("calloc");
-                        exit(EXIT_FAILURE);
-                }
         }
 
         for (;;) {
@@ -103,10 +86,6 @@ dhmadd(DHmap *hm, char *key, void *value)
 
                 if (!b->key) {
                         b->key = strdup(key);
-                        if (!b->key) {
-                                perror("strdup");
-                                exit(EXIT_FAILURE);
-                        }
                         b->value = value;
                         return;
                 }
@@ -121,10 +100,6 @@ dhmadd(DHmap *hm, char *key, void *value)
                 }
 
                 DHnode *nb = calloc(1, sizeof(DHnode));
-                if (!nb) {
-                        perror("calloc");
-                        exit(EXIT_FAILURE);
-                }
                 nb->d = b->d + 1;
                 int new_ld = nb->d;
                 b->d = new_ld;
@@ -187,12 +162,7 @@ dhmdestroya(DHmap *hm, void (*destra)(void *))
         if (!hm || !hm->data) return;
 
         int n = (hm->d == 0) ? 1 : (1 << hm->d);
-
         DHnode **uniq = calloc((size_t) n, sizeof(*uniq));
-        if (!uniq) {
-                perror("calloc");
-                exit(EXIT_FAILURE);
-        }
         int u = 0;
 
         for (int i = 0; i < n; ++i) {
