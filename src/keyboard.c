@@ -233,6 +233,8 @@ start_kbhandler()
         add_action(mappings, "$", ACTION(a_goto_max_right));
         add_action(mappings, "gg", ACTION(a_goto_top));
         add_action(mappings, "G", ACTION(a_goto_bottom));
+        add_action(mappings, "y", ACTION(a_yank));
+        add_action(mappings, "p", ACTION(a_paste));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

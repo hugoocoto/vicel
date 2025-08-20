@@ -7,7 +7,6 @@ cells interactively.
 * Edit CSV-like grids interactively in your terminal
 * Supports numbers, text, and formulas
 * Keyboard-focused Vim-style motions
-* Optional mouse support
 * Lightweight and minimal code
 
 ## Installation
@@ -22,6 +21,10 @@ make
 ```
 > All sources are in the `src/` folder. You can also compile manually using
 > any C compiler.
+
+## Touchpad support
+If your terminal emulator send arrow movement on touchpad actions it can be
+used. It is not intended but it works for me (tmux + alacritty).
 
 ## Usage
 Run from the terminal:

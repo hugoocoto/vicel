@@ -216,3 +216,26 @@ a_goto_top_left()
         a_goto_top();
         a_goto_max_left();
 }
+
+char *yank_buffer = NULL;
+
+void
+a_yank()
+{
+        if (!get_cursor_cell()->input_repr) return;
+        free(yank_buffer);
+        yank_buffer = strdup(get_cursor_cell()->input_repr);
+}
+
+void
+a_paste()
+{
+        if (!yank_buffer) return;
+        set_cell_text(get_cursor_cell(), strdup(yank_buffer));
+}
+
+void
+a_free_yank_buffer()
+{
+        free(yank_buffer);
+}

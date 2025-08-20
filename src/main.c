@@ -23,6 +23,7 @@
 #include "escape_code.h"
 #include "flag.h"
 #include "keyboard.h"
+#include "mappings.h"
 #include "saving.h"
 #include "window.h"
 
@@ -87,6 +88,7 @@ main(int argc, char *argv[])
 
         save(&active_ctx);
         cm_destroy(active_ctx.body);
+        a_free_yank_buffer();
 
         report("---| End without error |---");
         return 0;

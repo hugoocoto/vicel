@@ -49,5 +49,8 @@ void a_goto_max_left();
 void a_goto_max_right();
 void a_goto_top();
 void a_goto_bottom();
+void a_yank();
+void a_paste();
+void a_free_yank_buffer();
 
 #endif //! MAPPINGS_H
