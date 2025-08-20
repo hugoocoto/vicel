@@ -23,6 +23,7 @@
 #include "common.h"
 #include "escape_code.h"
 #include "keyboard.h"
+#include "saving.h"
 #include "window.h"
 
 inline Cell *
@@ -238,4 +239,11 @@ void
 a_free_yank_buffer()
 {
         free(yank_buffer);
+}
+
+
+void
+a_save()
+{
+        save(&active_ctx);
 }

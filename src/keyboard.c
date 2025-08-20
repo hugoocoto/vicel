@@ -30,6 +30,7 @@
 #include "mappings.h"
 #include "readlain.h"
 #include "window.h"
+#include <sys/ioctl.h>
 
 bool quit = false;
 
@@ -235,6 +236,7 @@ start_kbhandler()
         add_action(mappings, "G", ACTION(a_goto_bottom));
         add_action(mappings, "y", ACTION(a_yank));
         add_action(mappings, "p", ACTION(a_paste));
+        add_action(mappings, "w", ACTION(a_save));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

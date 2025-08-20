@@ -167,6 +167,7 @@ save(Context *ctx)
 {
         int fd;
         if (ctx->filename == NULL) {
+                /* Todo: ask for name */
                 report("Can't save unamed sheet");
                 return;
         }

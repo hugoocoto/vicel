@@ -52,5 +52,6 @@ void a_goto_bottom();
 void a_yank();
 void a_paste();
 void a_free_yank_buffer();
+void a_save();
 
 #endif //! MAPPINGS_H

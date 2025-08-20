@@ -67,6 +67,9 @@ The first non-flag argument is used as the filename.
 
 ### Misc
 * `q`: Quit
+* `w`: Write
+* `y`: Yank (copy)
+* `p`: Paste 
 * `r`: Re-render the screen
 
 ## Input Format
