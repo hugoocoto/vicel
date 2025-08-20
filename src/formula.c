@@ -603,6 +603,7 @@ void
 get_ast_repr(Expr *e, char *buffer, size_t len)
 {
         static bool is_func_param = false;
+        static bool is_name = false;
         if (e == NULL) return;
         if (strlen(buffer) >= len) return;
 
@@ -614,8 +615,9 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                                  e->as.literal.value.as.num);
                         break;
                 case TYPE_TEXT:
-                        snprintf(buffer + strlen(buffer), len,
-                                 is_func_param ? "'%s'" : "%s",
+                        snprintf(buffer + strlen(buffer),
+                                 len,
+                                 is_func_param && !is_name ? "'%s'" : "%s",
                                  e->as.literal.value.as.text);
                         break;
                 case TYPE_EMPTY:
@@ -629,15 +631,18 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 default: break;
                 }
                 break;
+
         case EXPR_BIN:
                 get_ast_repr(e->as.binop.lhs, buffer, len);
                 snprintf(buffer + strlen(buffer), len, "%s", e->as.binop.op);
                 get_ast_repr(e->as.binop.rhs, buffer, len);
                 break;
+
         case EXPR_UN:
                 snprintf(buffer + strlen(buffer), len, "%s", e->as.unop.op);
                 get_ast_repr(e->as.unop.rhs, buffer, len);
                 break;
+
         case EXPR_IDENTIFIER: {
                 char *c;
                 snprintf(buffer + strlen(buffer), len, "%s",
@@ -646,8 +651,11 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 free(c);
                 break;
         }
-        case EXPR_FUNC: {
+
+        case EXPR_FUNC:
+                is_name = true;
                 get_ast_repr(e->as.func.name, buffer, len);
+                is_name = false;
                 snprintf(buffer + strlen(buffer), len, "(");
                 Expr *args = e->as.func.args;
                 if (args) {
@@ -661,7 +669,7 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 }
                 snprintf(buffer + strlen(buffer), len, ")");
                 break;
-        }
+
         default:
                 report("No yet implemented: get_ast_repr for %d", e->type);
                 exit(ERR_REPAST);
