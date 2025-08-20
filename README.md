@@ -1,7 +1,7 @@
 # Visual Cell Editor
 A terminal-based cell editor for visual spreadsheets. Create, read, and write
 cells interactively.
-![Screenshot](./image.png)
+![Screenshot](images/image.png)
 
 ## Features
 * Edit CSV-like grids interactively in your terminal
@@ -106,7 +106,7 @@ set to more than one if using the formula string introducer, `'` as follow:
 function `colorb` that only changes the color if using the default. It is useful
 for set a bg color that can be override by other color calls. 
     
-![Color showcase](./image2.png)
+![Color showcase](images/image2.png)
 
 ## Latest Version
 [See version](./version.txt)
@@ -124,4 +124,4 @@ I like to flex on how little code is needed for a fully functional program.
 Issues [here](./TODO_ISSUES.md).
 
 ## Sheets done by the community
-* *Horario* by @hugoocoto ![](./image3.png)
+* *Horario* by @hugoocoto ![](images/image3.png)
