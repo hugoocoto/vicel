@@ -9,10 +9,10 @@ src/window.c|49|22|340
 src/escape_code.h|19|24|303
 src/eval.c|36|19|294
 src/keyboard.c|39|29|246
+src/builtin.c|27|20|222
 src/mappings.c|29|19|193
-src/builtin.c|20|19|174
 src/dhm.c|35|20|165
-src/saving.c|24|21|150
+src/saving.c|24|21|155
 src/readlain.c|26|29|144
 src/aptree.c|24|26|128
 src/hm.c|31|23|117
@@ -39,4 +39,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|636|807|4154
+SUM:|643|808|4207

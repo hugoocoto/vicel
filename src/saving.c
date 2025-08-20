@@ -33,7 +33,12 @@
 void
 remove_spaces(char *c)
 {
+        char *cc;
         while (*c) {
+                if (*c == '"' && (cc = strchr(c + 1, '"'))) {
+                        c = cc + 1;
+                        continue;
+                }
                 if (isspace(*c))
                         memmove(c, c + 1, strlen(c));
                 else

@@ -56,7 +56,7 @@ The first non-flag argument is used as the filename.
 * `v`: Toggle cell selection (useless)
 
 ### Insert + move
-* `gij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
+* `ij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
 
 ### Add rows/columns
 * `gj`: Add a new row
@@ -99,7 +99,10 @@ There is a builtin function called **color()** that changes the color of a cell.
 It can be used as: **color(color, cell [, cell]\* )**. Color can be a number, as
 ascii colors work: 30-37 for fg and 40-47 for bg to summarize. Also it can be
 set to more than one if using the formula string introducer, `'` as follow:
-**'35;42;1'** for magenta bold text in green background.
+**'35;42;1'** for magenta bold text in green background. Also, there is another
+function `colorb` that only changes the color if using the default. It is useful
+for set a bg color that can be override by other color calls. 
+    
 ![Color showcase](./image2.png)
 
 ## Latest Version

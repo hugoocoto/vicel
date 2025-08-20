@@ -165,6 +165,61 @@ set_color(Cell *cell, char *col)
         };
 }
 
+/* set color if none */
+static void
+set_color_b(Cell *cell, char *col)
+{
+        if (cell->color.active) return;
+
+        char *c = get_color(col);
+        if (c == NULL) {
+                add_color(col);
+                c = get_color(col);
+        }
+        assert(c);
+        char *name = cm_get_cell_name(active_ctx.body, cell);
+        report("changing color for `%s` to `%s`", name, c == NULL ? col : c);
+        free(name);
+        cell->color = (Color) {
+                .active = true,
+                .scolor = c,
+        };
+}
+
+Value
+builtin_colorb(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+
+        char *col = NULL;
+        Value v = eval_expr(e);
+
+        if (v.type == TYPE_TEXT || v.type == TYPE_NUMBER) col = get_repr(v);
+
+        while ((e = e->next)) {
+                if (e->type == EXPR_IDENTIFIER) {
+                        set_color_b(e->as.identifier.cell, col);
+                }
+                if (e->type == EXPR_LITERAL) {
+                        if (e->as.literal.value.type == TYPE_RANGE) {
+                                int x, y;
+                                Cell *c;
+                                __auto_type r = e->as.literal.value.as.range;
+
+                                for (x = r.startx; x <= r.endx; x++) {
+                                        for (y = r.starty; y <= r.endy; y++) {
+                                                c = cm_get_cell_ptr(active_ctx.body, x, y);
+                                                if (!c) break;
+                                                set_color_b(c, col);
+                                        }
+                                }
+                        }
+                }
+        }
+        free(col);
+        return VALUE_EMPTY;
+}
+
 Value
 builtin_color(Expr *e)
 {
@@ -210,4 +265,5 @@ __setup__()
         builtin_add("max", builtin_max);
         builtin_add("if", builtin_if);
         builtin_add("color", builtin_color);
+        builtin_add("colorb", builtin_colorb);
 }
