@@ -24,12 +24,18 @@
 #include "da.h"
 #include "debug.h"
 #include "eval.h"
+#include "keyboard.h"
 #include "window.h"
-#include <stdbool.h>
-#include <string.h>
-#include <unistd.h>
+#include <assert.h>
 
 Cell *cell_self = NULL;
+jmp_buf parsing_error_env;
+
+_Noreturn void
+raise_parsing_error()
+{
+        longjmp(parsing_error_env, 1);
+}
 
 Value
 build_range(Cell *cstart, Cell *cend)
@@ -79,6 +85,9 @@ refresh_formula_value(Cell *cell)
         cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
         free(cell->repr);
         cell->repr = get_repr(cell->value.as.formula->value);
+        free(cell->input_repr);
+        cell->input_repr = get_input_repr(cell->value);
+
 
         for_da_each(c, cell->subscribers) cm_notify(cell, *c);
         cell->updated = false;
@@ -251,85 +260,6 @@ free_tokens(Token *t)
         }
 }
 
-
-Token *
-early_expansion(Token *t)
-{
-        report("Do not call early_expansion. Todo: remove this");
-        return t;
-        Token *start = t;
-        Token *prev = NULL;
-        Token *last;
-        int x1, x2, y1, y2;
-        int x, y;
-        int x_inc, y_inc;
-        Cell *c;
-        char *cn;
-        int nest = 0;
-
-        while (t) {
-                /* I know I can optimize it but is better looking this way */
-                if (t->type != TOK_STRING) goto cont;
-                if (strcmp(t->as.str, ")") == 0) --nest;
-                if (strcmp(t->as.str, "(") == 0) ++nest;
-                if (strcmp(t->as.str, ":") == 0) {
-                        if (!prev || prev->type != TOK_IDENTIFIER) goto cont;
-                        if (!t->next || t->next->type != TOK_IDENTIFIER) goto cont;
-                        if (parse_coords(prev->as.id, &x1, &y1)) goto cont;
-                        if (parse_coords(t->next->as.id, &x2, &y2)) goto cont;
-
-                        if (x1 > x2) {
-                                int tmp = x1;
-                                x1 = x2;
-                                x2 = tmp;
-                        }
-
-                        if (y1 > y2) {
-                                int tmp = y1;
-                                y1 = y2;
-                                y2 = tmp;
-                        }
-
-                        /* What a chunk of code xd */
-
-                        x_inc = x2 != x1;
-                        assert(x_inc == 0 || x_inc == 1);
-                        y_inc = y2 != y1;
-                        assert(y_inc == 0 || y_inc == 1);
-                        x = x1 + x_inc;
-                        y = y1 + y_inc;
-                        last = prev;
-                        last->next = TOK_AS_STR(nest ? "," : "+", 1);
-                        last = last->next;
-
-                        while ((x1 == x2 || x < x2) &&
-                               (y1 == y2 || y < y2)) {
-                                c = cm_get_cell_ptr(active_ctx.body, x, y);
-                                if (!c) break;
-                                cn = cm_get_cell_name(active_ctx.body, c);
-                                last->next = TOK_AS_IDENTIFIER(cn);
-                                last = last->next;
-                                last->next = TOK_AS_STR(nest ? "," : "+", 1);
-                                last = last->next;
-                                x += x_inc;
-                                y += y_inc;
-                        }
-
-                        last->next = t->next;
-                        Token *f = t;
-                        prev = last;
-                        t = t->next;
-                        free_token(f);
-
-                        continue;
-                }
-        cont:
-                prev = t;
-                t = t->next;
-        }
-        return start;
-}
-
 Token *
 lexer(char *c)
 {
@@ -395,8 +325,8 @@ lexer(char *c)
                         if ((id = get_identifier(&c))) {
                                 if (*id == 0) {
                                         free(id);
-                                        report("can not get identifier");
-                                        last->next = TOK_AS_IDENTIFIER("Error");
+                                        report("Couldn't get identifier");
+                                        last->next = TOK_AS_STR("Error", 5);
                                         last = last->next;
                                         break;
                                 }
@@ -413,7 +343,7 @@ lexer(char *c)
         Token *r = zero->next;
         free(zero);
 
-        return early_expansion(r);
+        return r;
 }
 
 Token *
@@ -501,7 +431,7 @@ get_function(Token **t)
                                 args = get_comparison(t);
                                 if (args == NULL) {
                                         free_expr(e);
-                                        return new_literal_str("Error");
+                                        raise_parsing_error();
                                 }
                                 report("Adding argument");
                                 last = args;
@@ -516,7 +446,7 @@ get_function(Token **t)
                                 // todo: invalid formula
                                 report("Expected parenthesis at formula");
                                 free_expr(e);
-                                return new_literal_str("Error");
+                                raise_parsing_error();
                         }
                         last->next = get_comparison(t);
                         report("Adding argument");
@@ -533,10 +463,9 @@ get_group(Token **t)
         if (match(t, "(")) {
                 Expr *e = get_comparison(t);
                 if (!match(t, ")")) {
-                        // todo: invalid formula
                         report("Expected parenthesis at formula");
                         free_expr(e);
-                        return new_literal_str("Error");
+                        raise_parsing_error();
                 }
                 return e;
         }
@@ -693,7 +622,6 @@ parse_formula(char *c, Cell *self)
         cell_self = self;
         Token *t = lexer(c);
         report("Out of lexer");
-        Token *tt = t;
         // - comparison -> term ((">" | ">=" | "<" | "<=" | "==" | "!=") term)?
         // - term -> factor (("-" | "+") factor)*
         // - factor -> power (("/" | "\*") power)*
@@ -702,9 +630,8 @@ parse_formula(char *c, Cell *self)
         // - group -> "(" expr ")" | func
         // - func -> FUNC "(" expr? ("," expr)* ")" | literal
         // - literal -> NUM  | IDENTIFIER
-        Expr *e = report_ast(get_comparison(&t));
-        self->value.as.formula->tokens = tt;
-        return e;
+        self->value.as.formula->tokens = t;
+        return report_ast(get_comparison(&t));
 }
 
 void
@@ -720,20 +647,32 @@ void
 build_formula(char *_str, Cell *self)
 {
         char *str = strdup(_str);
+        Expr *body = NULL;
 
         if (*str != '=') {
                 report("Invalid formula: `%s` does not start with `=`", str);
                 exit(ERR_INVFORM);
         }
 
+        /* Execute this if some error is reported while parsing it */
+        if (setjmp(parsing_error_env)) {
+                clear_cell(self);
+                self->value.as.text = str;
+                self->value.type = TYPE_TEXT;
+                free(self->repr);
+                self->repr = str;
+                free(self->input_repr);
+                self->input_repr = get_input_repr(self->value);
+                return;
+        }
+
+
         clear_cell(self);
         self->value.as.formula = calloc(1, sizeof(Formula));
         self->value.type = TYPE_FORMULA;
-        self->value.as.formula->body = parse_formula(str + 1, self);
+        body = parse_formula(str + 1, self);
+        self->value.as.formula->body = body;
         refresh_formula_value(self);
-
-        free(self->input_repr);
-        self->input_repr = get_input_repr(self->value);
 
         free(str);
         assert(self->value.type == TYPE_FORMULA);

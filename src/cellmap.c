@@ -237,7 +237,6 @@ cm_convert(Cell *c, CellType tnew)
                         break;
                 case TYPE_FORMULA: {
                         build_formula(c->value.as.text, c);
-                        assert(c->value.type == tnew);
                         break;
                 }
                 default:

@@ -10,6 +10,7 @@
 * Try to expand with the difference between cell and the one in the opposite
   direction at least for numbers, that way if the two first numbers are written
   at the time of expansion it would use the desired spacing.
+* On color() formula delete it should clear color.
 
 # To-do (maybe)
 * Add more movement stuff
