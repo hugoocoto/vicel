@@ -167,7 +167,7 @@ save(Context *ctx)
 {
         int fd;
         if (ctx->filename == NULL) {
-                /* Todo: ask for name */
+                
                 report("Can't save unamed sheet");
                 return;
         }
@@ -181,18 +181,12 @@ save(Context *ctx)
 
         for_da_each(row, *ctx->body)
         {
-                bool first = true;
                 for_da_each(c, *row)
                 {
-                        if (first) {
-                                first = false;
-                        } else {
-                                dprintf(fd, ",");
-                        }
                         if (c->input_repr && *c->input_repr)
-                                dprintf(fd, "\"%s\"", c->input_repr);
+                                dprintf(fd, "\"%s\",", c->input_repr);
                         else
-                                dprintf(fd, "%s", c->input_repr);
+                                dprintf(fd, "%s,", c->input_repr);
                 }
                 dprintf(fd, "\n");
         }
