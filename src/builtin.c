@@ -187,6 +187,13 @@ set_color_b(Cell *cell, char *col)
 }
 
 Value
+builtin_literal(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+        return eval_expr(e);
+}
+
+Value
 builtin_colorb(Expr *e)
 {
         if (e == NULL) return VALUE_EMPTY;
@@ -266,4 +273,5 @@ __setup__()
         builtin_add("if", builtin_if);
         builtin_add("color", builtin_color);
         builtin_add("colorb", builtin_colorb);
+        builtin_add("literal", builtin_literal);
 }
