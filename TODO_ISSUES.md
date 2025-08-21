@@ -4,8 +4,6 @@
 # To-do
 * Add color to input.
 * Improve update screen when it isn't needed to update the full screen.
-* I think that formula error should return Error as value but should keep
-  formula as input for being edited.
 * Implement the $ to select what to expand
 * Try to expand with the difference between cell and the one in the opposite
   direction at least for numbers, that way if the two first numbers are written
