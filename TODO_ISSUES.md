@@ -19,7 +19,6 @@
   color from color() in a different cell.
 * I think that if a formula is at the last right cell it breaks on each comma.
   Untested but sometimes fails. Idk if I fix it yet.
-* Maybe copy on delete
 * Add more movement stuff
 
 # No tested at all

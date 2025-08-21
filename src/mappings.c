@@ -118,6 +118,13 @@ a_set_cell_type_empty()
 }
 
 void
+a_delete()
+{
+        a_yank();
+        cm_convert(get_cursor_cell(), TYPE_EMPTY);
+}
+
+void
 a_copy_moving_up()
 {
         cm_extend(active_ctx.body,

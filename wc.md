@@ -8,11 +8,11 @@ src/cellmap.c|35|24|391
 src/window.c|49|22|340
 src/escape_code.h|19|24|303
 src/eval.c|36|19|294
-src/keyboard.c|39|29|246
+src/keyboard.c|39|29|248
 src/builtin.c|27|20|222
-src/mappings.c|29|19|193
+src/mappings.c|32|19|205
 src/dhm.c|35|20|165
-src/saving.c|24|21|155
+src/saving.c|24|22|155
 src/readlain.c|26|29|144
 src/aptree.c|24|26|128
 src/hm.c|31|23|117
@@ -23,7 +23,7 @@ src/color.c|11|31|69
 src/main.c|12|20|63
 src/formula.h|11|22|55
 src/window.h|11|20|44
-src/mappings.h|4|19|33
+src/mappings.h|4|19|35
 src/debug.c|5|23|27
 src/debug.h|5|19|20
 src/hm.h|6|21|20
@@ -39,4 +39,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|643|808|4207
+SUM:|646|809|4223

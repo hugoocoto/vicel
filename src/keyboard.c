@@ -219,7 +219,7 @@ start_kbhandler()
         add_action(mappings, "i", ACTION(get_set_cell_input));
         add_action(mappings, "sd", ACTION(a_set_cell_type_numeric));
         add_action(mappings, "st", ACTION(a_set_cell_type_text));
-        add_action(mappings, "d", ACTION(a_set_cell_type_empty));
+        add_action(mappings, "d", ACTION(a_delete));
         add_action(mappings, "sf", ACTION(a_set_cell_type_formula));
         add_action(mappings, "J", ACTION(a_copy_moving_down));
         add_action(mappings, "K", ACTION(a_copy_moving_up));
