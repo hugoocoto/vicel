@@ -92,6 +92,11 @@ arguments and return a value.
 * **min(...)**: Get the min number between arguments.
 * **max(...)**: Get the max number between arguments.
 * **if(cond, iftrue [, else])**: Get the value depending on the condition.
+* **color(color, cells [, ...])**: Apply color to one or more cells
+* **colorb(color, cells [, ...])**: Apply color if not done yet to one or more
+  cells
+* **literal(v)**: Evaluates to v, literally. Can be used to store numbers as
+  strings.
 
 > Functions accept ranges as parameters. They are two valid cells separated by
 > a `:`. For example, `sum(A0:A9)` is the same as sum the 10 first numbers in
@@ -103,7 +108,7 @@ It can be used as: **color(color, cell [, cell]\* )**. Color can be a number, as
 ascii colors work: 30-37 for fg and 40-47 for bg to summarize. Also it can be
 set to more than one if using the formula string introducer, `'` as follow:
 **'35;42;1'** for magenta bold text in green background. Also, there is another
-function `colorb` that only changes the color if using the default. It is useful
+function **colorb** that only changes the color if using the default. It is useful
 for set a bg color that can be override by other color calls. 
     
 ![Color showcase](images/image2.png)
