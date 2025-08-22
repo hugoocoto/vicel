@@ -245,6 +245,11 @@ start_kbhandler()
         add_action(mappings, "gj", ACTION(a_insert_after_row));
         add_action(mappings, "gl", ACTION(a_insert_after_col));
 
+        add_action(mappings, "gdk", ACTION(a_delete_up_row));
+        add_action(mappings, "gdh", ACTION(a_delete_left_col));
+        add_action(mappings, "gdj", ACTION(a_delete_down_row));
+        add_action(mappings, "gdl", ACTION(a_delete_right_col));
+
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();
         render();

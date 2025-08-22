@@ -60,5 +60,9 @@ void a_insert_after_row();
 void a_insert_after_col();
 void a_insert_zero_row();
 void a_insert_zero_col();
+void a_delete_right_col();
+void a_delete_left_col();
+void a_delete_down_row();
+void a_delete_up_row();
 
 #endif //! MAPPINGS_H

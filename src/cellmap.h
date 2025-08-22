@@ -147,4 +147,7 @@ const char *cm_type_repr(CellType);
 
 char *cm_get_cell_name(CellMat *cm, Cell *c);
 
+void cm_delete_col(CellMat *mat, int index);
+void cm_delete_row(CellMat *mat, int index);
+
 #endif

@@ -292,3 +292,37 @@ a_save()
 {
         save(&active_ctx);
 }
+
+void
+a_delete_right_col()
+{
+        if (active_ctx.body->data->size == 1) return;
+        cm_delete_col(active_ctx.body, active_ctx.cursor_pos_c);
+        a_move_cursor_left();
+        a_move_cursor_right();
+}
+
+void
+a_delete_left_col()
+{
+        if (active_ctx.body->data->size == 1) return;
+        cm_delete_col(active_ctx.body, active_ctx.cursor_pos_c);
+        a_move_cursor_left();
+}
+
+void
+a_delete_down_row()
+{
+        if (active_ctx.body->size == 1) return;
+        cm_delete_row(active_ctx.body, active_ctx.cursor_pos_r);
+        a_move_cursor_up();
+        a_move_cursor_down();
+}
+
+void
+a_delete_up_row()
+{
+        if (active_ctx.body->size == 1) return;
+        cm_delete_row(active_ctx.body, active_ctx.cursor_pos_r);
+        a_move_cursor_up();
+}

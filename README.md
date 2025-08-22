@@ -58,7 +58,7 @@ The first non-flag argument is used as the filename.
 ### Insert + move
 * `ij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
 
-### Add rows/columns
+### Add/delete rows/columns
 * `gj`: Add a new row after the cursor
 * `gl`: Add a new column after the cursor
 * `gk`: Add a new row before the cursor
@@ -67,9 +67,10 @@ The first non-flag argument is used as the filename.
 * `gL`: Add a new column at the end
 * `gK`: Add a new row at the start 
 * `gH`: Add a new column at the start
-
-<!-- * `gdj`: Delete row -->
-<!-- * `gdl`: Delete column -->
+* `gdj`: Delete row and move up
+* `gdl`: Delete column and move right
+* `gdk`: Delete row and move down
+* `gdh`: Delete column and move left
 
 ### Expand cells
 * `J`, `K`, `H`, `L`: Expand current cell down, up, left, right (and move)

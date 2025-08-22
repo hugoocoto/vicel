@@ -271,6 +271,7 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
                 }
         }
 
+        if (avx > 0) T_EL(0);
         free(col);
         _cy = y0 += row_width;
         _cx = x0;

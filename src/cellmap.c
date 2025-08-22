@@ -98,6 +98,25 @@ cm_insert_col(CellMat *mat, int index)
 
 
 void
+cm_delete_row(CellMat *mat, int index)
+{
+        int s = mat->data->size;
+        for (int i = 0; i < s; i++)
+                clear_cell(cm_get_cell_ptr(mat, i, index));
+        da_remove(mat, index);
+}
+
+void
+cm_delete_col(CellMat *mat, int index)
+{
+        for (int i = 0; i < mat->size; i++) {
+                clear_cell(cm_get_cell_ptr(mat, index, i));
+                da_remove(&mat->data[i], index);
+        }
+}
+
+
+void
 cm_subscribe(Cell *actor, Cell *observer)
 {
         report("Add subscriber %p to %p", observer, actor);
