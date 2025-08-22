@@ -3,7 +3,6 @@
 * After row or column deletion some formulas may break. [](#err1)
 
 # To-do
-* Add color to input.
 * Improve update screen when it isn't needed to update the full screen.
 * Implement the $ to select what to expand
 * On color() formula delete it should clear color.

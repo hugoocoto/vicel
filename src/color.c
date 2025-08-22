@@ -58,27 +58,7 @@ set_default_colors()
         hmadd(&colors, "sheet_ui_over", Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD));
         hmadd(&colors, "sheet_ui_selected", Cdup(C_BG_MAGENTA, C_FG_GREEN));
         hmadd(&colors, "ui_cell_text", Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD));
-
-#define basecolor(c) hmadd(&colors, #c, Cdup(C_BG_DEFAULT, C_FG_##c));
-        basecolor(RED);
-        basecolor(GREEN);
-        basecolor(YELLOW);
-        basecolor(BLUE);
-        basecolor(MAGENTA);
-        basecolor(CYAN);
-
-        // #define pc(s) printf("%s%s%s\n", get_color(s), s, get_color(NULL))
-        //         pc("ui");
-        //         pc("cell");
-        //         pc("cell_over");
-        //         pc("cell_selected");
-        //         pc("ln_over");
-        //         pc("ln");
-        //         pc("sheet_ui");
-        //         pc("sheet_ui_over");
-        //         pc("sheet_ui_selected");
-        //         pc("ui_cell_text");
-        //         exit(0);
+        hmadd(&colors, "insert", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
 }
 
 char *

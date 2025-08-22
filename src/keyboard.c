@@ -22,6 +22,7 @@
 #include "action.h"
 #include "aptree.h"
 #include "cellmap.h"
+#include "color.h"
 #include "common.h"
 #include "da.h"
 #include "debug.h"
@@ -120,6 +121,7 @@ get_input_at_cursor()
         char *c;
 
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
+        apply_color("insert");
         printf("%*s", column_width, "");
         T_CUB(column_width - 1);
         T_CUSHW();

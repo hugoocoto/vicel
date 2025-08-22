@@ -9,7 +9,7 @@ src/window.c|49|22|341
 src/escape_code.h|19|24|303
 src/eval.c|36|19|294
 src/mappings.c|44|19|265
-src/keyboard.c|41|29|258
+src/keyboard.c|41|29|260
 src/builtin.c|28|20|229
 src/dhm.c|35|20|165
 src/saving.c|25|21|149
@@ -19,7 +19,7 @@ src/hm.c|31|23|117
 src/cellmap.h|26|21|106
 src/da.h|15|33|89
 src/flag.c|11|37|80
-src/color.c|11|31|69
+src/color.c|9|19|63
 src/main.c|12|20|63
 src/formula.h|11|22|55
 src/mappings.h|4|19|45
@@ -39,4 +39,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|662|806|4287
+SUM:|660|794|4283
