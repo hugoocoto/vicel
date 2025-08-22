@@ -44,6 +44,44 @@ a_add_col()
 }
 
 void
+a_insert_zero_row()
+{
+        cm_insert_row(active_ctx.body, 0);
+}
+
+void
+a_insert_zero_col()
+{
+        cm_insert_col(active_ctx.body, 0);
+}
+
+
+void
+a_insert_before_row()
+{
+        cm_insert_row(active_ctx.body, active_ctx.cursor_pos_r);
+}
+
+void
+a_insert_before_col()
+{
+        cm_insert_col(active_ctx.body, active_ctx.cursor_pos_c);
+}
+
+void
+a_insert_after_row()
+{
+        cm_insert_row(active_ctx.body, active_ctx.cursor_pos_r + 1);
+}
+
+void
+a_insert_after_col()
+{
+        cm_insert_col(active_ctx.body, active_ctx.cursor_pos_c + 1);
+}
+
+
+void
 a_move_cursor_left()
 {
         if (active_ctx.cursor_pos_c == 0)

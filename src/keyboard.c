@@ -205,8 +205,6 @@ start_kbhandler()
 
         add_action(mappings, "q", ACTION(should_quit));
         add_action(mappings, "r", ACTION(render));
-        add_action(mappings, "gl", ACTION(a_add_col));
-        add_action(mappings, "gj", ACTION(a_add_row));
         add_action(mappings, "j", ACTION(a_move_cursor_down));
         add_action(mappings, "k", ACTION(a_move_cursor_up));
         add_action(mappings, "h", ACTION(a_move_cursor_left));
@@ -237,6 +235,15 @@ start_kbhandler()
         add_action(mappings, "y", ACTION(a_yank));
         add_action(mappings, "p", ACTION(a_paste));
         add_action(mappings, "w", ACTION(a_save));
+
+        add_action(mappings, "gL", ACTION(a_add_col));
+        add_action(mappings, "gJ", ACTION(a_add_row));
+        add_action(mappings, "gL", ACTION(a_insert_zero_col));
+        add_action(mappings, "gJ", ACTION(a_insert_zero_row));
+        add_action(mappings, "gk", ACTION(a_insert_before_row));
+        add_action(mappings, "gh", ACTION(a_insert_before_col));
+        add_action(mappings, "gj", ACTION(a_insert_after_row));
+        add_action(mappings, "gl", ACTION(a_insert_after_col));
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

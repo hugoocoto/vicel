@@ -95,11 +95,10 @@
 #define da_insert(da_ptr, e, i)                                                 \
         ({                                                                      \
                 assert((i) >= 0 && (i) <= (da_ptr)->size);                      \
-                da_append(da_ptr, e);                                           \
+                da_append((da_ptr), (typeof((e))) { 0 });                       \
                 memmove((da_ptr)->data + (i) + 1, (da_ptr)->data + (i),         \
                         ((da_ptr)->size - (i) - 1) * sizeof *((da_ptr)->data)); \
-                (da_ptr)->data[i] = (e);                                        \
-                (da_ptr)->size - 1;                                             \
+                (da_ptr)->data[(i)] = (e);                                      \
         })
 
 /* Get size */

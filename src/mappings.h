@@ -54,5 +54,11 @@ void a_paste();
 void a_free_yank_buffer();
 void a_save();
 void a_delete();
+void a_insert_before_row();
+void a_insert_before_col();
+void a_insert_after_row();
+void a_insert_after_col();
+void a_insert_zero_row();
+void a_insert_zero_col();
 
 #endif //! MAPPINGS_H

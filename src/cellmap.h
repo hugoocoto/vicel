@@ -124,6 +124,8 @@ CellMat *cm_init();
 
 void cm_add_row(CellMat *mat);
 void cm_add_col(CellMat *mat);
+void cm_insert_col(CellMat *mat, int index);
+void cm_insert_row(CellMat *mat, int index);
 
 Cell cm_get_cell(CellMat *mat, int x, int y);
 Cell *cm_get_cell_ptr(CellMat *mat, int x, int y);

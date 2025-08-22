@@ -80,6 +80,24 @@ cm_add_col(CellMat *mat)
 }
 
 void
+cm_insert_row(CellMat *mat, int index)
+{
+        CellArr ca = { 0 };
+        int s = mat->data->size;
+        for (int i = 0; i < s; i++)
+                da_append(&ca, EMPTY_CELL);
+        da_insert(mat, ca, index);
+}
+
+void
+cm_insert_col(CellMat *mat, int index)
+{
+        for (int i = 0; i < mat->size; i++)
+                da_insert(&mat->data[i], EMPTY_CELL, index);
+}
+
+
+void
 cm_subscribe(Cell *actor, Cell *observer)
 {
         report("Add subscriber %p to %p", observer, actor);
