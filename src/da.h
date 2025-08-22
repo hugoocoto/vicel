@@ -110,7 +110,7 @@
 /* Remove element al index I */
 #define da_remove(da_ptr, i)                                              \
         ({                                                                \
-                if (i >= 0 && i < (da_ptr)->size) {                       \
+                if ((i) >= 0 && (i) < (da_ptr)->size) {                   \
                         --(da_ptr)->size;                                 \
                         memmove(                                          \
                         (da_ptr)->data + (i), (da_ptr)->data + (i) + 1,   \

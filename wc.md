@@ -4,12 +4,12 @@ cloc|github.com/AlDanial/cloc v 2.06
 File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/formula.c|87|32|712
-src/cellmap.c|41|24|421
+src/cellmap.c|41|24|429
 src/window.c|49|22|341
 src/escape_code.h|19|24|303
 src/eval.c|36|19|294
-src/mappings.c|44|19|265
 src/keyboard.c|41|29|260
+src/mappings.c|44|19|257
 src/builtin.c|28|20|229
 src/dhm.c|35|20|165
 src/saving.c|25|21|149

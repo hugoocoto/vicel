@@ -23,7 +23,8 @@
 #include "da.h"
 #include "debug.h"
 #include "formula.h"
-#include <string.h>
+#include <assert.h>
+#include <unistd.h>
 
 bool
 cm_is_valid_pos(CellMat *mat, int x, int y)
@@ -100,18 +101,25 @@ cm_insert_col(CellMat *mat, int index)
 void
 cm_delete_row(CellMat *mat, int index)
 {
-        int s = mat->data->size;
-        for (int i = 0; i < s; i++)
-                clear_cell(cm_get_cell_ptr(mat, i, index));
+        assert(index < mat->size);
+        for_da_each(cel, mat->data[index])
+        {
+                assert(cel);
+                cm_clear_cell(cel);
+        }
+        da_destroy(&mat->data[index]);
         da_remove(mat, index);
 }
 
 void
 cm_delete_col(CellMat *mat, int index)
 {
-        for (int i = 0; i < mat->size; i++) {
-                clear_cell(cm_get_cell_ptr(mat, index, i));
-                da_remove(&mat->data[i], index);
+        int i = 0;
+        int size = mat->size;
+        assert(index < mat->data->size);
+        for (; i < size; i++) {
+                cm_clear_cell((mat->data + i)->data + index);
+                da_remove((mat->data + i), index);
         }
 }
 
@@ -142,10 +150,10 @@ cm_unsubscribe(Cell *actor, Cell *observer)
 
 /* Return NULL on overflow */
 Cell *
-cm_get_cell_ptr(CellMat *mat, int x, int y)
+cm_get_cell_ptr(CellMat *mat, int c, int r)
 {
-        if (mat->size <= y || mat->data->size <= x) return NULL;
-        return &mat->data[y].data[x];
+        if (mat->size <= r || mat->data->size <= c) return NULL;
+        return &mat->data[r].data[c];
 }
 
 /* cm_get_cell_ptr is more secure */

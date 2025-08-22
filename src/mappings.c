@@ -84,8 +84,7 @@ a_insert_after_col()
 void
 a_move_cursor_left()
 {
-        if (active_ctx.cursor_pos_c == 0)
-                return;
+        if (active_ctx.cursor_pos_c == 0) return;
         --active_ctx.cursor_pos_c;
         if (active_ctx.scroll_c > active_ctx.cursor_pos_c) {
                 --active_ctx.scroll_c;
@@ -95,8 +94,7 @@ a_move_cursor_left()
 void
 a_move_cursor_right()
 {
-        if (active_ctx.cursor_pos_c >= active_ctx.body->data->size - 1)
-                return;
+        if (active_ctx.cursor_pos_c >= active_ctx.body->data->size - 1) return;
         ++active_ctx.cursor_pos_c;
         if (active_ctx.cursor_pos_c >= active_ctx.scroll_c + active_ctx.max_display_c) {
                 ++active_ctx.scroll_c;
@@ -106,8 +104,7 @@ a_move_cursor_right()
 void
 a_move_cursor_up()
 {
-        if (active_ctx.cursor_pos_r == 0)
-                return;
+        if (active_ctx.cursor_pos_r == 0) return;
         --active_ctx.cursor_pos_r;
         if (active_ctx.scroll_r > active_ctx.cursor_pos_r) {
                 --active_ctx.scroll_r;
@@ -117,8 +114,7 @@ a_move_cursor_up()
 void
 a_move_cursor_down()
 {
-        if (active_ctx.cursor_pos_r >= active_ctx.body->size - 1)
-                return;
+        if (active_ctx.cursor_pos_r >= active_ctx.body->size - 1) return;
         ++active_ctx.cursor_pos_r;
         if (active_ctx.cursor_pos_r >= active_ctx.scroll_r + active_ctx.max_display_r) {
                 ++active_ctx.scroll_r;
@@ -294,15 +290,6 @@ a_save()
 }
 
 void
-a_delete_right_col()
-{
-        if (active_ctx.body->data->size == 1) return;
-        cm_delete_col(active_ctx.body, active_ctx.cursor_pos_c);
-        a_move_cursor_left();
-        a_move_cursor_right();
-}
-
-void
 a_delete_left_col()
 {
         if (active_ctx.body->data->size == 1) return;
@@ -311,12 +298,10 @@ a_delete_left_col()
 }
 
 void
-a_delete_down_row()
+a_delete_right_col()
 {
-        if (active_ctx.body->size == 1) return;
-        cm_delete_row(active_ctx.body, active_ctx.cursor_pos_r);
-        a_move_cursor_up();
-        a_move_cursor_down();
+        a_delete_left_col();
+        a_move_cursor_right();
 }
 
 void
@@ -325,4 +310,11 @@ a_delete_up_row()
         if (active_ctx.body->size == 1) return;
         cm_delete_row(active_ctx.body, active_ctx.cursor_pos_r);
         a_move_cursor_up();
+}
+
+void
+a_delete_down_row()
+{
+        a_delete_up_row();
+        a_move_cursor_down();
 }
