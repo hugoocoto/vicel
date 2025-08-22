@@ -1,9 +1,8 @@
 # Issues
 * use after free in some formulas, irregular: I cant reproduce
+* After row or column deletion some formulas may break. [](#err1)
 
 # To-do
-* Add inset row at the left, right (same for columns)
-* Add delete rows and columns
 * Add color to input.
 * Improve update screen when it isn't needed to update the full screen.
 * Implement the $ to select what to expand
@@ -27,3 +26,7 @@
 * Behaviour of corner cases in formulas for builtin, ranges and comparison.
 * Possible leak at return Error from invalid stuff
 
+### err1
+After delete a row or a column, ALL formulas that use cells that are moved
+should update the id reference to the new one. Formulas that point to a cell
+that was deleted should be set as error. 
