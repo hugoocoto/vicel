@@ -12,7 +12,7 @@ src/keyboard.c|41|29|260
 src/mappings.c|44|19|257
 src/builtin.c|28|20|229
 src/dhm.c|35|20|165
-src/saving.c|23|21|150
+src/saving.c|23|21|152
 src/readlain.c|26|29|144
 src/aptree.c|24|26|128
 src/hm.c|31|23|117
@@ -39,4 +39,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|658|794|4286
+SUM:|658|794|4288

@@ -101,7 +101,7 @@ get_line_data(char *line)
         return ca;
 }
 
-int
+bool
 get_data(CellMat *cm, FILE *f, int *max_size)
 {
         char line[1024 * 1024];
@@ -113,12 +113,13 @@ get_data(CellMat *cm, FILE *f, int *max_size)
                 if ((c = strchr(line, '\n'))) *c = 0;
                 if ((c = strchr(line, '\r'))) *c = 0;
 
+                report("Line: `%s`", line);
                 remove_spaces(line);
                 ca = get_line_data(line);
                 da_append(cm, ca);
                 *max_size = max(*max_size, ca.size);
         }
-        return max_size == 0;
+        return *max_size == 0;
 }
 
 void
@@ -143,6 +144,7 @@ load(char *filename, Context *ctx)
         ctx->body = calloc(1, sizeof(CellMat));
         if (get_data(ctx->body, f, &max_size)) {
                 free(ctx->body);
+                report("Load empty file");
                 goto load_blank;
         }
 
