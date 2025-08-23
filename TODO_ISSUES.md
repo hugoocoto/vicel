@@ -8,6 +8,7 @@
 * Implement the $ to select what to expand
 * On color() formula delete it should clear color.
 * Add autosave
+* Add config file
 
 # To-do (maybe)
 * Add more movement stuff
