@@ -29,4 +29,4 @@
 ### err1
 After delete a row or a column, ALL formulas that use cells that are moved
 should update the id reference to the new one. Formulas that point to a cell
-that was deleted should be set as error. 
+that was deleted should be set to error. 
