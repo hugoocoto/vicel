@@ -299,7 +299,7 @@ lexer(char *c)
                         last->next = TOK_AS_STR(c + 1, len);
                         last = last->next;
                         c += len + 1;
-                        if (c[len+1]=='\'') ++c;
+                        if (*c=='\'') ++c;
                         break;
                 }
 
