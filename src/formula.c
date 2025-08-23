@@ -329,6 +329,7 @@ lexer(char *c)
                                         report("Couldn't get identifier");
                                         last->next = TOK_AS_STR("Error", 5);
                                         last = last->next;
+                                        ++c;
                                         break;
                                 }
                                 last->next = TOK_AS_IDENTIFIER(id);
