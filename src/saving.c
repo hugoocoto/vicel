@@ -25,8 +25,6 @@
 #include "debug.h"
 #include "keyboard.h"
 #include "window.h"
-#include <stdbool.h>
-#include <stddef.h>
 
 void
 remove_spaces(char *c)
@@ -78,20 +76,17 @@ get_sep(char **r, char **c, bool *last)
 CellArr
 get_line_data(char *line)
 {
-        char *r;
-        char *c;
         CellArr ca = (CellArr) { 0 };
-        Cell cell;
-        bool last = false;
         size_t len = strlen(line);
+        bool last = false;
+        Cell cell;
+        char *r = line;
+        char *c = line;
 
-        // report("line: `%s`", line);
-        c = r = line;
         do {
                 get_sep(&r, &c, &last);
                 if (line + len == r) break;
                 *c = 0;
-                // report("=> %s", r);
                 cell = EMPTY_CELL;
                 free(cell.repr);
                 cell.repr = strdup(r);
@@ -126,6 +121,7 @@ void
 load(char *filename, Context *ctx)
 {
         int max_size;
+        FILE *f;
         ctx->cursor_pos_c = 0;
         ctx->cursor_pos_r = 0;
         ctx->scroll_c = 0;
@@ -134,8 +130,8 @@ load(char *filename, Context *ctx)
         if (filename == NULL) goto load_blank;
 
         ctx->filename = strdup(filename);
+        f = fopen(filename, "r");
 
-        FILE *f = fopen(filename, "r");
         if (f == NULL) {
                 report("Fail to load from %s", filename);
                 goto load_blank;
