@@ -298,7 +298,7 @@ lexer(char *c)
                         size_t len = strcspn(c + 1, "'");
                         last->next = TOK_AS_STR(c + 1, len);
                         last = last->next;
-                        if (!c[len]) break;
+                        if (!c[len+1]) break;
                         c += len + 2;
                         break;
                 }
