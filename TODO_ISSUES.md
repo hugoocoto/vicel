@@ -2,6 +2,7 @@
 * use after free in some formulas, irregular: I cant reproduce
 * After row or column deletion some formulas may break. [Link](#err1).
 * `= sum.` falls into an infinite loop
+* Load a blank sheet (created with touch for example, empty) segfaults
 
 # To-do
 * Improve update screen when it isn't needed to update the full screen.

@@ -396,7 +396,7 @@ get_literal(Token **t)
                         Expr *e = get_literal(t);
                         if (e->type != EXPR_IDENTIFIER) {
                                 report("Invalid range");
-                                exit(ERR_INVRANGE);
+                                raise_parsing_error();
                         }
                         assert(cell_self);
 

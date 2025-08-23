@@ -25,10 +25,8 @@
 #include "debug.h"
 #include "keyboard.h"
 #include "window.h"
-#include <ctype.h>
 #include <stdbool.h>
-#include <string.h>
-
+#include <stddef.h>
 
 void
 remove_spaces(char *c)
@@ -85,11 +83,13 @@ get_line_data(char *line)
         CellArr ca = (CellArr) { 0 };
         Cell cell;
         bool last = false;
+        size_t len = strlen(line);
 
         // report("line: `%s`", line);
         c = r = line;
         do {
                 get_sep(&r, &c, &last);
+                if (line + len == r) break;
                 *c = 0;
                 // report("=> %s", r);
                 cell = EMPTY_CELL;
@@ -167,7 +167,6 @@ save(Context *ctx)
 {
         int fd;
         if (ctx->filename == NULL) {
-                
                 report("Can't save unamed sheet");
                 return;
         }
