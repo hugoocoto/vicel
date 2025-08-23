@@ -56,7 +56,7 @@ The first non-flag argument is used as the filename.
 * `v`: Toggle cell selection (useless)
 
 ### Insert + move
-* `ij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
+* `gij`, `gik`, `gih`, `gil`: Insert input and move in the given direction
 
 ### Add/delete rows/columns
 * `gj`: Add a new row after the cursor
