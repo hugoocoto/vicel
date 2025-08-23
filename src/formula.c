@@ -24,9 +24,8 @@
 #include "da.h"
 #include "debug.h"
 #include "eval.h"
-#include "keyboard.h"
+// #include "keyboard.h"
 #include "window.h"
-#include <assert.h>
 
 Cell *cell_self = NULL;
 jmp_buf parsing_error_env;
@@ -42,6 +41,8 @@ build_range(Cell *cstart, Cell *cend)
 {
         Value r = (Value) { .type = TYPE_RANGE };
         char *cs;
+        int x, y;
+        Cell *c;
 
         cs = cm_get_cell_name(active_ctx.body, cstart);
         if (cs == NULL) return VALUE_ERROR;
@@ -59,9 +60,6 @@ build_range(Cell *cstart, Cell *cend)
         }
         free(cs);
 
-        /* should add subscribers */
-        int x, y;
-        Cell *c;
         for (x = r.as.range.startx; x <= r.as.range.endx; x++) {
                 for (y = r.as.range.starty; y <= r.as.range.endy; y++) {
                         c = cm_get_cell_ptr(active_ctx.body, x, y);
@@ -75,19 +73,28 @@ build_range(Cell *cstart, Cell *cend)
 }
 
 void
+update_repr(Cell *cell)
+{
+        free(cell->repr);
+        cell->repr = get_repr(cell->value);
+        free(cell->input_repr);
+        cell->input_repr = get_input_repr(cell->value);
+}
+
+void
 refresh_formula_value(Cell *cell)
 {
         if (cell->updated) {
                 cell->value.as.formula->value = VALUE_ERROR;
                 return;
-        };
+        }
         cell->updated = true;
         cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
-        free(cell->repr);
-        cell->repr = get_repr(cell->value.as.formula->value);
-        free(cell->input_repr);
-        cell->input_repr = get_input_repr(cell->value);
-
+        // free(cell->repr);
+        // cell->repr = get_repr(cell->value.as.formula->value);
+        // free(cell->input_repr);
+        // cell->input_repr = get_input_repr(cell->value);
+        update_repr(cell);
 
         for_da_each(c, cell->subscribers) cm_notify(cell, *c);
         cell->updated = false;
@@ -102,7 +109,6 @@ new_expr()
 Expr *
 new_function(Expr *name, Expr *args)
 {
-        report("Creating new fun call");
         Expr *e = new_expr();
         e->type = EXPR_FUNC;
         e->as.func.name = name;
@@ -184,7 +190,7 @@ Token *
 TOK_AS_STR(char *c, int len)
 {
         Token *t = new_tok();
-
+        t->type = TOK_STRING;
         if (len > 0) {
                 char prev = c[len];
                 if (prev) c[len] = 0;
@@ -192,8 +198,6 @@ TOK_AS_STR(char *c, int len)
                 if (prev) c[len] = prev;
         } else
                 t->as.str = strdup("");
-
-        t->type = TOK_STRING;
         return t;
 }
 
@@ -220,11 +224,11 @@ char *
 get_identifier(char **c)
 {
         char *id = *c;
+        char prev;
         while (isalnum(**c)) {
                 ++*c;
         }
-
-        char prev = **c;
+        prev = **c;
         if (prev) **c = 0;
         id = strdup(id);
         if (prev) **c = prev;
@@ -282,6 +286,7 @@ lexer(char *c)
                         last = last->next;
                         ++c;
                         break;
+
                 case '<':
                 case '>':
                 case '!':
@@ -299,7 +304,7 @@ lexer(char *c)
                         last->next = TOK_AS_STR(c + 1, len);
                         last = last->next;
                         c += len + 1;
-                        if (*c=='\'') ++c;
+                        if (*c == '\'') ++c;
                         break;
                 }
 
@@ -326,7 +331,7 @@ lexer(char *c)
                         if ((id = get_identifier(&c))) {
                                 if (*id == 0) {
                                         free(id);
-                                        report("Couldn't get identifier");
+                                        report("Couldn't get identifier from `%s`", c);
                                         last->next = TOK_AS_STR("Error", 5);
                                         last = last->next;
                                         ++c;
@@ -336,6 +341,7 @@ lexer(char *c)
                                 last = last->next;
                                 break;
                         }
+
                         report("Invalid lexeme found: `%c`", *c);
                         ++c;
                         break;
@@ -344,7 +350,6 @@ lexer(char *c)
 
         Token *r = zero->next;
         free(zero);
-
         return r;
 }
 
@@ -383,14 +388,9 @@ get_literal(Token **t)
 
         case TOK_IDENTIFIER: {
                 char *id = (*t)->as.id;
-
-                report("get_literal from identifier %s", id);
                 Cell *cell = get_cell_from_coords(id);
                 *t = (*t)->next;
-
-                if (cell == NULL) {
-                        return new_literal_str(id);
-                }
+                if (cell == NULL) return new_literal_str(id);
 
                 if (match(t, ":")) {
                         Expr *e = get_literal(t);
@@ -398,19 +398,14 @@ get_literal(Token **t)
                                 report("Invalid range");
                                 raise_parsing_error();
                         }
-                        assert(cell_self);
-
-                        /* Should notify into new_range */
                         Expr *ret = new_range(cell, e->as.identifier.cell);
                         free_expr(e);
                         return ret;
                 }
-
-                assert(cell_self);
                 cm_subscribe(cell, cell_self);
-
                 return new_identifier(cell);
         }
+
         default:
                 report("No yet implemented: get_literal for %d", (*t)->type);
                 exit(ERR_GETLITERAL);
@@ -445,7 +440,6 @@ get_function(Token **t)
                                         free_expr(args);
                                         args = last;
                                 }
-                                // todo: invalid formula
                                 report("Expected parenthesis at formula");
                                 free_expr(e);
                                 raise_parsing_error();
@@ -530,11 +524,22 @@ get_comparison(Token **t)
         return e;
 }
 
+// ---| Formal |---
+// - comparison -> term ((">" | ">=" | "<" | "<=" | "==" | "!=") term)?
+// - term -> factor (("-" | "+") factor)*
+// - factor -> power (("/" | "\*") power)*
+// - power -> unary ("^") unary)*
+// - unary -> ("!" | "-") unary | group
+// - group -> "(" expr ")" | func
+// - func -> FUNC "(" expr? ("," expr)* ")" | literal
+// - literal -> NUM  | IDENTIFIER
+
 void
 get_ast_repr(Expr *e, char *buffer, size_t len)
 {
         static bool is_func_param = false;
         static bool is_name = false;
+
         if (e == NULL) return;
         if (strlen(buffer) >= len) return;
 
@@ -545,12 +550,14 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                         snprintf(buffer + strlen(buffer), len, "%g",
                                  e->as.literal.value.as.num);
                         break;
+
                 case TYPE_TEXT:
                         snprintf(buffer + strlen(buffer),
                                  len,
                                  is_func_param && !is_name ? "'%s'" : "%s",
                                  e->as.literal.value.as.text);
                         break;
+
                 case TYPE_EMPTY:
                 case TYPE_FORMULA:
                 case TYPE_RANGE: {
@@ -559,7 +566,9 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                         free(c);
                         break;
                 }
-                default: break;
+
+                default:
+                        break;
                 }
                 break;
 
@@ -623,15 +632,6 @@ parse_formula(char *c, Cell *self)
 {
         cell_self = self;
         Token *t = lexer(c);
-        report("Out of lexer");
-        // - comparison -> term ((">" | ">=" | "<" | "<=" | "==" | "!=") term)?
-        // - term -> factor (("-" | "+") factor)*
-        // - factor -> power (("/" | "\*") power)*
-        // - power -> unary ("^") unary)*
-        // - unary -> ("!" | "-") unary | group
-        // - group -> "(" expr ")" | func
-        // - func -> FUNC "(" expr? ("," expr)* ")" | literal
-        // - literal -> NUM  | IDENTIFIER
         self->value.as.formula->tokens = t;
         return report_ast(get_comparison(&t));
 }
@@ -648,36 +648,36 @@ clear_cell(Cell *c)
 void
 build_formula(char *_str, Cell *self)
 {
-        char *str = strdup(_str);
         Expr *body = NULL;
 
-        if (*str != '=') {
-                report("Invalid formula: `%s` does not start with `=`", str);
+        if (*_str != '=') {
+                report("Invalid formula: `%s` does not start with `=`", _str);
                 exit(ERR_INVFORM);
         }
 
         /* Execute this if some error is reported while parsing it */
         if (setjmp(parsing_error_env)) {
                 clear_cell(self);
-                self->value.as.text = str;
+                self->value.as.text = _str;
                 self->value.type = TYPE_TEXT;
-                free(self->repr);
-                self->repr = str;
-                free(self->input_repr);
-                self->input_repr = get_input_repr(self->value);
+                // free(self->repr);
+                // self->repr = str;
+                // free(self->input_repr);
+                // self->input_repr = get_input_repr(self->value);
+                update_repr(self);
+                self->value.as.text = self->repr;
                 return;
         }
 
-
+        char *str = strdup(_str);
         clear_cell(self);
         self->value.as.formula = calloc(1, sizeof(Formula));
         self->value.type = TYPE_FORMULA;
         body = parse_formula(str + 1, self);
         self->value.as.formula->body = body;
         refresh_formula_value(self);
-
-        free(str);
         assert(self->value.type == TYPE_FORMULA);
+        free(str);
 }
 
 void
@@ -689,7 +689,6 @@ cm_notify(Cell *actor, Cell *observer)
                        cm_type_repr(observer->value.type));
                 exit(ERR_OBSVAL);
         }
-
         refresh_formula_value(observer);
 }
 
@@ -816,18 +815,16 @@ Formula *
 formula_extend(Cell *self, Formula *f, int r, int c)
 {
         Formula *new = calloc(1, sizeof *f);
+        Token *t = new->tokens = dup_tokens(f->tokens);
+
         self->value.as.formula = new;
         self->value.type = TYPE_FORMULA;
-        Token *t = new->tokens = dup_tokens(f->tokens);
         cell_self = self;
-        report("set cell_self to %p", cell_self);
         if (extend_identifiers(t, r, c)) {
                 report("Can not extend formula");
                 return NULL;
         }
-        report(">>> formula extend <<<<<<<<<<<");
         new->body = report_ast(get_comparison(&t));
         new->value = eval_formula(*new);
-        report(">>> formula extend end <<<<<<<");
         return new;
 }
