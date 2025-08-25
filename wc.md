@@ -3,7 +3,7 @@ cloc|github.com/AlDanial/cloc v 2.06
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
-src/formula.c|87|32|714
+src/formula.c|84|39|707
 src/cellmap.c|41|24|429
 src/window.c|49|22|341
 src/escape_code.h|19|24|303
@@ -12,7 +12,7 @@ src/keyboard.c|41|29|260
 src/mappings.c|44|19|257
 src/builtin.c|28|20|229
 src/dhm.c|35|20|165
-src/saving.c|23|21|152
+src/saving.c|23|19|150
 src/readlain.c|26|29|144
 src/aptree.c|24|26|128
 src/hm.c|31|23|117
@@ -39,4 +39,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|658|794|4288
+SUM:|655|799|4279
