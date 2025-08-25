@@ -21,10 +21,6 @@
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
-#include "keyboard.h"
-#include <stdio.h>
-#include <string.h>
-
 
 /* Append text to line BEFORE call readline */
 void rlain_insert(char *text);

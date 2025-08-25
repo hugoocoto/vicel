@@ -18,7 +18,7 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
-/* Source are from here:
+/* Source is a modified version of arp242 implementation from here:
  * https://github.com/arp242/toml-c/blob/main/header/toml-c.h
  *
  * Maybe some day I would implement it myself. */

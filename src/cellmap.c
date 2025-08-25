@@ -23,8 +23,6 @@
 #include "da.h"
 #include "debug.h"
 #include "formula.h"
-#include <assert.h>
-#include <unistd.h>
 
 bool
 cm_is_valid_pos(CellMat *mat, int x, int y)

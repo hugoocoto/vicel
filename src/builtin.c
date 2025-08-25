@@ -27,9 +27,6 @@
 #include "eval.h"
 #include "formula.h"
 #include "window.h"
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
 
 struct Pair {
         char *name;

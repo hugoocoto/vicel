@@ -21,7 +21,7 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-#include <stdlib.h>
+#include <stddef.h>
 typedef struct Action {
         void (*action)(void);
 } Action;

@@ -27,7 +27,6 @@
 #include "options.h"
 #include "saving.h"
 #include "window.h"
-#include <stdlib.h>
 
 void
 resize_handler(int s)

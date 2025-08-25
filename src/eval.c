@@ -25,8 +25,6 @@
 #include "debug.h"
 #include "formula.h"
 #include "window.h"
-#include <assert.h>
-#include <stdbool.h>
 
 Value
 eval_identifier(Expr *e)

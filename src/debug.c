@@ -19,7 +19,6 @@
  */
 
 #include "debug.h"
-#include <assert.h>
 
 /* default debug level
  * 0: do not report

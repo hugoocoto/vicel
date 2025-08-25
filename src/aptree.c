@@ -22,8 +22,6 @@
 #include "action.h"
 #include "common.h"
 #include "dhm.h"
-#include <assert.h>
-#include <unistd.h>
 
 APTree
 ap_init()

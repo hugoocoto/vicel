@@ -21,17 +21,6 @@
 #include "dhm.h"
 #include "common.h"
 
-void dhmadd(DHmap *, char *key, void *value);
-void dhmremove(DHmap *, char *key);
-void *dhmget(DHmap *, char *key);
-void dhmdestroy(DHmap *);
-void dhmdestroya(DHmap *hm, void (*destra)(void *));
-
-static int dhmhash(char *key);
-static int hashmask(int hash, int bits);
-static void grow(DHmap *hm);
-
-
 static inline void
 grow(DHmap *hm)
 {

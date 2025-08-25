@@ -23,9 +23,6 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "toml.h"
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
