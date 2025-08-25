@@ -18,21 +18,20 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
-#include <assert.h>
-#include <ctype.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <math.h>
-#include <signal.h>
-#include <stdarg.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <termios.h>
-#include <time.h>
-#include <unistd.h>
-#include <setjmp.h>
-#include <stdarg.h>
+#ifndef OPTS_H_
+#define OPTS_H_
+
+#include "common.h"
+
+typedef struct win_opts {
+        int num_col_width;
+        int col_width;
+        bool use_cell_color_for_sep;
+        char *cell_l_sep;
+        char *cell_r_sep;
+} Win_opts;
+
+void parse_options_default_file();
+void parse_options_file(FILE *f);
+
+#endif //! OPTS_H_
