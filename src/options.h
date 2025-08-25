@@ -26,12 +26,31 @@
 typedef struct win_opts {
         int num_col_width;
         int col_width;
+        int row_width;
         bool use_cell_color_for_sep;
         char *cell_l_sep;
         char *cell_r_sep;
 } Win_opts;
 
+typedef struct Col_opts {
+        char *ui;
+        char *cell;
+        char *cell_over;
+        char *cell_selected;
+        char *ln_over;
+        char *ln;
+        char *sheet_ui;
+        char *sheet_ui_over;
+        char *sheet_ui_selected;
+        char *ui_cell_text;
+        char *insert;
+}Col_opts; 
+
+extern Win_opts win_opts;
+extern Col_opts col_opts;
+
 void parse_options_default_file();
 void parse_options_file(FILE *f);
+void free_opts();
 
 #endif //! OPTS_H_

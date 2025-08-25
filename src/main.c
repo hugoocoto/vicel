@@ -24,8 +24,10 @@
 #include "flag.h"
 #include "keyboard.h"
 #include "mappings.h"
+#include "options.h"
 #include "saving.h"
 #include "window.h"
+#include <stdlib.h>
 
 void
 resize_handler(int s)
@@ -62,6 +64,8 @@ int
 main(int argc, char *argv[])
 {
         char *filename = NULL;
+        char *cfile;
+
         flag_set(&argc, &argv);
         if (flag_get("-m", "--use-mouse")) {
                 printf("Are you idiot?\n");
@@ -71,24 +75,33 @@ main(int argc, char *argv[])
                 debug_level = 1;
         }
 
+        report("------| Starting |------");
+        parse_options_default_file(); // before parse custom config file
+
+        if (flag_get_value(&cfile, "-c", "--config-file")) {
+                parse_options_file(fopen(cfile, "r"));
+        }
+
         if (argc == 2) {
                 filename = argv[1];
         }
 
-        report("------| Starting |------");
         if (debug_level == 0) T_ASBE();
         T_CUHDE();
         EFFECT(RESET);
         clear_screen();
         atexit(reset_at_exit);
-        load(filename, &active_ctx);
 
+        set_default_colors(); // after parse config file
+        load(filename, &active_ctx);
         set_resize_handler();
-        start_kbhandler();
+
+        start_kbhandler(); // loop
 
         save(&active_ctx);
         cm_destroy(active_ctx.body);
         a_free_yank_buffer();
+        free_opts();
 
         report("---| End without error |---");
         return 0;

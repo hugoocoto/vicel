@@ -8,6 +8,7 @@ cells interactively.
 * Supports numbers, text, and formulas
 * Keyboard-focused Vim-style motions
 * Lightweight and minimal code
+* Configuration via .toml file
 
 ## Installation
 You can install **Visual Cell Editor** by running:
@@ -34,10 +35,11 @@ vicel data.csv
 The first non-flag argument is used as the filename.
 
 ### Options
-| Flag                | Description          | 
-| ------------------- | -------------------- | 
-| `-m`, `--use-mouse` | Enable mouse support |
-| `-D`, `--debug`     | Enable debug output  |
+| Flag                  | Description           | 
+| --------------------- | --------------------- | 
+| `-m`, `--use-mouse`   | Enable mouse support  |
+| `-D`, `--debug`       | Enable debug output   |
+| `-c`, `--config-file` | Set custom file path  |
 
 ## Mappings
 > *As of the time of writing*
@@ -89,7 +91,7 @@ Supported formats:
 * **Text**: Any non-number string
 * **Formula**: Starts with `=`, e.g. `=C2 + 8.5`
 
->  Cell references are of the form `A1`, `B3`, etc.
+>  Cell references are of the form `A3`, `B0`, etc (From A to ZZ).
 
 ## Builtin functions
 Builtin functions can be called in formulas. It take numbers, text or cells as 
@@ -122,6 +124,16 @@ function **colorb** that only changes the color if using the default. It is usef
 for set a bg color that can be override by other color calls. 
     
 ![Color showcase](images/image2.png)
+
+## Configuration
+You can modify some values using the vicel config file. This file is searched in
+the following paths: `./vicel.toml`, `~/vicel.toml`, `~/.config/vicel.toml`,
+`~/.config/vicel/vicel.toml`. If other file is desired to be used it can be
+specified with the `-c` or `--config-file` flag, following with the full path of
+the config file. The format chosen for the file is [toml](https://toml.io). 
+
+The valid fields whith their default values are set in
+[`./vicel.toml`](./vicel.toml).
 
 ## Latest Version
 [See version](./version.txt)

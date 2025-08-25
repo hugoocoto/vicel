@@ -29,9 +29,9 @@
 #include "escape_code.h"
 #include "formula.h"
 #include "mappings.h"
+#include "options.h"
 #include "readlain.h"
 #include "window.h"
-#include <sys/ioctl.h>
 
 bool quit = false;
 
@@ -122,8 +122,8 @@ get_input_at_cursor()
 
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         apply_color("insert");
-        printf("%*s", column_width, "");
-        T_CUB(column_width - 1);
+        printf("%*s", win_opts.col_width, "");
+        T_CUB(win_opts.col_width - 1);
         T_CUSHW();
 
         rlain_insert(get_cursor_cell()->input_repr);

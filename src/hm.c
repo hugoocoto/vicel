@@ -20,8 +20,6 @@
 
 #include "hm.h"
 #include "common.h"
-#include <assert.h>
-#include <sys/cdefs.h>
 
 void
 hmnew(Hmap *table, int size)

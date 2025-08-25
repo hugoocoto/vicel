@@ -26,8 +26,8 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "mappings.h"
-#include <stdio.h>
-#include <string.h>
+#include "options.h"
+
 
 Context active_ctx = INIT_CONTEXT;
 
@@ -209,8 +209,8 @@ cursor_gotocell(int x, int y)
 {
         int first_cell_col = 1;
         int first_cell_row = 2;
-        T_CUP(first_cell_row + row_width * y - active_ctx.scroll_r,
-              num_col_width + first_cell_col + column_width * (x - 1 - active_ctx.scroll_c));
+        T_CUP(first_cell_row + win_opts.row_width * y - active_ctx.scroll_r,
+              win_opts.num_col_width + first_cell_col + win_opts.col_width * (x - 1 - active_ctx.scroll_c));
 }
 
 void
@@ -229,11 +229,11 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
         apply_color("ln");
 
         /* The top left gap */
-        printf("%-*.*s", num_col_width, num_col_width, "");
+        printf("%-*.*s", win_opts.num_col_width, win_opts.num_col_width, "");
 
-        _cx += num_col_width;
-        avx -= num_col_width;
-        avy -= row_width;
+        _cx += win_opts.num_col_width;
+        avx -= win_opts.num_col_width;
+        avy -= win_opts.row_width;
 
         col[1] = 'A' + x_off % range;
         if (x_off / range) col[0] = 'A' + x_off / range - 1;
@@ -247,15 +247,15 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
 
                 if (xx == active_ctx.cursor_pos_c) apply_color("ln_over");
 
-                int wwww = min(column_width, avx);
+                int wwww = min(win_opts.col_width, avx);
                 int ww = (wwww + 1) / 2;
                 printf("%*.*s%*.*s", ww, ww, col,
                        wwww - ww, wwww - ww, "");
 
                 if (xx == active_ctx.cursor_pos_c) apply_color("ln");
 
-                _cx += column_width;
-                avx -= column_width;
+                _cx += win_opts.col_width;
+                avx -= win_opts.col_width;
                 xx++;
                 if (avx <= 0) break;
 
@@ -273,7 +273,7 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
 
         if (avx > 0) T_EL(0);
         free(col);
-        _cy = y0 += row_width;
+        _cy = y0 += win_opts.row_width;
         _cx = x0;
         n = y_off;
         int yy = 0;
@@ -287,12 +287,12 @@ display_add_names(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int 
 
                 if (yy == active_ctx.cursor_pos_r) apply_color("ln_over");
 
-                printf("%*d ", num_col_width - 1, n);
+                printf("%*d ", win_opts.num_col_width - 1, n);
 
                 if (yy == active_ctx.cursor_pos_r) apply_color("ln");
 
-                _cy += row_width;
-                avy -= row_width;
+                _cy += win_opts.row_width;
+                avy -= win_opts.row_width;
                 if (avy <= 0) break;
                 n++;
                 yy++;
@@ -331,8 +331,8 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         T_CUP(_cy, _cx);
                         assert(cell->heigh == 1);
 
-                        int w = min(column_width, avx) -
-                                strlen(CELL_L_SEP CELL_R_SEP);
+                        int w = min(win_opts.col_width, avx) -
+                                strlen(win_opts.cell_l_sep) - strlen(win_opts.cell_r_sep);
 
                         if (w <= 0) {
                                 break;
@@ -341,25 +341,25 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
 
                         if (cell->selected) {
                                 apply_color("sheet_ui_selected");
-                                printf(CELL_L_SEP);
+                                printf("%s", win_opts.cell_l_sep);
                                 apply_color("cell_selected");
                         }
 
                         else if (active_ctx.cursor_pos_r == yy &&
                                  active_ctx.cursor_pos_c == xx) {
                                 apply_color("sheet_ui_over");
-                                printf(CELL_L_SEP);
+                                printf("%s", win_opts.cell_l_sep);
                                 apply_color("cell_over");
                         }
 
                         else {
-                                if (!USE_CELL_COLOR_FOR_SEP) {
+                                if (!win_opts.use_cell_color_for_sep) {
                                         apply_color("sheet_ui");
-                                        printf(CELL_L_SEP);
+                                        printf("%s", win_opts.cell_l_sep);
                                 }
                                 set_cell_color(cell);
-                                if (USE_CELL_COLOR_FOR_SEP) {
-                                        printf(CELL_L_SEP);
+                                if (win_opts.use_cell_color_for_sep) {
+                                        printf("%s", win_opts.cell_l_sep);
                                 }
                         }
 
@@ -368,30 +368,30 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
                         if (active_ctx.cursor_pos_r == yy &&
                             active_ctx.cursor_pos_c == xx) {
                                 apply_color("sheet_ui_over");
-                                printf(CELL_R_SEP);
+                                printf("%s", win_opts.cell_r_sep);
                         }
 
                         else if (cell->selected) {
                                 apply_color("sheet_ui_selected");
-                                printf(CELL_R_SEP);
+                                printf("%s",win_opts.cell_r_sep);
                         }
 
                         else {
-                                if (!USE_CELL_COLOR_FOR_SEP) {
+                                if (!win_opts.use_cell_color_for_sep) {
                                         apply_color("sheet_ui");
                                 }
-                                printf(CELL_R_SEP);
+                                printf("%s",win_opts.cell_r_sep);
                         }
 
-                        _cx += column_width;
-                        avx -= column_width;
+                        _cx += win_opts.col_width;
+                        avx -= win_opts.col_width;
                         if (avx <= 0) break;
                         ++xx;
                 }
                 apply_color(C_RESET);
                 if (avx > 0) T_EL(0);
-                avy -= row_width;
-                _cy += row_width;
+                avy -= win_opts.row_width;
+                _cy += win_opts.row_width;
                 ++yy;
                 if (avy <= 0) break;
         }
@@ -406,7 +406,7 @@ render()
 {
         print_status_bar();
         display_add_names(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, 1, 2);
-        cm_display(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, num_col_width + 1, 3);
+        cm_display(active_ctx.body, active_ctx.scroll_c, active_ctx.scroll_r, active_ctx.ws.ws_col + 1, active_ctx.ws.ws_row, win_opts.num_col_width + 1, 3);
         print_status_bar2();
         fflush(stdout);
 }

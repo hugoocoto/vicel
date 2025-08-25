@@ -23,8 +23,7 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "hm.h"
-#include <stdio.h>
-#include <unistd.h>
+#include "options.h"
 
 Hmap colors;
 
@@ -42,23 +41,23 @@ del_default_colors()
         hmdestroy(&colors);
 }
 
-static __attribute__((constructor)) void
+void
 set_default_colors()
 {
         hmnew(&colors, 32); // random size
         atexit(del_default_colors);
 
-        hmadd(&colors, "ui", Cdup(C_BG_DEFAULT, C_FG_BLACK));
-        hmadd(&colors, "cell", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
-        hmadd(&colors, "cell_over", Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_REVERSE, C_BOLD));
-        hmadd(&colors, "cell_selected", Cdup(C_BG_DEFAULT, C_FG_GREEN));
-        hmadd(&colors, "ln_over", Cdup(C_BG_DEFAULT, C_FG_GREEN, C_REVERSE, C_BOLD));
-        hmadd(&colors, "ln", Cdup(C_BG_DEFAULT, C_FG_GREEN));
-        hmadd(&colors, "sheet_ui", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
-        hmadd(&colors, "sheet_ui_over", Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD));
-        hmadd(&colors, "sheet_ui_selected", Cdup(C_BG_MAGENTA, C_FG_GREEN));
-        hmadd(&colors, "ui_cell_text", Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD));
-        hmadd(&colors, "insert", Cdup(C_BG_DEFAULT, C_FG_DEFAULT));
+        hmadd(&colors, "ui", strdup(col_opts.ui));
+        hmadd(&colors, "cell", strdup(col_opts.cell));
+        hmadd(&colors, "cell_over", strdup(col_opts.cell_over));
+        hmadd(&colors, "cell_selected", strdup(col_opts.cell_selected));
+        hmadd(&colors, "ln_over", strdup(col_opts.ln_over));
+        hmadd(&colors, "ln", strdup(col_opts.ln));
+        hmadd(&colors, "sheet_ui", strdup(col_opts.sheet_ui));
+        hmadd(&colors, "sheet_ui_over", strdup(col_opts.sheet_ui_over));
+        hmadd(&colors, "sheet_ui_selected", strdup(col_opts.sheet_ui_selected));
+        hmadd(&colors, "ui_cell_text", strdup(col_opts.ui_cell_text));
+        hmadd(&colors, "insert", strdup(col_opts.insert));
 }
 
 char *

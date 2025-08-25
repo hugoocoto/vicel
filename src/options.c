@@ -21,40 +21,121 @@
 #include "options.h"
 #include "common.h"
 #include "debug.h"
+#include "escape_code.h"
 #include "toml.h"
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
-Win_opts win_opts = {
-        /* defaults */
-        .num_col_width = 5,
-        .col_width = 14,
-        .use_cell_color_for_sep = true,
-        .cell_l_sep = " ",
-        .cell_r_sep = " ",
-};
+Win_opts win_opts;
+Col_opts col_opts;
+
+#define toml_cpyfree(a, b)          \
+        {                           \
+                __auto_type _b = b; \
+                free(a);            \
+                (a) = strdup(_b);   \
+                free(_b);           \
+        }
+
+static __attribute__((constructor)) void
+init_default_values()
+{
+        win_opts = (Win_opts) {
+                .num_col_width = 5,
+                .col_width = 14,
+                .row_width = 1,
+                .use_cell_color_for_sep = true,
+                .cell_l_sep = STRDUP(" "),
+                .cell_r_sep = STRDUP(" "),
+        };
+
+        col_opts = (Col_opts) {
+                .ui = Cdup(C_BG_DEFAULT, C_FG_BLACK),
+                .cell = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
+                .cell_over = Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_REVERSE, C_BOLD),
+                .cell_selected = Cdup(C_BG_DEFAULT, C_FG_GREEN),
+                .ln_over = Cdup(C_BG_DEFAULT, C_FG_GREEN, C_REVERSE, C_BOLD),
+                .ln = Cdup(C_BG_DEFAULT, C_FG_GREEN),
+                .sheet_ui = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
+                .sheet_ui_over = Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD),
+                .sheet_ui_selected = Cdup(C_BG_MAGENTA, C_FG_GREEN),
+                .ui_cell_text = Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD),
+                .insert = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
+        };
+}
+
+void
+free_opts()
+{
+        free(win_opts.cell_l_sep);
+        free(win_opts.cell_r_sep);
+
+        free(col_opts.ui);
+        free(col_opts.cell);
+        free(col_opts.cell_over);
+        free(col_opts.cell_selected);
+        free(col_opts.ln_over);
+        free(col_opts.ln);
+        free(col_opts.sheet_ui);
+        free(col_opts.sheet_ui_over);
+        free(col_opts.sheet_ui_selected);
+        free(col_opts.ui_cell_text);
+        free(col_opts.insert);
+}
+
+char *
+col_format(char **col)
+{
+        char *new = calloc(strlen(*col) + strlen(T_CSI "m") + 1, 1);
+        *new = 0;
+        strcat(new, T_CSI);
+        strcat(new, *col);
+        strcat(new, "m");
+        free(*col);
+        *col = new;
+        return *col;
+}
 
 void
 get_window_options(toml_table_t *tbl)
 {
+        report("Getting [window]");
         toml_value_t v;
+        if ((v = toml_table_string(tbl, "cell_l_sep")).ok) toml_cpyfree(win_opts.cell_l_sep, v.u.s);
+        if ((v = toml_table_string(tbl, "cell_r_sep")).ok) toml_cpyfree(win_opts.cell_r_sep, v.u.s);
+        if ((v = toml_table_int(tbl, "num_col_width")).ok) win_opts.num_col_width = v.u.i;
+        if ((v = toml_table_int(tbl, "col_width")).ok) win_opts.col_width = v.u.i;
+        if ((v = toml_table_bool(tbl, "use_cell_color_for_sep")).ok) win_opts.use_cell_color_for_sep = v.u.b;
+}
 
-        if ((v = toml_table_string(tbl, "cell_l_sep")).ok)
-                win_opts.cell_l_sep = v.u.s;
-        if ((v = toml_table_string(tbl, "cell_r_sep")).ok)
-                win_opts.cell_r_sep = v.u.s;
-        if ((v = toml_table_int(tbl, "num_col_width")).ok)
-                win_opts.num_col_width = v.u.i;
-        if ((v = toml_table_int(tbl, "col_width")).ok)
-                win_opts.col_width = v.u.i;
-        if ((v = toml_table_int(tbl, "use_cell_color_for_sep")).ok)
-                win_opts.use_cell_color_for_sep = v.u.b;
+void
+get_color_options(toml_table_t *tbl)
+{
+        report("Getting [color]");
+        toml_value_t v;
+        if ((v = toml_table_string(tbl, "ui")).ok) toml_cpyfree(col_opts.ui, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "cell_over")).ok) toml_cpyfree(col_opts.cell_over, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "cell_selected")).ok) toml_cpyfree(col_opts.cell_selected, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "ln_over")).ok) toml_cpyfree(col_opts.ln_over, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "ln")).ok) toml_cpyfree(col_opts.ln, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "sheet_ui")).ok) toml_cpyfree(col_opts.sheet_ui, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "sheet_ui_over")).ok) toml_cpyfree(col_opts.sheet_ui_over, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "sheet_ui_selected")).ok) toml_cpyfree(col_opts.sheet_ui_selected, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "ui_cell_text")).ok) toml_cpyfree(col_opts.ui_cell_text, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "insert")).ok) toml_cpyfree(col_opts.insert, col_format(&v.u.s));
 }
 
 void
 get_options(toml_table_t *tbl)
 {
-        toml_table_t *win = toml_table_table(tbl, "window");
-        if (win) get_window_options(win);
+        toml_table_t *stbl;
+
+        stbl = toml_table_table(tbl, "window");
+        if (stbl) get_window_options(stbl);
+
+        stbl = toml_table_table(tbl, "color");
+        if (stbl) get_color_options(stbl);
 }
 
 void
@@ -67,6 +148,7 @@ parse_options(char *content)
                 return;
         }
         get_options(tbl);
+        toml_free(tbl);
 }
 
 void
@@ -89,11 +171,15 @@ path_join(char *base, ...)
 {
         va_list v;
         char *c;
+        int n = 0;
         va_start(v, base);
+        *base = 0;
         while ((c = va_arg(v, char *))) {
+                if (n++) strcat(base, "/");
                 strcat(base, c);
         }
-        *base = 0;
+
+        report("New route: %s", base);
         return base;
 }
 
@@ -103,57 +189,11 @@ void
 parse_options_default_file()
 {
         char path[128];
-        char *home = getenv("HOME") ?: "";
-        parse_options_file(fopen(pjoin(path, "vicel.toml"), "r"));
+        char *home = getenv("HOME");
+        report("home=%s", home);
+        if (home == NULL) home = "";
         parse_options_file(fopen(pjoin(path, home, "vicel.toml"), "r"));
         parse_options_file(fopen(pjoin(path, home, ".config/vicel.toml"), "r"));
         parse_options_file(fopen(pjoin(path, home, ".config/vicel/vicel.toml"), "r"));
+        parse_options_file(fopen(pjoin(path, "vicel.toml"), "r"));
 }
-
-// Example:
-// #include "../header/toml-c.h"
-//
-// char *doc = "\n"
-// 	"host = 'example.com'\n"
-// 	"port = 80\n"
-// 	"\n"
-// 	"[tbl]\n"
-// 	"key = 'value'\n"
-// 	"[tbl.sub]\n"
-// 	"subkey = 'subvalue'\n";
-//
-// int main(void) {
-// 	char errbuf[200];
-// 	toml_table_t *tbl = toml_parse(doc, errbuf, sizeof(errbuf));
-// 	if (!tbl) {
-// 		fprintf(stderr, "ERROR: %s\n", errbuf);
-// 		exit(1);
-// 	}
-//
-// 	// Get specific keys.
-// 	toml_value_t host = toml_table_string(tbl, "host");
-// 	toml_value_t port = toml_table_int(tbl, "port");
-// 	if (!host.ok) // Default values.
-// 		host.u.s = "localhost";
-// 	if (!port.ok)
-// 		host.u.i = 80;
-// 	printf("%s:%ld\n", host.u.s, port.u.i);
-//
-// 	// Get a table.
-// 	toml_table_t *sub_tbl = toml_table_table(tbl, "tbl");
-// 	if (sub_tbl) {
-// 		// Loop over all keys in a table.
-// 		int l = toml_table_len(sub_tbl);
-// 		for (int i = 0; i < l; i++) {
-// 			int keylen;
-// 			const char *key = toml_table_key(sub_tbl, i, &keylen);
-// 			printf("key #%d: %s\n", i, key);
-// 			// TODO: this should return toml_key_t or something, which also
-// 			// includes the type. This actually requires a bit of frobbing with
-// 			// the lexer, as that just sets the type of everything to STRING.
-// 			//
-// 			// Then we can also get rid of toml_table_{string,int,...} and just
-// 			// parse it automatically.
-// 		}
-// 	}
-// }

@@ -1,13 +1,14 @@
 # Issues
 * use after free in some formulas, irregular: I cant reproduce
 * After row or column deletion some formulas may break. [Link](#err1).
+* gdl in col A moves. 
 
 # To-do
 * Improve update screen when it isn't needed to update the full screen.
 * Implement the $ to select what to expand
 * On color() formula delete it should clear color.
 * Add autosave
-* Add config file
+* Add all things to config file
 
 # To-do (maybe)
 * Add more movement stuff

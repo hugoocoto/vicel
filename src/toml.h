@@ -175,7 +175,6 @@ TOML_EXTERN toml_table_t *toml_array_table(const toml_array_t *array, int idx);
 
 
 #define ALIGN8(sz) (((sz) + 7) & ~7)
-#define calloc(x, y) error - forbidden - use CALLOC instead
 static void *
 CALLOC(size_t nmemb, size_t sz)
 {
@@ -187,9 +186,6 @@ CALLOC(size_t nmemb, size_t sz)
         return p;
 }
 
-// some old platforms define strdup macro -- drop it.
-#undef strdup
-#define strdup(x) error - forbidden - use STRDUP instead
 static char *
 STRDUP(const char *s)
 {
@@ -202,9 +198,6 @@ STRDUP(const char *s)
         return p;
 }
 
-// some old platforms define strndup macro -- drop it.
-#undef strndup
-#define strndup(x) error - forbidden - use STRNDUP instead
 static char *
 STRNDUP(const char *s, size_t n)
 {

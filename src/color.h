@@ -36,5 +36,6 @@ void apply_color(char *key);
 void apply_color_custom(char *color);
 char *get_color(char *key);
 void add_color(char *c);
+void set_default_colors();
 
 #endif // !COLOR_H_
