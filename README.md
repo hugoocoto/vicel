@@ -156,6 +156,10 @@ Issues [here](./TODO_ISSUES.md).
 
 ## vicel.toml
 
+The toml parser is not written by myself. I have had problems using commented
+config file. Erasing all the comments fix it. It is not tested at all and a
+unstable feature until I write my own toml parser. 
+
 ``` toml
 # This file contains all the valid fields with their default value. Default
 # values are set by default, you should only have the changed values.
