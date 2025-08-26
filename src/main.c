@@ -27,6 +27,9 @@
 #include "options.h"
 #include "saving.h"
 #include "window.h"
+#include <assert.h>
+#include <signal.h>
+#include <unistd.h>
 
 void
 resize_handler(int s)
@@ -50,6 +53,27 @@ set_resize_handler()
         resize_handler(SIGWINCH); // get current winsize
 }
 
+volatile int should_autosave = 0;
+volatile int save_time = 0;
+
+void
+autosave_handler(int s)
+{
+        assert(s == SIGALRM);
+        if (should_autosave) return;
+        should_autosave = 1;
+        alarm(save_time);
+}
+
+void
+set_autosave_handler()
+{
+        signal(SIGALRM, autosave_handler);
+        save_time = win_opts.save_time;
+        alarm(save_time);
+}
+
+
 void
 reset_at_exit()
 {
@@ -57,6 +81,12 @@ reset_at_exit()
         T_ASBD();
         T_CUSHW();
         fflush(stdout);
+}
+
+void
+catch_sigint()
+{
+        signal(SIGINT, exit);
 }
 
 int
@@ -90,10 +120,12 @@ main(int argc, char *argv[])
         EFFECT(RESET);
         clear_screen();
         atexit(reset_at_exit);
+        catch_sigint();
 
         set_default_colors(); // after parse config file
         load(filename, &active_ctx);
         set_resize_handler();
+        set_autosave_handler();
 
         start_kbhandler(); // loop
 

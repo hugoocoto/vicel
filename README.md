@@ -9,6 +9,7 @@ cells interactively.
 * Keyboard-focused Vim-style motions
 * Lightweight and minimal code
 * Configuration via .toml file
+* Autosave
 
 ## Installation
 You can install **Visual Cell Editor** by running:
@@ -83,6 +84,7 @@ The first non-flag argument is used as the filename.
 * `y`: Yank (copy)
 * `p`: Paste 
 * `r`: Re-render the screen
+* `Ctrl-c`: Exit the program without save
 
 ## Input Format
 Press `i` while the cursor is on a cell.
@@ -177,7 +179,8 @@ col_width = 14                  # Column width (Min is 3: cell_l_sep + cell_r_se
 row_width = 1                   # Other size is not supported 
 use_cell_color_for_sep = true   # Use cell color for separators instead of sheet_ui
 cell_l_sep = " "                # Left separator
-cell_r_sep = " "                # Ritht separator
+cell_r_sep = " "                # Right separator
+save_time = 0                   # Time interval (in seconds) where save is call. 0 means no autosave.
 
 # Top bar
 status_l_stuff = "vicel | "     # Top Left bar text
@@ -188,5 +191,5 @@ status_r_end = "github: hugoocoto/vicel" # Top right-align bar text
 ui_celltext_l_sep = "cell text: " # Bottom Left bar text, before cell repr text
 ui_celltext_m_sep = " ("        # Between cell text and cell type
 ui_celltext_r_sep = ")"         # Before cell type, left-aligned
-ui_status_bottom_end = "None"       # Bottom right-align text
+ui_status_bottom_end = ""       # Bottom right-align text
 ```

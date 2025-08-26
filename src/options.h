@@ -27,6 +27,7 @@ typedef struct win_opts {
         int num_col_width;
         int col_width;
         int row_width;
+        int save_time;
         bool use_cell_color_for_sep;
         char *cell_l_sep;
         char *cell_r_sep;

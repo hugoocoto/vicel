@@ -34,6 +34,7 @@
 #include "window.h"
 
 bool quit = false;
+extern volatile int should_autosave;
 
 void
 should_quit()
@@ -322,6 +323,13 @@ start_kbhandler()
                 }
 
                 print_mapping_buffer(buf, read_index, MAX_MAPPING_LEN, repeat);
+
+                if (should_autosave) {
+                        should_autosave = 0;
+                        report("[Auto save]");
+                        a_save();
+                }
+
                 render();
         }
 
