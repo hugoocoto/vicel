@@ -45,6 +45,13 @@ init_default_values()
                 .use_cell_color_for_sep = true,
                 .cell_l_sep = STRDUP(" "),
                 .cell_r_sep = STRDUP(" "),
+                .ui_celltext_l_sep = strdup("cell text: "),
+                .ui_celltext_m_sep = strdup(" ("),
+                .ui_celltext_r_sep = strdup(")"),
+                .status_l_stuff = strdup("vicel | "),
+                .status_filename = strdup("filename: "),
+                .status_r_end = strdup("github: hugoocoto/vicel"),
+                .ui_status_bottom_end = strdup("(Report issues to hugo.coto@member.fsf.org)"),
         };
 
         col_opts = (Col_opts) {
@@ -67,6 +74,13 @@ free_opts()
 {
         free(win_opts.cell_l_sep);
         free(win_opts.cell_r_sep);
+        free(win_opts.ui_celltext_l_sep);
+        free(win_opts.ui_celltext_m_sep);
+        free(win_opts.ui_celltext_r_sep);
+        free(win_opts.status_l_stuff);
+        free(win_opts.status_filename);
+        free(win_opts.status_r_end);
+        free(win_opts.ui_status_bottom_end);
 
         free(col_opts.ui);
         free(col_opts.cell);
@@ -104,6 +118,13 @@ get_window_options(toml_table_t *tbl)
         if ((v = toml_table_int(tbl, "num_col_width")).ok) win_opts.num_col_width = v.u.i;
         if ((v = toml_table_int(tbl, "col_width")).ok) win_opts.col_width = v.u.i;
         if ((v = toml_table_bool(tbl, "use_cell_color_for_sep")).ok) win_opts.use_cell_color_for_sep = v.u.b;
+        if ((v = toml_table_string(tbl, "ui_celltext_l_sep")).ok) toml_cpyfree(win_opts.ui_celltext_l_sep, v.u.s);
+        if ((v = toml_table_string(tbl, "ui_celltext_m_sep")).ok) toml_cpyfree(win_opts.ui_celltext_m_sep, v.u.s);
+        if ((v = toml_table_string(tbl, "ui_celltext_r_sep")).ok) toml_cpyfree(win_opts.ui_celltext_r_sep, v.u.s);
+        if ((v = toml_table_string(tbl, "status_l_stuff")).ok) toml_cpyfree(win_opts.status_l_stuff, v.u.s);
+        if ((v = toml_table_string(tbl, "status_filename")).ok) toml_cpyfree(win_opts.status_filename, v.u.s);
+        if ((v = toml_table_string(tbl, "status_r_end")).ok) toml_cpyfree(win_opts.status_r_end, v.u.s);
+        if ((v = toml_table_string(tbl, "ui_status_bottom_end")).ok) toml_cpyfree(win_opts.ui_status_bottom_end, v.u.s);
 }
 
 void

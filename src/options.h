@@ -30,6 +30,13 @@ typedef struct win_opts {
         bool use_cell_color_for_sep;
         char *cell_l_sep;
         char *cell_r_sep;
+        char *ui_celltext_l_sep;
+        char *ui_celltext_m_sep;
+        char *ui_celltext_r_sep;
+        char *status_l_stuff;
+        char *status_filename;
+        char *status_r_end;
+        char *ui_status_bottom_end;
 } Win_opts;
 
 typedef struct Col_opts {
@@ -44,7 +51,7 @@ typedef struct Col_opts {
         char *sheet_ui_selected;
         char *ui_cell_text;
         char *insert;
-}Col_opts; 
+} Col_opts;
 
 extern Win_opts win_opts;
 extern Col_opts col_opts;

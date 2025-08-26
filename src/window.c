@@ -106,38 +106,38 @@ void
 print_status_bar2()
 {
         char buf[1024];
-#define UI_CELLTEXT_L_SEP "Cell text: "
-#define UI_CELLTEXT_M_SEP " ("
-#define UI_CELLTEXT_R_SEP ")"
-        char *UI_STATUS_BOTTOM_END =
-        (debug_level == 0) ? "" :
-                             "(Report issues to hugo.coto@member.fsf.org)";
-
-        int asize = strlen(UI_CELLTEXT_L_SEP) + strlen(get_cursor_cell()->input_repr) + strlen(UI_CELLTEXT_M_SEP) + strlen(cm_type_repr(get_cursor_cell()->value.type)) + strlen(UI_CELLTEXT_R_SEP) > active_ctx.ws.ws_col ? 0 : strlen(get_color("ui"));
+        int asize = strlen(win_opts.ui_celltext_l_sep) +
+                    strlen(get_cursor_cell()->input_repr) +
+                    strlen(win_opts.ui_celltext_m_sep) +
+                    strlen(cm_type_repr(get_cursor_cell()->value.type)) +
+                    strlen(win_opts.ui_celltext_r_sep) >
+                    active_ctx.ws.ws_col ?
+                    0 :
+                    strlen(get_color("ui"));
 
         buf[snprintf(buf, active_ctx.ws.ws_col + 1 + asize,
                      "%s%s%s%s%s%s%*.*s",
-                     UI_CELLTEXT_L_SEP,
+                     win_opts.ui_celltext_l_sep,
                      get_cursor_cell()->input_repr,
-                     UI_CELLTEXT_M_SEP,
+                     win_opts.ui_celltext_m_sep,
                      cm_type_repr(get_cursor_cell()->value.type),
-                     UI_CELLTEXT_R_SEP,
+                     win_opts.ui_celltext_r_sep,
                      get_color("ui"),
                      max((int) (active_ctx.ws.ws_col -
-                                +strlen(UI_CELLTEXT_L_SEP) -
-                                +strlen(UI_CELLTEXT_M_SEP) -
-                                +strlen(UI_CELLTEXT_R_SEP) -
+                                +strlen(win_opts.ui_celltext_l_sep) -
+                                +strlen(win_opts.ui_celltext_m_sep) -
+                                +strlen(win_opts.ui_celltext_r_sep) -
                                 +strlen(get_cursor_cell()->input_repr) -
                                 +strlen(cm_type_repr(get_cursor_cell()->value.type))),
                          0),
                      max((int) (active_ctx.ws.ws_col -
-                                +strlen(UI_CELLTEXT_L_SEP) -
-                                +strlen(UI_CELLTEXT_M_SEP) -
-                                +strlen(UI_CELLTEXT_R_SEP) -
+                                +strlen(win_opts.ui_celltext_l_sep) -
+                                +strlen(win_opts.ui_celltext_m_sep) -
+                                +strlen(win_opts.ui_celltext_r_sep) -
                                 +strlen(get_cursor_cell()->input_repr) -
                                 +strlen(cm_type_repr(get_cursor_cell()->value.type))),
                          0),
-                     UI_STATUS_BOTTOM_END)] = 0;
+                     win_opts.ui_status_bottom_end)] = 0;
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(active_ctx.ws.ws_row, 1);
@@ -152,26 +152,23 @@ void
 print_status_bar()
 {
         char buf[1024];
-#define STATUS_L_STUFF "vicel | "
-#define STATUS_FILENAME "filename: "
-#define STATUS_R_END "github: hugoocoto/vicel"
 
         buf[snprintf(buf, active_ctx.ws.ws_col + 1, "%s%s%s%s%*.*s",
-                     STATUS_L_STUFF,
-                     STATUS_FILENAME,
+                     win_opts.status_l_stuff,
+                     win_opts.status_filename,
                      active_ctx.filename ?: "(unnamed)",
                      mappings_buffer,
                      (int) (active_ctx.ws.ws_col -
-                            +strlen(STATUS_L_STUFF) -
+                            +strlen(win_opts.status_l_stuff) -
                             +strlen(active_ctx.filename ?: "(unnamed)") -
                             +strlen(mappings_buffer) -
-                            +strlen(STATUS_FILENAME)),
+                            +strlen(win_opts.status_filename)),
                      (int) (active_ctx.ws.ws_col -
-                            +strlen(STATUS_L_STUFF) -
+                            +strlen(win_opts.status_l_stuff) -
                             +strlen(active_ctx.filename ?: "(unnamed)") -
                             +strlen(mappings_buffer) -
-                            +strlen(STATUS_FILENAME)),
-                     STATUS_R_END)] = 0;
+                            +strlen(win_opts.status_filename)),
+                     win_opts.status_r_end)] = 0;
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(1, 1);
@@ -373,14 +370,14 @@ cm_display(CellMat *mat, int x_off, int y_off, int scr_w, int scr_h, int x0, int
 
                         else if (cell->selected) {
                                 apply_color("sheet_ui_selected");
-                                printf("%s",win_opts.cell_r_sep);
+                                printf("%s", win_opts.cell_r_sep);
                         }
 
                         else {
                                 if (!win_opts.use_cell_color_for_sep) {
                                         apply_color("sheet_ui");
                                 }
-                                printf("%s",win_opts.cell_r_sep);
+                                printf("%s", win_opts.cell_r_sep);
                         }
 
                         _cx += win_opts.col_width;

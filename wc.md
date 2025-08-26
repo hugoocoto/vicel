@@ -6,14 +6,14 @@ File|blank|comment|code
 src/toml.h|268|155|1893
 src/formula.c|84|39|707
 src/cellmap.c|41|24|427
-src/window.c|50|22|340
+src/window.c|49|22|338
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/keyboard.c|41|29|260
 src/mappings.c|44|19|257
 src/builtin.c|28|20|226
+src/options.c|21|20|176
 src/dhm.c|32|20|157
-src/options.c|21|20|155
 src/saving.c|23|19|150
 src/readlain.c|25|29|141
 src/aptree.c|24|26|126
@@ -26,7 +26,7 @@ src/color.c|9|19|62
 src/formula.h|11|22|55
 src/mappings.h|4|19|45
 src/window.h|10|20|38
-src/options.h|7|19|30
+src/options.h|7|19|37
 src/debug.c|5|23|26
 src/debug.h|5|19|20
 src/hm.h|6|21|20
@@ -43,4 +43,4 @@ src/saving.h|4|19|6
 src/readlain.h|5|21|5
 src/test.csv|0|0|1
 --------|--------|--------|--------
-SUM:|951|993|6337
+SUM:|950|993|6363

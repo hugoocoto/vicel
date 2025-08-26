@@ -132,8 +132,7 @@ the following paths: `./vicel.toml`, `~/vicel.toml`, `~/.config/vicel.toml`,
 specified with the `-c` or `--config-file` flag, following with the full path of
 the config file. The format chosen for the file is [toml](https://toml.io). 
 
-The valid fields whith their default values are set in
-[`./vicel.toml`](./vicel.toml).
+The valid fields whith their default values are set [here](#vicel.toml).
 
 ## Latest Version
 [See version](./version.txt)
@@ -152,3 +151,42 @@ Issues [here](./TODO_ISSUES.md).
 
 ## Sheets done by the community
 * *Horario* by @hugoocoto ![](images/image3.png)
+
+## vicel.toml
+
+``` toml
+# This file contains all the valid fields with their default value. Default
+# values are set by default, you should only have the changed values.
+
+[color]
+ui = "49;30"                    # All ui text except ui_text_cell
+ui_cell_text = "49;39;1"        # Cell text representation and previous message
+cell = "49;39"                  # Cell color if not custom color applied
+cell_over = "49;39;7;1"         # Cell color if cursor is over cell
+cell_selected = "49;32"         # Cell color if selected
+ln_over = "49;32;7;1"           # Row/col number/alpha if cursor is in this row/col
+ln = "49;32"                    # Row/col number/alpha default color
+sheet_ui = "49;39"              # UI elements inside sheet as separators
+sheet_ui_over = "45;39;7;1"     # UI elements inside sheet if cursor is over they
+sheet_ui_selected = "45;32"     # UI elements inside sheet if assigned cell is selected
+insert = "49;39"                # Color used when cell input text is being written
+
+[window]
+num_col_width = 5               # Number column width
+col_width = 14                  # Column width (Min is 3: cell_l_sep + cell_r_sep + 1)
+row_width = 1                   # Other size is not supported 
+use_cell_color_for_sep = true   # Use cell color for separators instead of sheet_ui
+cell_l_sep = " "                # Left separator
+cell_r_sep = " "                # Ritht separator
+
+# Top bar
+status_l_stuff = "vicel | "     # Top Left bar text
+status_filename = "fn: "  # Between status_l_stuff and filename              
+status_r_end = "github: hugoocoto/vicel" # Top right-align bar text 
+
+# Bottom bar
+ui_celltext_l_sep = "cell text: " # Bottom Left bar text, before cell repr text
+ui_celltext_m_sep = " ("        # Between cell text and cell type
+ui_celltext_r_sep = ")"         # Before cell type, left-aligned
+ui_status_bottom_end = "None"       # Bottom right-align text
+```
