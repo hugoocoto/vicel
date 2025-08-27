@@ -10,6 +10,7 @@ cells interactively. https://hugoocoto.github.io/vicel/
 * Lightweight and minimal code
 * Configuration via .toml file
 * Autosave
+* Mouse support
 
 ## Installation
 You can install **Visual Cell Editor** by running:
