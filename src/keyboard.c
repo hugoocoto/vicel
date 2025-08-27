@@ -73,6 +73,10 @@ get_escape_sequence()
         char buf[16];
         ssize_t n;
         char ret = 0;
+        char btn;
+        unsigned char c, r;
+        int cellc;
+        int cellr;
 
         flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
@@ -81,10 +85,44 @@ get_escape_sequence()
         case 0:
         case -1:
                 break;
+
         default:
-                buf[n] = 0;
-                if (buf[0] == '[')
-                        ret = 128 + buf[1];
+                if (win_opts.use_mouse && sscanf(buf, "[M%c%c%c", &btn, &c, &r) == 3) {
+                        cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
+                        cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
+                        int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
+                        int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
+                        set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_r, cellr, active_ctx.max_display_c);
+                        switch (btn) {
+                        case '@': /* mouse left hold move */
+                        case 'C': /* mouse move */
+                                if (cellc >= 0 && cellc < active_ctx.max_display_c)
+                                        active_ctx.cursor_pos_c = cellc;
+                                if (cellr >= 0 && cellr < active_ctx.max_display_r)
+                                        active_ctx.cursor_pos_r = cellr;
+                                break;
+                        case ' ': /* mouse left press */
+                                a_delete();
+                                break;
+                        case '#': /* mouse release */
+                                a_paste();
+                                break;
+                        case '"': /* mouse right press */
+                        case 'B': /* mouse right hold move */
+                        case 'a': /* mouse wheel up */
+                        case '`': /* mouse wheel down */
+                        case '!': /* mouse wheel press */
+                        case 'A': /* mouse wheel hold move */
+                        default:
+                                break;
+                        }
+
+                } else {
+                        buf[n] = 0;
+                        if (buf[0] == '[')
+                                ret = 128 + buf[1];
+                }
+                break;
         }
         report("[KB] Escape sequence: \033%s", buf);
         fcntl(STDIN_FILENO, F_SETFL, flags);
@@ -330,9 +368,9 @@ start_kbhandler()
                         set_ui_report("save");
                         a_save();
 
-                /* I dont know If I have to clear it here. */
                 } else
-                        clear_ui_report();
+                        /* Clear on 2 secs */
+                        clear_ui_report_ontimeout(2);
 
                 render();
         }

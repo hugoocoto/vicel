@@ -38,6 +38,7 @@ typedef struct win_opts {
         char *status_filename;
         char *status_r_end;
         char *ui_status_bottom_end;
+        bool use_mouse;
 } Win_opts;
 
 typedef struct Col_opts {

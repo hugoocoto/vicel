@@ -1,11 +1,12 @@
 # Issues
 * use after free in some formulas, irregular: I cant reproduce
 * After row or column deletion some formulas may break. [Link](#err1).
+* Input/edit text on the last cell fails
 
 # To-do
+* Toml subset parser
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula delete it should clear color.
-* Add message box on UI to show like reports but for user.
 
 # To-do (maybe)
 * Add more movement stuff
@@ -25,6 +26,7 @@
 * Behaviour of corner cases in formulas for builtin, ranges and comparison.
 * Possible leak at return Error from invalid stuff
 * Deletion
+* Options
 
 ### err1
 After delete a row or a column, ALL formulas that use cells that are moved

@@ -23,6 +23,7 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "toml.h"
+#include <stdbool.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
@@ -44,6 +45,7 @@ init_default_values()
                 .row_width = 1,
                 .save_time = 0,
                 .use_cell_color_for_sep = true,
+                .use_mouse = true,
                 .cell_l_sep = STRDUP(" "),
                 .cell_r_sep = STRDUP(" "),
                 .ui_celltext_l_sep = strdup("cell text: "),
@@ -122,6 +124,7 @@ get_window_options(toml_table_t *tbl)
         if ((v = toml_table_int(tbl, "col_width")).ok) win_opts.col_width = v.u.i;
         if ((v = toml_table_int(tbl, "save_time")).ok) win_opts.save_time = v.u.i;
         if ((v = toml_table_bool(tbl, "use_cell_color_for_sep")).ok) win_opts.use_cell_color_for_sep = v.u.b;
+        if ((v = toml_table_bool(tbl, "use_mouse")).ok) win_opts.use_mouse = v.u.b;
         if ((v = toml_table_string(tbl, "ui_celltext_l_sep")).ok) toml_cpyfree(win_opts.ui_celltext_l_sep, v.u.s);
         if ((v = toml_table_string(tbl, "ui_celltext_m_sep")).ok) toml_cpyfree(win_opts.ui_celltext_m_sep, v.u.s);
         if ((v = toml_table_string(tbl, "ui_celltext_r_sep")).ok) toml_cpyfree(win_opts.ui_celltext_r_sep, v.u.s);

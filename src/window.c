@@ -27,25 +27,33 @@
 #include "escape_code.h"
 #include "mappings.h"
 #include "options.h"
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include <unistd.h>
 
 Context active_ctx = INIT_CONTEXT;
 char ui_report[64] = "";
+time_t ui_report_update_time = 0;
 
 void
-set_ui_report(char *c)
+set_ui_report(const char *c, ...)
 {
-        size_t size = min(strlen(c), sizeof ui_report - 1);
-        memcpy(ui_report, c, size);
-        ui_report[size] = 0;
+        va_list v;
+        va_start(v, c);
+        vsnprintf(ui_report, sizeof ui_report, c, v);
+        ui_report_update_time = time(NULL);
+        va_end(v);
 }
 
 void
 clear_ui_report()
 {
         *ui_report = 0;
+}
+
+void
+clear_ui_report_ontimeout(time_t maxtime)
+{
+        if (*ui_report && time(NULL) - ui_report_update_time > maxtime)
+                *ui_report = 0;
 }
 
 int

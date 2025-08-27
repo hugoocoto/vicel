@@ -73,6 +73,20 @@ set_autosave_handler()
         alarm(save_time);
 }
 
+void
+toggle_mouse_support()
+{
+        static bool enabled = false;
+        if (win_opts.use_mouse == false) return;
+        set_ui_report("Mouse on");
+        if (!enabled) {
+                printf("\033[?1003h");
+                enabled = true;
+        } else {
+                printf("\033[?1003l");
+                enabled = false;
+        }
+}
 
 void
 reset_at_exit()
@@ -80,6 +94,7 @@ reset_at_exit()
         EFFECT(RESET);
         T_ASBD();
         T_CUSHW();
+        toggle_mouse_support();
         fflush(stdout);
 }
 
@@ -118,6 +133,7 @@ main(int argc, char *argv[])
         if (debug_level == 0) T_ASBE();
         T_CUHDE();
         EFFECT(RESET);
+        toggle_mouse_support();
         clear_screen();
         atexit(reset_at_exit);
         catch_sigint();

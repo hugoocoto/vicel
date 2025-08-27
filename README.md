@@ -136,6 +136,14 @@ the config file. The format chosen for the file is [toml](https://toml.io).
 
 The valid fields whith their default values are set [here](#vicel.toml).
 
+## Mouse mappings
+It is an experimental feature. (Need to set window.use_mouse to true). 
+
+* Drag and drop: Left click over a cell, move cursor without release left click
+  and then release left over another cell. It should delete the first cell and
+  paste it in the second.
+* Moving the mouse moves the cursor to the cell pointed by the mouse cursor.
+
 ## Latest Version
 [See version](./version.txt)
 
@@ -187,6 +195,7 @@ use_cell_color_for_sep = true   # Use cell color for separators instead of sheet
 cell_l_sep = " "                # Left separator
 cell_r_sep = " "                # Right separator
 save_time = 0                   # Time interval (in seconds) where save is call. 0 means no autosave.
+use_mouse = false               # Enable mouse capturing
 
 # Top bar
 status_l_stuff = "vicel | "     # Top Left bar text
