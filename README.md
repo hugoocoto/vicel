@@ -161,8 +161,9 @@ config file. Erasing all the comments fix it. It is not tested at all and a
 unstable feature until I write my own toml parser. 
 
 ``` toml
-# This file contains all the valid fields with their default value. Default
-# values are set by default, you should only have the changed values.
+# This file contains all the valid fields with their default (? Maybe not)
+# value. Default values are set by default, you should only have the changed
+# values.
 
 [color]
 ui = "49;30"                    # All ui text except ui_text_cell
@@ -189,12 +190,12 @@ save_time = 0                   # Time interval (in seconds) where save is call.
 
 # Top bar
 status_l_stuff = "vicel | "     # Top Left bar text
-status_filename = "fn: "  # Between status_l_stuff and filename              
+status_filename = "filename: "  # Between status_l_stuff and filename              
 status_r_end = "github: hugoocoto/vicel" # Top right-align bar text 
 
 # Bottom bar
 ui_celltext_l_sep = "cell text: " # Bottom Left bar text, before cell repr text
 ui_celltext_m_sep = " ("        # Between cell text and cell type
-ui_celltext_r_sep = ")"         # Before cell type, left-aligned
+ui_celltext_r_sep = ") "        # Before cell type, left-aligned
 ui_status_bottom_end = ""       # Bottom right-align text
 ```
