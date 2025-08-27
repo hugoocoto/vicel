@@ -3,10 +3,62 @@
 <head>
   <meta charset="UTF-8">
   <title>Mi Página</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2em;
+      font-weight: bold;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .links {
+      text-align: center;
+      width: 100%;
+    }
+
+    hr {
+      width: 60%;
+      margin: 20px auto;
+      border: 1px solid #333;
+    }
+
+    .links a {
+      margin: 0 15px;
+      text-decoration: none;
+      color: #0077cc;
+      font-size: 1.2em;
+    }
+
+    .links a:hover {
+      color: #005599;
+    }
+  </style>
 </head>
 <body>
-  <h1>¡Hola, mundo!</h1>
-  <p>Esta es mi primera página en GitHub Pages.</p>
+  <header>Vicel</header>
+  <main>
+    <div class="links">
+      <hr>
+      <a href="#link1">Link 1</a>
+      <a href="#link2">Link 2</a>
+      <a href="#link3">Link 3</a>
+      <hr>
+    </div>
+  </main>
 </body>
 </html>
-
