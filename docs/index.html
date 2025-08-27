@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mi Página</title>
+  <title>Vicel</title>
   <style>
     body {
       margin: 0;
@@ -10,13 +10,27 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      background: #f9f9f9;
     }
 
     header {
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px; /* espacio entre la imagen y el texto */
       padding: 20px;
       font-size: 2em;
       font-weight: bold;
+      background: #0077cc;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    header img {
+      width: 50px;   /* tamaño de la imagen */
+      height: 50px;
+      border-radius: 50%; /* opcional: hace la imagen circular */
+      object-fit: cover;
     }
 
     main {
@@ -34,7 +48,9 @@
     hr {
       width: 60%;
       margin: 20px auto;
-      border: 1px solid #333;
+      border: none;
+      border-top: 1px dashed #777;
+      opacity: 0.6;
     }
 
     .links a {
@@ -42,21 +58,45 @@
       text-decoration: none;
       color: #0077cc;
       font-size: 1.2em;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    .links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 100%;
+      height: 2px;
+      background: #0077cc;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+      transform-origin: right;
     }
 
     .links a:hover {
       color: #005599;
     }
+
+    .links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
   </style>
 </head>
 <body>
-  <header>Vicel</header>
+  <header>
+    <img src="../images/logo.png" alt="Logo">
+    Vicel
+  </header>
   <main>
     <div class="links">
       <hr>
-      <a href="#link1">Link 1</a>
-      <a href="#link2">Link 2</a>
-      <a href="#link3">Link 3</a>
+      <a href="https://github.com/hugoocoto/vicel">Vicel github</a>
+      <a href="https://github.com/hugoocoto">About Hugo Coto</a>
+      <a
+              href="https://github.com/hugoocoto/vicel/blob/main/docs/vicel_reference.pdf">Pdf reference</a>
       <hr>
     </div>
   </main>
