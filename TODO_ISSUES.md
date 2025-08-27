@@ -4,9 +4,7 @@
 
 # To-do
 * Improve update screen when it isn't needed to update the full screen.
-* Implement the $ to select what to expand
 * On color() formula delete it should clear color.
-* Add all things to config file (done?)
 * Add message box on UI to show like reports but for user.
 
 # To-do (maybe)

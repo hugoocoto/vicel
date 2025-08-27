@@ -26,6 +26,7 @@
 #include "eval.h"
 // #include "keyboard.h"
 #include "window.h"
+#include <assert.h>
 
 Cell *cell_self = NULL;
 jmp_buf parsing_error_env;
@@ -46,7 +47,7 @@ build_range(Cell *cstart, Cell *cend)
 
         cs = cm_get_cell_name(active_ctx.body, cstart);
         if (cs == NULL) return VALUE_ERROR;
-        if (parse_coords(cs, &r.as.range.startx, &r.as.range.starty)) {
+        if (parse_coords(cs, &r.as.range.startx, &r.as.range.starty, 0, 0)) {
                 free(cs);
                 return VALUE_ERROR;
         }
@@ -54,7 +55,7 @@ build_range(Cell *cstart, Cell *cend)
 
         cs = cm_get_cell_name(active_ctx.body, cend);
         if (cs == NULL) return VALUE_ERROR;
-        if (parse_coords(cs, &r.as.range.endx, &r.as.range.endy)) {
+        if (parse_coords(cs, &r.as.range.endx, &r.as.range.endy, 0, 0)) {
                 free(cs);
                 return VALUE_ERROR;
         }
@@ -90,10 +91,6 @@ refresh_formula_value(Cell *cell)
         }
         cell->updated = true;
         cell->value.as.formula->value = eval_expr(cell->value.as.formula->body);
-        // free(cell->repr);
-        // cell->repr = get_repr(cell->value.as.formula->value);
-        // free(cell->input_repr);
-        // cell->input_repr = get_input_repr(cell->value);
         update_repr(cell);
 
         for_da_each(c, cell->subscribers) cm_notify(cell, *c);
@@ -166,11 +163,12 @@ new_range(Cell *cstart, Cell *cend)
 }
 
 Expr *
-new_identifier(Cell *c)
+new_identifier(Cell *c, char *name)
 {
         Expr *e = new_expr();
         e->type = EXPR_IDENTIFIER;
         e->as.identifier.cell = c;
+        e->as.identifier.name = strdup(name);
         return e;
 }
 
@@ -225,7 +223,12 @@ get_identifier(char **c)
 {
         char *id = *c;
         char prev;
-        while (isalnum(**c)) {
+        if (**c == '$') ++*c;
+        while (isalpha(**c)) {
+                ++*c;
+        }
+        if (**c == '$') ++*c;
+        while ('0' <= **c && **c <= '9') {
                 ++*c;
         }
         prev = **c;
@@ -403,7 +406,7 @@ get_literal(Token **t)
                         return ret;
                 }
                 cm_subscribe(cell, cell_self);
-                return new_identifier(cell);
+                return new_identifier(cell, id);
         }
 
         default:
@@ -583,14 +586,9 @@ get_ast_repr(Expr *e, char *buffer, size_t len)
                 get_ast_repr(e->as.unop.rhs, buffer, len);
                 break;
 
-        case EXPR_IDENTIFIER: {
-                char *c;
-                snprintf(buffer + strlen(buffer), len, "%s",
-                         c = cm_get_cell_name(active_ctx.body,
-                                              e->as.identifier.cell));
-                free(c);
+        case EXPR_IDENTIFIER:
+                snprintf(buffer + strlen(buffer), len, "%s", e->as.identifier.name);
                 break;
-        }
 
         case EXPR_FUNC:
                 is_name = true;
@@ -655,21 +653,19 @@ build_formula(char *_str, Cell *self)
                 exit(ERR_INVFORM);
         }
 
+        char *str = strdup(_str);
         /* Execute this if some error is reported while parsing it */
         if (setjmp(parsing_error_env)) {
+                report("parsing error at formula");
                 clear_cell(self);
-                self->value.as.text = _str;
+                self->value.as.text = str;
                 self->value.type = TYPE_TEXT;
-                // free(self->repr);
-                // self->repr = str;
-                // free(self->input_repr);
-                // self->input_repr = get_input_repr(self->value);
                 update_repr(self);
                 self->value.as.text = self->repr;
+                free(str);
                 return;
         }
 
-        char *str = strdup(_str);
         clear_cell(self);
         self->value.as.formula = calloc(1, sizeof(Formula));
         self->value.type = TYPE_FORMULA;
@@ -709,6 +705,7 @@ free_expr(Expr *e)
                         free(e->as.literal.value.as.text);
                 break;
         case EXPR_IDENTIFIER:
+                free(e->as.identifier.name);
                 break;
         case EXPR_FUNC: {
                 Expr *cur = e->as.func.args;
@@ -767,16 +764,24 @@ dup_tokens(Token *t)
 }
 
 char *
-create_id(int r, int c)
+create_id(int r, int c, bool freeze_r, bool freeze_c)
 {
-        char buf[8];
+        char buf[10];
         int start = 0;
+        if (freeze_c) {
+                buf[start] = '$';
+                ++start;
+        }
         do {
-                memcpy(buf + 1, buf, start + 1);
+                memmove(buf + 1, buf, start + 1);
                 buf[start] = 'A' + c % ('Z' - 'A' + 1);
                 c /= 'Z' - 'A' + 1;
                 ++start;
         } while (c);
+        if (freeze_r) {
+                buf[start] = '$';
+                ++start;
+        }
         snprintf(buf + start, sizeof buf - start, "%d", r);
         return strdup(buf);
 }
@@ -785,25 +790,33 @@ static __attribute__((constructor)) void
 test_create_id()
 {
         char *c0, *c1, *c2;
-        assert(!strcmp(c0 = create_id(0, 0), "A0"));
-        assert(!strcmp(c1 = create_id(2, 0), "A2"));
-        assert(!strcmp(c2 = create_id(0, 2), "C0"));
+        char *c3, *c4, *c5;
+        assert(!strcmp(c0 = create_id(0, 0, false, false), "A0"));
+        assert(!strcmp(c1 = create_id(2, 0, false, false), "A2"));
+        assert(!strcmp(c2 = create_id(0, 2, false, false), "C0"));
+        assert(!strcmp(c3 = create_id(0, 0, true, false), "A$0"));
+        assert(!strcmp(c4 = create_id(2, 0, false, true), "$A2"));
+        assert(!strcmp(c5 = create_id(0, 2, true, true), "$C$0"));
         free(c0);
         free(c1);
         free(c2);
+        free(c3);
+        free(c4);
+        free(c5);
 }
 
 static int
 extend_identifiers(Token *t, int r, int c)
 {
         int rr, cc;
+        bool freeze_r, freeze_c;
         while (t) {
                 if (t->type == TOK_IDENTIFIER) {
-                        if (!parse_coords(t->as.id, &cc, &rr)) {
-                                cc += c;
-                                rr += r;
+                        if (!parse_coords(t->as.id, &cc, &rr, &freeze_r, &freeze_c)) {
+                                if (!freeze_c) cc += c;
+                                if (!freeze_r) rr += r;
                                 free(t->as.id);
-                                t->as.id = create_id(rr, cc);
+                                t->as.id = create_id(rr, cc, freeze_r, freeze_c);
                         }
                 }
                 t = t->next;

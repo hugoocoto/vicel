@@ -180,8 +180,7 @@ get_input_repr(Value v)
         case TYPE_BOOL:
                 return strdup(v.as.bol ? "true" : "false");
         case TYPE_FORMULA: {
-                char buffer[128] = "= \0";
-                report("TEMP: too big buffer usage at %s:%d", __FILE_NAME__, __LINE__);
+                char buffer[128] = "= ";
                 get_ast_repr(v.as.formula->body, buffer, sizeof buffer - 1);
                 return strdup(buffer);
         }
@@ -189,8 +188,8 @@ get_input_repr(Value v)
                 char buffer[16] = "";
                 char *c1, *c2;
                 snprintf(buffer, sizeof buffer, "%s:%s",
-                         c1 = create_id(v.as.range.starty, v.as.range.startx),
-                         c2 = create_id(v.as.range.endy, v.as.range.endx));
+                         c1 = create_id(v.as.range.starty, v.as.range.startx, false, false),
+                         c2 = create_id(v.as.range.endy, v.as.range.endx, false, false));
                 free(c1);
                 free(c2);
                 return strdup(buffer);
@@ -206,11 +205,12 @@ get_input_repr(Value v)
 char *
 get_repr(Value v)
 {
+        report("get_repr for v: %s", cm_type_repr(v.type));
         switch (v.type) {
         case TYPE_NUMBER:
                 return get_num_repr(v.as.num);
         case TYPE_TEXT:
-                return strdup(v.as.text);
+                return strdup(v.as.text ?: "");
         case TYPE_BOOL:
                 return strdup(v.as.bol ? "true" : "false");
         case TYPE_FORMULA:
@@ -221,8 +221,8 @@ get_repr(Value v)
                 char buffer[16] = "";
                 char *c1, *c2;
                 snprintf(buffer, sizeof buffer, "%s:%s",
-                         c1 = create_id(v.as.range.starty, v.as.range.startx),
-                         c2 = create_id(v.as.range.endy, v.as.range.endx));
+                         c1 = create_id(v.as.range.starty, v.as.range.startx, false, false),
+                         c2 = create_id(v.as.range.endy, v.as.range.endx, false, false));
                 free(c1);
                 free(c2);
                 report("Range for (%d,%d => %d,%d), ",
@@ -484,7 +484,7 @@ cm_get_cell_name(CellMat *cm, Cell *c)
         for (i = 0; i < cm->size; i++) {
                 for (j = 0; j < cm->data->size; j++) {
                         if (&cm->data[i].data[j] == c) {
-                                return create_id(i, j);
+                                return create_id(i, j, false, false);
                         }
                 }
         }

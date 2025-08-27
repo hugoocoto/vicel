@@ -40,7 +40,7 @@ typedef struct Expr {
                 struct { Value value; } literal;
                 struct { struct Expr *lhs; char *op; struct Expr *rhs; } binop;
                 struct { char *op; struct Expr *rhs; } unop;
-                struct { Cell *cell; } identifier;
+                struct { Cell *cell; char* name; } identifier;
                 struct { struct Expr* name; struct Expr* args; } func;
         } as;
         struct Expr * next; 
@@ -82,7 +82,7 @@ Expr *parse_formula(char *, Cell *self);
 void destroy_formula(Cell *c);
 
 Formula *formula_extend(Cell *self, Formula *f, int r, int c);
-void get_ast_repr(Expr *e, char *buffer, size_t leng); // get a0+3/2 from expression
-char *create_id(int x, int y);            // return A + y 0 + x
+void get_ast_repr(Expr *e, char *buffer, size_t leng); 
+char * create_id(int r, int c, bool freeze_r, bool freeze_c);
 
 #endif //! FORMULA_H_

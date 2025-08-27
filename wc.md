@@ -4,9 +4,9 @@ cloc|github.com/AlDanial/cloc v 2.06
 File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/toml.h|268|155|1893
-src/formula.c|84|39|707
+src/formula.c|84|31|728
 src/cellmap.c|41|24|427
-src/window.c|49|22|338
+src/window.c|50|22|348
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/keyboard.c|43|29|266
@@ -43,4 +43,4 @@ src/saving.h|4|19|6
 src/readlain.h|5|21|5
 src/test.csv|0|0|1
 --------|--------|--------|--------
-SUM:|957|993|6401
+SUM:|958|985|6432

@@ -28,19 +28,29 @@
 #include "mappings.h"
 #include "options.h"
 
-
 Context active_ctx = INIT_CONTEXT;
 
 int
-parse_coords(char *c, int *x, int *y)
+parse_coords(char *c, int *x, int *y, bool *freeze_r, bool *freeze_c)
 {
         *x = 0;
         *y = 0;
+        if (freeze_r) *freeze_r = false;
+        if (freeze_c) *freeze_c = false;
 
+        if (*c == '$') {
+                if (freeze_c) *freeze_c = true;
+                ++c;
+        }
         if (!isalpha(*c)) return 1;
         while (isalpha(*c)) {
                 *x *= 'Z' - 'A' + 1;
                 *x += toupper(*c) - 'A';
+                ++c;
+        }
+
+        if (*c == '$') {
+                if (freeze_r) *freeze_r = true;
                 ++c;
         }
         if (*c < '0' || *c > '9') return 1;
@@ -49,6 +59,7 @@ parse_coords(char *c, int *x, int *y)
                 *y += *c - '0';
                 ++c;
         }
+
         return 0;
 }
 
@@ -56,7 +67,7 @@ Cell *
 get_cell_from_coords(char *coords)
 {
         int x, y;
-        if (parse_coords(coords, &x, &y)) {
+        if (parse_coords(coords, &x, &y, 0, 0)) {
                 report("Impossible to parse coords: %s", coords);
                 return NULL;
         }

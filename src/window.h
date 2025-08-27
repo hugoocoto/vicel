@@ -61,7 +61,7 @@ void render();
 void cursor_gotocell(int x, int y);
 void print_mapping_buffer(char *buf, int len, int n, int repeat);
 Cell *get_cell_from_coords(char *coords);
-int parse_coords(char *coords, int *x, int *y);
+int parse_coords(char *c, int *x, int *y, bool *freeze_r, bool *freeze_c);
 
 extern Context active_ctx;
 
