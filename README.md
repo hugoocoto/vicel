@@ -1,7 +1,6 @@
 # Visual Cell Editor
 A terminal-based cell editor for visual spreadsheets. Create, read, and write
-cells interactively. 
-(https://hugoocoto.github.io/vicel/)[https://hugoocoto.github.io/vicel/]
+cells interactively. https://hugoocoto.github.io/vicel/
 ![Screenshot](images/image.png)
 
 ## Features
