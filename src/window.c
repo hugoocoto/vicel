@@ -27,8 +27,26 @@
 #include "escape_code.h"
 #include "mappings.h"
 #include "options.h"
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 Context active_ctx = INIT_CONTEXT;
+char ui_report[64] = "";
+
+void
+set_ui_report(char *c)
+{
+        size_t size = min(strlen(c), sizeof ui_report - 1);
+        memcpy(ui_report, c, size);
+        ui_report[size] = 0;
+}
+
+void
+clear_ui_report()
+{
+        *ui_report = 0;
+}
 
 int
 parse_coords(char *c, int *x, int *y, bool *freeze_r, bool *freeze_c)
@@ -117,6 +135,7 @@ void
 print_status_bar2()
 {
         char buf[1024];
+        bool has_ui_report = *ui_report;
         int asize = strlen(win_opts.ui_celltext_l_sep) +
                     strlen(get_cursor_cell()->input_repr) +
                     strlen(win_opts.ui_celltext_m_sep) +
@@ -124,16 +143,16 @@ print_status_bar2()
                     strlen(win_opts.ui_celltext_r_sep) >
                     active_ctx.ws.ws_col ?
                     0 :
-                    strlen(get_color("ui"));
+                    strlen(get_color(has_ui_report ? "ui_report" : "ui"));
 
         buf[snprintf(buf, active_ctx.ws.ws_col + 1 + asize,
-                     "%s%s%s%s%s%s%*.*s",
+                     has_ui_report ? "%s%s%s%s%s%s%-*.*s" : "%s%s%s%s%s%s%*.*s",
                      win_opts.ui_celltext_l_sep,
                      get_cursor_cell()->input_repr,
                      win_opts.ui_celltext_m_sep,
                      cm_type_repr(get_cursor_cell()->value.type),
                      win_opts.ui_celltext_r_sep,
-                     get_color("ui"),
+                     get_color(has_ui_report ? "ui_report" : "ui"),
                      max((int) (active_ctx.ws.ws_col -
                                 +strlen(win_opts.ui_celltext_l_sep) -
                                 +strlen(win_opts.ui_celltext_m_sep) -
@@ -148,7 +167,7 @@ print_status_bar2()
                                 +strlen(get_cursor_cell()->input_repr) -
                                 +strlen(cm_type_repr(get_cursor_cell()->value.type))),
                          0),
-                     win_opts.ui_status_bottom_end)] = 0;
+                     has_ui_report ? ui_report : win_opts.ui_status_bottom_end)] = 0;
 
         assert(active_ctx.status_bar_height == 1);
         T_CUP(active_ctx.ws.ws_row, 1);

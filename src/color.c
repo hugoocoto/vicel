@@ -57,6 +57,7 @@ set_default_colors()
         hmadd(&colors, "sheet_ui_over", strdup(col_opts.sheet_ui_over));
         hmadd(&colors, "sheet_ui_selected", strdup(col_opts.sheet_ui_selected));
         hmadd(&colors, "ui_cell_text", strdup(col_opts.ui_cell_text));
+        hmadd(&colors, "ui_report", strdup(col_opts.ui_report));
         hmadd(&colors, "insert", strdup(col_opts.insert));
 }
 

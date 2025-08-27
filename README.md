@@ -167,6 +167,7 @@ unstable feature until I write my own toml parser.
 [color]
 ui = "49;30"                    # All ui text except ui_text_cell
 ui_cell_text = "49;39;1"        # Cell text representation and previous message
+ui_report = "41;39"             # Error/report message at the bottom right
 cell = "49;39"                  # Cell color if not custom color applied
 cell_over = "49;39;7;1"         # Cell color if cursor is over cell
 cell_selected = "49;32"         # Cell color if selected

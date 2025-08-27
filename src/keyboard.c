@@ -327,8 +327,12 @@ start_kbhandler()
                 if (should_autosave) {
                         should_autosave = 0;
                         report("[Auto save]");
+                        set_ui_report("save");
                         a_save();
-                }
+
+                /* I dont know If I have to clear it here. */
+                } else
+                        clear_ui_report();
 
                 render();
         }

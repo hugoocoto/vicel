@@ -51,6 +51,7 @@ typedef struct Col_opts {
         char *sheet_ui_over;
         char *sheet_ui_selected;
         char *ui_cell_text;
+        char *ui_report;
         char *insert;
 } Col_opts;
 

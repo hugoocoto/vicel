@@ -66,6 +66,7 @@ init_default_values()
                 .sheet_ui_over = Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD),
                 .sheet_ui_selected = Cdup(C_BG_MAGENTA, C_FG_GREEN),
                 .ui_cell_text = Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD),
+                .ui_report = Cdup(C_BG_RED, C_FG_DEFAULT),
                 .insert = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
         };
 }
@@ -93,6 +94,7 @@ free_opts()
         free(col_opts.sheet_ui_over);
         free(col_opts.sheet_ui_selected);
         free(col_opts.ui_cell_text);
+        free(col_opts.ui_report);
         free(col_opts.insert);
 }
 
@@ -143,6 +145,7 @@ get_color_options(toml_table_t *tbl)
         if ((v = toml_table_string(tbl, "sheet_ui_over")).ok) toml_cpyfree(col_opts.sheet_ui_over, col_format(&v.u.s));
         if ((v = toml_table_string(tbl, "sheet_ui_selected")).ok) toml_cpyfree(col_opts.sheet_ui_selected, col_format(&v.u.s));
         if ((v = toml_table_string(tbl, "ui_cell_text")).ok) toml_cpyfree(col_opts.ui_cell_text, col_format(&v.u.s));
+        if ((v = toml_table_string(tbl, "ui_report")).ok) toml_cpyfree(col_opts.ui_report, col_format(&v.u.s));
         if ((v = toml_table_string(tbl, "insert")).ok) toml_cpyfree(col_opts.insert, col_format(&v.u.s));
 }
 
