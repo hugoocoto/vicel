@@ -29,12 +29,30 @@ quite simple, al least for now).
 == About development
 For now it is being developed by Hugo Coto as a side project. He do that
 because for college reasons he has to use the Windows-only mouse-centered
-similar and he almost went ill. The plan for the future is reach a stable
+similar and he almost went ill. The plan for the future is to reach a stable
 version with all and no more than the useful and needed features to have an
 usable program for non professional usage. What I mean with no professional is
 that it's not planned to support any graphs neither economic formulas or such
 specific things. It's true that with builtins someone can adapt vicel to his own
 necessities.
+
+== Installation
+This section would guide you to install vicel from source. Source is
+available in #link("https://github.com/hugoocoto/vicel", "github"). First,
+it's needed to clone the repo to your own machine.
+```sh
+git clone "https://github.com/hugoocoto/vicel"
+cd vicel
+```
+
+Then, there are two options to install it.
++ Local installation: run ```sh make```.
++ Global installation: run ```sh make install```. This would move the
+  executable to #smallcaps("~/.local/bin"), make sure this route is in path.
+
+After installation, it would be available. Note that local installation requires
+```sh ./vicel``` while if installed globally it can be called just by name:
+```sh vicel```.
 
 == Open Vicel
 As vicel is a TUI program you have to start it from the command line. If you
@@ -57,11 +75,11 @@ The options supported are the following:
   [`-m`, `--use-mouse`  ], [Enable mouse support],
   [`-D`, `--debug`      ], [Enable debug output ],
   [`-c`, `--config-file`], [Set custom file path],
-),
+)
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
 a config file in #smallcaps("./config/vicel.toml"), the command line should
-look like that:
+looks like that:
 ```sh
 vicel sheets/table.csv -c config/vicel.toml
 ```
@@ -82,7 +100,7 @@ executed that amount of times. The following table describes the basic movement.
   [ `gg`], [ Go to first cell of the current column],
   [ `G`], [ Go to last cell of the current column],
   [ `g0`], [ Same as `^` and `gg`],
-),
+)
 
 == Write or edit
 For write text in a cell, move the cursor there an press `i`. A text input box
@@ -100,7 +118,7 @@ interpreted as a formula. Other formats would be set to #smallcaps("Text").
   [i], [insert/modify text],
   [d], [delete cell content],
   [v], [toggle cell selection],
-),
+)
 
 The valid types are described in the following table by it's formal
 representation.
@@ -113,10 +131,10 @@ representation.
   [#smallcaps("Number")], [[0-9]+("."[0-9]+)?],
   [#smallcaps("Formula")], ["=" #smallcaps("Formula body")],
   [#smallcaps("Text")], [!#smallcaps("Number") && !#smallcaps("Formula")],
-),
+)
 
 === Formula
-Formulas are expressions that evaluate to a valid value. They start with a
+Formulas are expressions that evaluate to a valid value. They start with an
 equal sign. The function body have to contain a valid expression.
 
 #table(
@@ -135,13 +153,13 @@ equal sign. The function body have to contain a valid expression.
   [sum(A0,A1)],
   table.hline(),
   [Todo: expand formula reference], [], [],
-),
+)
 
 === Advanced write: write and move
 There is a builtin feature to automatically move before insert text. It is
 useful if you need to input a big amount of data in a given direction. The idea
-is to prefix the following commands with a number, to do it for a given number
-of times.
+is to prefix the following commands with a number, to do it for a given
+amount of times.
 
 #table(
   columns: 2,
@@ -149,7 +167,7 @@ of times.
   table.header("Command", "Description"),
   table.hline(),
   [gih, gij, gik, gil], [insert text and move in the given direction],
-),
+)
 
 == Modify sheet structure
 There is some commands to add/delete rows and columns. Note that formula
@@ -193,7 +211,9 @@ following table.
 
 == Copy - Paste
 As a vim user, you would want to copy-paste things around. Unfortunately, it's
-only possible to copy a single cell value and paste it in a single cell. 
+only possible to copy a single cell value and paste it in a single cell. Note
+that deletion also copy the content of the cell, it would sound natural for vim
+users.
 
 #table(
   columns: 2,
@@ -217,3 +237,74 @@ There are another useful commands, described below.
   [r], [Re-render the screen],
   [Ctrl-c], [Quit without save],
 )
+
+== Mouse support
+Despite the early development idea was to create a fully mouseless experience, some users
+may find convenient to do some actions with their mouse. It can be enabled
+setting the option #smallcaps("window.use_mouse") to #smallcaps("true").
+
+This is an experimental feature. At the time of writing, the cursor follows the
+mouse and you can drag and drop cell values using left click (drop on press,
+drag on release).
+
+== Configuration
+
+=== vicel.toml
+
+#box(
+  stroke: black,
+  inset: 10pt,
+)[#align(horizon)[Because of the #smallcaps("toml") parser it doesn't accept
+comments. This would be fixed in the future.]]
+
+
+==== Color
+Options in this table controls colors in all the editor.
+
+```toml
+[color]
+ui = "49;30"                    # All ui text except ui_text_cell
+ui_cell_text = "49;39;1"        # Cell text representation and previous message
+ui_report = "41;39"             # Error/report message at the bottom right
+cell = "49;39"                  # Cell color if not custom color applied
+cell_over = "49;39;7;1"         # Cell color if cursor is over cell
+cell_selected = "49;32"         # Cell color if selected
+ln_over = "49;32;7;1"           # Row/col number/alpha if cursor is in this row/col
+ln = "49;32"                    # Row/col number/alpha default color
+sheet_ui = "49;39"              # UI elements inside sheet as separators
+sheet_ui_over = "45;39;7;1"     # UI elements inside sheet if cursor is over they
+sheet_ui_selected = "45;32"     # UI elements inside sheet if assigned cell is selected
+insert = "49;39"                # Color used when cell input text is being written
+```
+
+==== Window
+Despite of the name, in this table lives all the options that are not colors. In
+the future it would migrate to another table.
+
+```toml
+[window]
+num_col_width = 5               # Number column width
+col_width = 14                  # Column width (min is cell_l_sep + cell_r_sep + 1)
+row_width = 1                   # Other size is not supported
+use_cell_color_for_sep = true   # Use cell color for separators instead of sheet_ui
+cell_l_sep = " "                # Left separator
+cell_r_sep = " "                # Right separator
+save_time = 0                   # Time interval (in seconds) where save is call. 0 means no autosave.
+use_mouse = false               # Enable mouse capturing
+
+```
+
+This is the ui customization, where you can modify how the editor looks like (Also in #smallcaps("window")). 
+
+```toml
+# Top bar
+status_l_stuff = "vicel | "     # Top Left bar text
+status_filename = "filename: "  # Between status_l_stuff and filename
+status_r_end = "github: hugoocoto/vicel" # Top right-align bar text
+
+# Bottom bar
+ui_celltext_l_sep = "cell text: " # Bottom Left bar text, before cell repr text
+ui_celltext_m_sep = " ("        # Between cell text and cell type
+ui_celltext_r_sep = ") "        # Before cell type, left-aligned
+ui_status_bottom_end = ""       # Bottom right-align text
+```
