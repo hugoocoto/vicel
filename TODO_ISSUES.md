@@ -1,7 +1,6 @@
 # Issues
 * use after free in some formulas, irregular: I cant reproduce
 * After row or column deletion some formulas may break. [Link](#err1).
-* gdl in col A moves. 
 
 # To-do
 * Improve update screen when it isn't needed to update the full screen.

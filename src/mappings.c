@@ -300,8 +300,9 @@ a_delete_left_col()
 void
 a_delete_right_col()
 {
+        bool zero = active_ctx.cursor_pos_c == 0;
         a_delete_left_col();
-        a_move_cursor_right();
+        if (!zero) a_move_cursor_right();
 }
 
 void
@@ -315,6 +316,7 @@ a_delete_up_row()
 void
 a_delete_down_row()
 {
+        bool zero = active_ctx.cursor_pos_r == 0;
         a_delete_up_row();
-        a_move_cursor_down();
+        if (!zero) a_move_cursor_down();
 }
