@@ -6,44 +6,60 @@
   <style>
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: "Segoe UI", Arial, sans-serif;
       display: flex;
       flex-direction: column;
       height: 100vh;
-      background: #f9f9f9;
-    }
-
-    img {
-      width: 40%;   /* tamaño de la imagen */
-      border-radius: 50%; /* opcional: hace la imagen circular */
-      object-fit: cover;
+      background: linear-gradient(135deg, #f9f9f9, #eaeaea);
+      color: #333;
     }
 
     main {
       flex: 1;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      justify-content: center; /* centra horizontalmente el bloque */
+      align-items: center;     /* centra verticalmente */
+    }
+
+    .content {
+      display: flex;           
+      align-items: center;     /* centra verticalmente la imagen y links */
+      gap: 60px;               /* espacio entre imagen y links */
+      padding: 20px 40px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+
+    img {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #0077cc;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .links {
-      text-align: center;
-      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
     }
 
-    hr {
-      width: 60%;
-      margin: 20px auto;
+    .links hr {
+      width: 100%;
       border: none;
-      border-top: 1px dashed #777;
-      opacity: 0.6;
+      border-top: 1px dashed #aaa;
+      opacity: 0.5;
+      margin: 5px 0;
     }
 
     .links a {
-      margin: 0 15px;
       text-decoration: none;
       color: #0077cc;
       font-size: 1.2em;
+      font-weight: 500;
       position: relative;
       transition: color 0.3s ease;
     }
@@ -52,7 +68,7 @@
       content: "";
       position: absolute;
       left: 0;
-      bottom: -3px;
+      bottom: -4px;
       width: 100%;
       height: 2px;
       background: #0077cc;
@@ -72,16 +88,16 @@
   </style>
 </head>
 <body>
-  <header>
-  </header>
   <main>
-    <img src="https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/logo.png" alt="Logo">
-    <div class="links">
-      <hr>
-      <a href="https://github.com/hugoocoto/vicel">Vicel github</a>
-      <a href="https://github.com/hugoocoto">About Hugo Coto</a>
-      <a href="https://github.com/hugoocoto/vicel/blob/main/docs/vicel_reference.pdf">Pdf reference</a>
-      <hr>
+    <div class="content">
+      <img src="https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/logo.png" alt="Logo">
+      <div class="links">
+        <hr>
+        <a href="https://github.com/hugoocoto/vicel">Vicel github</a>
+        <a href="https://github.com/hugoocoto">About Hugo Coto</a>
+        <a href="https://github.com/hugoocoto/vicel/blob/main/docs/vicel_reference.pdf">Pdf reference</a>
+        <hr>
+      </div>
     </div>
   </main>
 </body>
