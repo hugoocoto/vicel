@@ -773,7 +773,7 @@ create_id(int r, int c, bool freeze_r, bool freeze_c)
                 ++start;
         }
         do {
-                memmove(buf + 1, buf, start + 1);
+                memmove(buf + start + 1, buf + start, start + 1);
                 buf[start] = 'A' + c % ('Z' - 'A' + 1);
                 c /= 'Z' - 'A' + 1;
                 ++start;

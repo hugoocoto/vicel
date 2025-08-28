@@ -7,15 +7,15 @@ src/toml.h|268|155|1893
 src/formula.c|84|31|728
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
-src/keyboard.c|46|30|304
+src/keyboard.c|48|31|314
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/mappings.c|44|19|259
 src/builtin.c|28|20|226
+src/readlain.c|26|30|201
 src/options.c|21|20|184
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
-src/readlain.c|25|29|141
 src/aptree.c|24|26|126
 src/hm.c|31|23|115
 src/main.c|21|20|114
@@ -43,4 +43,4 @@ src/saving.h|4|19|6
 src/readlain.h|5|21|5
 src/test.csv|0|0|1
 --------|--------|--------|--------
-SUM:|964|986|6522
+SUM:|967|988|6592

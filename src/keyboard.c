@@ -36,6 +36,8 @@
 bool quit = false;
 extern volatile int should_autosave;
 
+void get_set_cell_input();
+
 void
 should_quit()
 {
@@ -77,6 +79,7 @@ get_escape_sequence()
         unsigned char c, r;
         int cellc;
         int cellr;
+        void (*after)(void) = NULL;
 
         flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
@@ -87,14 +90,18 @@ get_escape_sequence()
                 break;
 
         default:
+                /* This is ugly as fuck because it's an experimental feature */
                 if (win_opts.use_mouse && sscanf(buf, "[M%c%c%c", &btn, &c, &r) == 3) {
+                        static char hold = 0;
                         cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
                         cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
                         int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
                         int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
                         set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_r, cellr, active_ctx.max_display_c);
+                        report("%d == %d and %d == %d? it should", cellr_max, active_ctx.max_display_r, cellc_max, active_ctx.max_display_c);
                         switch (btn) {
                         case '@': /* mouse left hold move */
+                        case 'B': /* mouse right hold move */
                         case 'C': /* mouse move */
                                 if (cellc >= 0 && cellc < active_ctx.max_display_c)
                                         active_ctx.cursor_pos_c = cellc;
@@ -103,12 +110,16 @@ get_escape_sequence()
                                 break;
                         case ' ': /* mouse left press */
                                 a_delete();
+                                hold = btn;
                                 break;
                         case '#': /* mouse release */
-                                a_paste();
+                                if (hold == ' ') a_paste();
+                                if (hold == '"') after = get_set_cell_input;
+                                hold = 0;
                                 break;
                         case '"': /* mouse right press */
-                        case 'B': /* mouse right hold move */
+                                hold = btn;
+                                break;
                         case 'a': /* mouse wheel up */
                         case '`': /* mouse wheel down */
                         case '!': /* mouse wheel press */
@@ -126,6 +137,8 @@ get_escape_sequence()
         }
         report("[KB] Escape sequence: \033%s", buf);
         fcntl(STDIN_FILENO, F_SETFL, flags);
+
+        if (after) after();
         return ret;
 }
 

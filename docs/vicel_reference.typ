@@ -22,12 +22,12 @@
 
 == Abstract
 Vicel is a free open source TUI spreadsheet editor. You can read, modify and
-save data stored in rows and columns. It aims to be an alternative to privative
-non gratis well known Microsoft program, for non professional usage (as it is
-quite simple, al least for now).
+save data stored in rows and columns. It aims to be an alternative to
+proprietary non gratis well known Microsoft program, for non professional usage
+(as it is quite simple, al least for now).
 
 == About development
-For now it is being developed by Hugo Coto as a side project. He do that
+For now it is being developed by Hugo Coto as a side project. He does that
 because for college reasons he has to use the Windows-only mouse-centered
 similar and he almost went ill. The plan for the future is to reach a stable
 version with all and no more than the useful and needed features to have an
@@ -50,7 +50,7 @@ Then, there are two options to install it.
 + Global installation: run ```sh make install```. This would move the
   executable to #smallcaps("~/.local/bin"), make sure this route is in path.
 
-After installation, it would be available. Note that local installation requires
+After installation, it will be available. Note that local installation requires
 ```sh ./vicel``` while if installed globally it can be called just by name:
 ```sh vicel```.
 
@@ -103,8 +103,8 @@ executed that amount of times. The following table describes the basic movement.
 )
 
 == Write or edit
-For write text in a cell, move the cursor there an press `i`. A text input box
-would be open at the cell. After write, press #smallcaps("Enter") to save it.
+To write text in a cell, move the cursor there and press `i`. A text input box
+would be open at the cell. After writing, press #smallcaps("Enter") to save it.
 The data type would be automatically calculated by the program. Every number,
 with or without a fractional part separated by a dot would be interpreted as a
 #smallcaps("Number"). If the text written starts with a equal sign it would be
@@ -155,6 +155,27 @@ equal sign. The function body have to contain a valid expression.
   [Todo: expand formula reference], [], [],
 )
 
+=== Builtin functions
+Builtin functions can be called in formulas. It takes numbers, text or cells as
+arguments and return a value.
+- *sum(...)*: Sum zero or more arguments and return the result as if adding it
+  one by one.
+- *mul(...)*: Multiply zero or more arguments.
+- *avg(...)*: Get the average of zero or more values.
+- *count(...)*: Get the number of non empty arguments.
+- *min(...)*: Get the min number between arguments.
+- *max(...)*: Get the max number between arguments.
+- *if(cond, iftrue [, else])*: Get the value depending on the condition.
+- *color(color, cells [, ...])*: Apply color to one or more cells
+- *colorb(color, cells [, ...])*: Apply color if not done yet to one or more
+  cells
+- *literal(v)*: Evaluates to v, literally. Can be used to store numbers as
+  strings.
+
+Functions accepts ranges as parameters. They are two valid cells separated by
+a `:`. For example, `sum(A0:A9)` is the same as sum the first 10 numbers in
+row `A`.
+
 === Advanced write: write and move
 There is a builtin feature to automatically move before insert text. It is
 useful if you need to input a big amount of data in a given direction. The idea
@@ -170,7 +191,7 @@ amount of times.
 )
 
 == Modify sheet structure
-There is some commands to add/delete rows and columns. Note that formula
+There are some commands to add/delete rows and columns. Note that formula
 identifier would not change on row/col insertion/deletion.
 
 #table(
@@ -178,8 +199,8 @@ identifier would not change on row/col insertion/deletion.
   stroke: none,
   table.header("Command", "Description"),
   table.hline(),
-  [`g#`], [ Add row/column: see below],
-  [`gd#`], [ Delete row/column: see below],
+  [`g#`], [ Add s row/column: see below],
+  [`gd#`], [ Delete a row/column: see below],
   [`gj`], [ Add a new row after the cursor],
   [`gl`], [ Add a new column after the cursor],
   [`gk`], [ Add a new row before the cursor],
@@ -195,11 +216,11 @@ identifier would not change on row/col insertion/deletion.
 )
 
 == Expand cells
-There is a feature to get the cell value given the previous one and a direction.
-Numbers add 1 and formula identifiers recalculate depending on the direction.
-They can avoid modification if `$` is used before identifier letter (for freeze
-column) or number (for freeze row). The mappings to do this are described in the
-following table.
+There is a feature to fill the next cell value based on the previous one and a
+direction. Numbers add 1 and formula identifiers recalculate depending on the
+direction. You can prevent modification by prefixing the identifier with `$`
+before the column letter (freeze column) or number (freeze row). The mappings to
+do this are described in the following table.
 
 #table(
   columns: 2,
@@ -210,7 +231,7 @@ following table.
 )
 
 == Copy - Paste
-As a vim user, you would want to copy-paste things around. Unfortunately, it's
+As a vim user, you might want to copy-paste things around. Unfortunately, it's
 only possible to copy a single cell value and paste it in a single cell. Note
 that deletion also copy the content of the cell, it would sound natural for vim
 users.
@@ -239,13 +260,17 @@ There are another useful commands, described below.
 )
 
 == Mouse support
-Despite the early development idea was to create a fully mouseless experience, some users
-may find convenient to do some actions with their mouse. It can be enabled
-setting the option #smallcaps("window.use_mouse") to #smallcaps("true").
+Despite the early development idea was to create a fully mouseless experience,
+some users may find convenient to do some actions with their mouse. It can be
+enabled setting the option #smallcaps("window.use_mouse") to #smallcaps("true").
 
 This is an experimental feature. At the time of writing, the cursor follows the
-mouse and you can drag and drop cell values using left click (drop on press,
-drag on release).
+mouse and you can drag and drop cell values using left click (drag on press,
+drop on release).
+
+Left click over a cell enters insert mode. If you click on a cell, its name
+would be appended to input. If you press the mouse over the cell A and move to
+the cell B and then release the left button, the range A:B would be written.
 
 == Configuration
 
@@ -255,7 +280,7 @@ drag on release).
   stroke: black,
   inset: 10pt,
 )[#align(horizon)[Because of the #smallcaps("toml") parser it doesn't accept
-comments. This would be fixed in the future.]]
+  comments. This would be fixed in the future.]]
 
 
 ==== Color
@@ -294,7 +319,7 @@ use_mouse = false               # Enable mouse capturing
 
 ```
 
-This is the ui customization, where you can modify how the editor looks like (Also in #smallcaps("window")). 
+This is the ui customization, where you can modify how the editor looks like (Also in #smallcaps("window")).
 
 ```toml
 # Top bar

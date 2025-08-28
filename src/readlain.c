@@ -18,9 +18,13 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
+#include "cellmap.h"
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
+#include "options.h"
+#include "window.h"
+#include <assert.h>
 
 /* Append text to line BEFORE call readline */
 void rlain_insert(char *text);
@@ -102,14 +106,71 @@ handle_esc()
                                 --rlindex;
                                 T_CUB(1);
                         }
+                        return;
                 }
                 if (!strcmp(buf, "[C")) {
                         if (rline[rlindex]) {
                                 ++rlindex;
                                 T_CUF(1);
-                        };
+                        }
+                        return;
                 }
-                break;
+
+                char *name;
+                char *ns;
+                unsigned char c, r;
+                char btn;
+                static Cell *selection_start;
+                static Cell *selection_end;
+                if (sscanf(buf, "[M%c%c%c", &btn, &c, &r) == 3) {
+                        static char hold = 0;
+                        int cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
+                        int cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
+                        int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
+                        int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
+                        set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_r, cellr, active_ctx.max_display_c);
+                        switch (btn) {
+                        case '"': /* mouse left press */
+                                hold = btn;
+                                break;
+                        case '#': /* mouse release */
+                                if (hold == '"')
+                                        ;
+                                if (hold == ' ') {
+                                        selection_end = cm_get_cell_ptr(active_ctx.body, cellc, cellr);
+                                        if (!selection_start || !selection_end) break;
+                                        ns = name = cm_get_cell_name(active_ctx.body, selection_start);
+                                        assert(name && 2);
+                                        while (*name)
+                                                rlinsert(*name++);
+                                        free(ns);
+                                        if (selection_start != selection_end) {
+                                                rlinsert(':');
+                                                ns = name = cm_get_cell_name(active_ctx.body, selection_end);
+                                                assert(name && 1);
+                                                while (*name)
+                                                        rlinsert(*name++);
+                                                free(ns);
+                                        }
+                                        line_refresh();
+                                }
+                                hold = 0;
+                                break;
+                        case ' ': /* mouse right press */
+                                hold = btn;
+                                selection_start = cm_get_cell_ptr(active_ctx.body, cellc, cellr);
+                                break;
+                        case '@': /* mouse left hold move */
+                        case 'B': /* mouse right hold move */
+                        case 'C': /* mouse move */
+                        case 'a': /* mouse wheel up */
+                        case '`': /* mouse wheel down */
+                        case '!': /* mouse wheel press */
+                        case 'A': /* mouse wheel hold move */
+                        default:
+                                break;
+                        }
+                }
         }
 }
 
@@ -164,7 +225,7 @@ readlain(char *prompt)
         lprompt = prompt;
         T_SCP();
         line_refresh();
-        line_refresh();
+        // line_refresh();
 
         /* get line */
         char c;
@@ -174,8 +235,9 @@ readlain(char *prompt)
                 fflush(stdout);
                 switch (read(STDIN_FILENO, &c, 1)) {
                 case 0:
+                        break;
                 case -1:
-                        report("Exit from readlain due to invalid (or zero) read");
+                        report("Exit from readlain due to invalid read:%s", strerror(errno));
                         quit = true;
                         break;
 
