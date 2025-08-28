@@ -11,6 +11,8 @@
   #linebreak()
 ]
 
+#show link: set text(blue)
+
 #set page(header: align(right + horizon)[
   #author (#link("mailto:" + mail))
 ])
@@ -276,12 +278,22 @@ the cell B and then release the left button, the range A:B would be written.
 
 === vicel.toml
 
+You can cutomize some values using a vicel configuration file. By default, vicel
+looks for this file in the following paths:
+- #smallcaps("./vicel.toml")
+- #smallcaps("~/vicel.toml")
+- #smallcaps("~/.config/vicel.toml")
+- #smallcaps("~/.config/vicel/vicel.toml")
+If you want to use a different file, you can specify it with the `-c` or
+`--config-file` fag, followed by the full path to the file. The configuration
+format is #smallcaps("TOML"). You can check out the configuration I currently
+use #link("https://github.com/hugoocoto/vicel/blob/main/vicel.toml","here").
+
 #box(
   stroke: black,
   inset: 10pt,
 )[#align(horizon)[Because of the #smallcaps("toml") parser it doesn't accept
   comments. This would be fixed in the future.]]
-
 
 ==== Color
 Options in this table controls colors in all the editor.

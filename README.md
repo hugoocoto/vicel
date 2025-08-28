@@ -15,15 +15,6 @@ Webpage: https://hugoocoto.github.io/vicel/
 Documentation and installation/usage guide are
 [here](./docs/vicel_reference.pdf). 
 
-## Configuration
-You can modify some values using the vicel config file. This file is searched in
-the following paths: `./vicel.toml`, `~/vicel.toml`, `~/.config/vicel.toml`,
-`~/.config/vicel/vicel.toml`. If other file is desired to be used it can be
-specified with the `-c` or `--config-file` flag, following with the full path of
-the config file. The format chosen for the file is [toml](https://toml.io). 
-
-The valid fields whith their default values are set [here](#vicel.toml).
-
 ## Latest Version
 [See version](./version.txt)
 
