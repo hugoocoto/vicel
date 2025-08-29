@@ -11,7 +11,7 @@
   #linebreak()
 ]
 
-#show link: set text(blue)
+#show link: set text(navy)
 
 #set page(header: align(right + horizon)[
   #author (#link("mailto:" + mail))

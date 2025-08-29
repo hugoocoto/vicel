@@ -25,11 +25,19 @@
  * 1: report if DEBUG is set
  */
 int debug_level = 0;
+extern bool using_repl;
 
 #if defined(DEBUG) && DEBUG
 void
 report(char *format, ...)
 {
+        if (using_repl) {
+                va_list v;
+                va_start(v, format);
+                vprintf(format, v);
+                va_end(v);
+                return;
+        }
         if (debug_level == 0) return;
         va_list arg;
         FILE *file = fopen(DEBUG_LOG, "a");
@@ -48,7 +56,12 @@ report(char *format, ...)
 void
 report(char *format, ...)
 {
-        assert(format);
+        if (using_repl) {
+                va_list v;
+                va_start(v, format);
+                vprintf(format, v);
+                va_end(v);
+        }
 }
 
 #endif

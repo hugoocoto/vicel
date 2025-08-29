@@ -315,7 +315,7 @@ eval_unexpr(Expr *e)
                 }
                 panik_invalid_unop(e->unexpr.op->token, lhs);
         default:
-                report("unexpr operation no yet implemented: %s\n",
+                report("Unexpr operation no yet implemented: %s\n",
                        TOKEN_REPR[e->litexpr.value->token]);
                 runtime_error();
         }

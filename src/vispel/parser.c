@@ -98,7 +98,7 @@ print_ast_expr_branch(Expr *e)
                 print_ast_expr_branch(e->orexpr.rhs);
                 break;
         default:
-                report("print_ast_expr_branch not yet implemeted for %s\n",
+                report("Print_ast_expr_branch not yet implemeted for %s\n",
                        EXPR_REPR[e->type]);
                 break;
         }
@@ -259,7 +259,7 @@ free_stmts(Stmt *s)
                         free_stmts(current->funcdecl.body);
                         break;
                 default:
-                        report("free_stmts not yet implemeted for %s\n",
+                        report("Free_stmts not yet implemeted for %s\n",
                                STMT_REPR[current->type]);
                         panik_exit();
                 }
@@ -418,8 +418,8 @@ report_expected_token(const char *expected, const char *current, vtok *pos)
 {
         report("Expected %s but got %s ", expected, current);
         if (pos)
-                report("at line %d, offset %lu", pos->line, pos->offset);
-        printf("\n");
+                report("At line %d, offset %lu", pos->line, pos->offset);
+        report("\n");
         return;
 }
 
@@ -918,7 +918,7 @@ void
 tok_parse()
 {
         if (head_token == NULL) {
-                report("tok_parse: invalid token list. Call lex_analize() first.\n");
+                report("Invalid token list. Call lex_analize() first.\n");
                 exit(1);
         }
 

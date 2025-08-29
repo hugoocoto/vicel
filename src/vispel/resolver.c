@@ -30,7 +30,7 @@ sidetable_add_expr(Expr *e)
         switch (e->type) {
         case LITEXPR:
                 if (e->litexpr.value->token != IDENTIFIER) {
-                        report("sidetable_add_expr case LITEXPR for literal not identifier: error\n");
+                        report("Sidetable_add_expr case LITEXPR for literal not identifier: error\n");
                         resolve_error();
                 }
                 hmput(sidetable, e, env_get_offset(e->litexpr.value->str_literal));
@@ -84,7 +84,7 @@ static void
 check_declared(char *name)
 {
         if (env_get(name).num & DECLARED.num) return;
-        report("check_declared: var `%s` not declared\n", name);
+        report("Var `%s` not declared\n", name);
         resolve_error();
 }
 

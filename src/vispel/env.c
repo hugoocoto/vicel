@@ -63,7 +63,7 @@ Env *
 env_change_upper(Env *newupper)
 {
         if (!lower_env) {
-                report("no env created!\n");
+                report("No env created!\n");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -76,7 +76,7 @@ Value
 env_add_e(struct Env *e, char *name, Value value)
 {
         if (!e) {
-                report("no env created!\n");
+                report("No env created!\n");
                 longjmp(eval_runtime_error, 1);
         }
         if (shgeti(e->map, name) >= 0) {
@@ -102,7 +102,7 @@ Value
 env_get_e(struct Env *env, char *name)
 {
         if (!env) {
-                report("no env created!\n");
+                report("No env created!\n");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -112,7 +112,7 @@ env_get_e(struct Env *env, char *name)
                 e = e->upper;
         }
         if (ret == NULL) {
-                report("env_get_e: var `%s` not declared\n", name);
+                report("Var `%s` not declared\n", name);
                 longjmp(eval_runtime_error, 1);
         }
         return ret->value;
@@ -122,7 +122,7 @@ int
 env_get_offset(char *name)
 {
         if (!lower_env) {
-                report("no env created!\n");
+                report("No env created!\n");
                 longjmp(resolve_error_jmp, 1);
         }
 
@@ -134,7 +134,7 @@ env_get_offset(char *name)
                 ++offset;
         }
         if (ret == NULL) {
-                report("env_get_offset: Var `%s` not declared\n", name);
+                report("Var `%s` not declared\n", name);
                 longjmp(resolve_error_jmp, 1);
                 return -1;
         }
@@ -161,7 +161,7 @@ Value
 env_set_e(struct Env *env, char *name, Value value)
 {
         if (!env) {
-                report("no env created!\n");
+                report("No env created!\n");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -174,7 +174,7 @@ env_set_e(struct Env *env, char *name, Value value)
                 report("Var %s not declared\n", name);
                 longjmp(eval_runtime_error, 1);
         }
-        if (ret->value.type == TYPE_STR) free(ret->value.str);
+        // if (ret->value.type == TYPE_STR) free(ret->value.str);
         return ret->value = value;
 }
 

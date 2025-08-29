@@ -8,6 +8,20 @@
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula delete it should clear color.
 
+# vspl issues
+[vispel] >> a = 0
+0
+[vispel] >> a
+0
+[vispel] >> hh
+Var `hh` not declared
+[vispel] >> a
+3
+
+# vspl todos
+* Check that all memleaks are fixed
+* Try to find segfaults on weird stuff
+
 # To-do (maybe)
 * Add more movement stuff
 * Improve UI and UI customization.

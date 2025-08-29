@@ -1,4 +1,5 @@
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -17,12 +18,15 @@ prompt()
         fflush(stdout);
 }
 
+bool using_repl = false;
+
 int
 REPL()
 {
         char buf[1024 * 1024];
         ssize_t n;
 
+        using_repl = true;
         env_create();
         load_core_lib();
         prompt();
@@ -30,15 +34,14 @@ REPL()
                 buf[n] = 0;
                 buf[n + 1] = EOF;
                 lex_analize(buf);
-                // print_tokens();
                 tok_parse();
-                // print_ast();
                 if (resolve() == 0) eval();
                 prompt();
         }
         env_destroy();
         vspl_free_tokens();
         free_stmt_head();
+        using_repl = false;
 
         if (n < 0) {
                 report("Can't read\n");
