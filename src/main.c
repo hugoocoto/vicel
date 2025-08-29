@@ -120,11 +120,13 @@ main(int argc, char *argv[])
         }
 
         report("------| Starting |------");
+        options_init();
         parse_options_default_file(); // before parse custom config file
 
         if (flag_get_value(&cfile, "-c", "--config-file")) {
                 parse_options_file(fopen(cfile, "r"));
         }
+        options_destroy();
 
         if (argc == 2) {
                 filename = argv[1];

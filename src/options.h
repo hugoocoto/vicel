@@ -63,5 +63,7 @@ extern Col_opts col_opts;
 void parse_options_default_file();
 void parse_options_file(FILE *f);
 void free_opts();
+void options_init();
+void options_destroy();
 
 #endif //! OPTS_H_

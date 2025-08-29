@@ -23,24 +23,151 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "toml.h"
-#include <stdbool.h>
+#include "vispel/embedded.h"
+#include <stdio.h>
+#include <string.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
 
-#define toml_cpyfree(a, b)          \
+#define copy_free(a, b)             \
         {                           \
                 __auto_type _b = b; \
                 free(a);            \
                 (a) = strdup(_b);   \
-                free(_b);           \
         }
+
+
+void
+free_opts()
+{
+        free(win_opts.cell_l_sep);
+        free(win_opts.cell_r_sep);
+        free(win_opts.ui_celltext_l_sep);
+        free(win_opts.ui_celltext_m_sep);
+        free(win_opts.ui_celltext_r_sep);
+        free(win_opts.status_l_stuff);
+        free(win_opts.status_filename);
+        free(win_opts.status_r_end);
+        free(win_opts.ui_status_bottom_end);
+
+        free(col_opts.ui);
+        free(col_opts.cell);
+        free(col_opts.cell_over);
+        free(col_opts.cell_selected);
+        free(col_opts.ln_over);
+        free(col_opts.ln);
+        free(col_opts.sheet_ui);
+        free(col_opts.sheet_ui_over);
+        free(col_opts.sheet_ui_selected);
+        free(col_opts.ui_cell_text);
+        free(col_opts.ui_report);
+        free(col_opts.insert);
+}
+
+char *
+col_format(char **col)
+{
+        if (!strncmp(*col, T_CSI, strlen(T_CSI))) return *col;
+        char *new = calloc(strlen(*col) + strlen(T_CSI "m") + 1, 1);
+        sprintf(new, T_CSI "%sm", *col);
+        report("col format: from %s to %s", *col, new);
+        return new;
+}
+
+void
+get_window_options()
+{
+        report("Getting [window]");
+        char *vs;
+        int vi;
+        if (vspl_get_str("cell_l_sep", &vs)) copy_free(win_opts.cell_l_sep, vs);
+        if (vspl_get_str("cell_l_sep", &vs)) copy_free(win_opts.cell_l_sep, vs);
+        if (vspl_get_str("cell_r_sep", &vs)) copy_free(win_opts.cell_r_sep, vs);
+        if (vspl_get_int("num_col_width", &vi)) win_opts.num_col_width = vi;
+        if (vspl_get_int("col_width", &vi)) win_opts.col_width = vi;
+        if (vspl_get_int("save_time", &vi)) win_opts.save_time = vi;
+        if (vspl_get_int("use_cell_color_for_sep", &vi)) win_opts.use_cell_color_for_sep = vi;
+        if (vspl_get_int("use_mouse", &vi)) win_opts.use_mouse = vi;
+        if (vspl_get_int("natural_scroll", &vi)) win_opts.natural_scroll = vi;
+        if (vspl_get_str("ui_celltext_l_sep", &vs)) copy_free(win_opts.ui_celltext_l_sep, vs);
+        if (vspl_get_str("ui_celltext_m_sep", &vs)) copy_free(win_opts.ui_celltext_m_sep, vs);
+        if (vspl_get_str("ui_celltext_r_sep", &vs)) copy_free(win_opts.ui_celltext_r_sep, vs);
+        if (vspl_get_str("status_l_stuff", &vs)) copy_free(win_opts.status_l_stuff, vs);
+        if (vspl_get_str("status_filename", &vs)) copy_free(win_opts.status_filename, vs);
+        if (vspl_get_str("status_r_end", &vs)) copy_free(win_opts.status_r_end, vs);
+        if (vspl_get_str("ui_status_bottom_end", &vs)) copy_free(win_opts.ui_status_bottom_end, vs);
+}
+
+void
+get_color_options()
+{
+        report("Getting [color]");
+        char *vs;
+        if (vspl_get_str("ui", &vs)) copy_free(col_opts.ui, col_format(&vs));
+        if (vspl_get_str("cell_over", &vs)) copy_free(col_opts.cell_over, col_format(&vs));
+        if (vspl_get_str("cell_selected", &vs)) copy_free(col_opts.cell_selected, col_format(&vs));
+        if (vspl_get_str("ln_over", &vs)) copy_free(col_opts.ln_over, col_format(&vs));
+        if (vspl_get_str("ln", &vs)) copy_free(col_opts.ln, col_format(&vs));
+        if (vspl_get_str("sheet_ui", &vs)) copy_free(col_opts.sheet_ui, col_format(&vs));
+        if (vspl_get_str("sheet_ui_over", &vs)) copy_free(col_opts.sheet_ui_over, col_format(&vs));
+        if (vspl_get_str("sheet_ui_selected", &vs)) copy_free(col_opts.sheet_ui_selected, col_format(&vs));
+        if (vspl_get_str("ui_cell_text", &vs)) copy_free(col_opts.ui_cell_text, col_format(&vs));
+        if (vspl_get_str("ui_report", &vs)) copy_free(col_opts.ui_report, col_format(&vs));
+        if (vspl_get_str("insert", &vs)) copy_free(col_opts.insert, col_format(&vs));
+}
+
+void
+options_get()
+{
+        get_color_options();
+        get_window_options();
+}
+
+
+void
+parse_options_file(FILE *f)
+{
+        if (vspl_parse(f)) options_get();
+}
+
+/* unsafe */
+char *
+path_join(char *base, ...)
+{
+        va_list v;
+        char *c;
+        int n = 0;
+        va_start(v, base);
+        *base = 0;
+        while ((c = va_arg(v, char *))) {
+                if (n++) strcat(base, "/");
+                strcat(base, c);
+        }
+
+        report("New route: %s", base);
+        return base;
+}
+
+#define pjoin(base, ...) path_join((base), ##__VA_ARGS__, NULL)
+
+void
+parse_options_default_file()
+{
+        char path[128];
+        char *home = getenv("HOME");
+        report("home=%s", home);
+        if (home == NULL) home = "";
+        parse_options_file(fopen(pjoin(path, home, "vicel.vspl"), "r"));
+        parse_options_file(fopen(pjoin(path, home, ".config/vicel.vspl"), "r"));
+        parse_options_file(fopen(pjoin(path, home, ".config/vicel/vicel.vspl"), "r"));
+        parse_options_file(fopen(pjoin(path, "vicel.vspl"), "r"));
+}
 
 static __attribute__((constructor)) void
 init_default_values()
 {
-        win_opts = (Win_opts)
-        {
+        win_opts = (Win_opts) {
                 .num_col_width = 5,
                 .col_width = 14,
                 .row_width = 1,
@@ -76,153 +203,42 @@ init_default_values()
 }
 
 void
-free_opts()
+options_init()
 {
-        free(win_opts.cell_l_sep);
-        free(win_opts.cell_r_sep);
-        free(win_opts.ui_celltext_l_sep);
-        free(win_opts.ui_celltext_m_sep);
-        free(win_opts.ui_celltext_r_sep);
-        free(win_opts.status_l_stuff);
-        free(win_opts.status_filename);
-        free(win_opts.status_r_end);
-        free(win_opts.ui_status_bottom_end);
+        vspl_start();
 
-        free(col_opts.ui);
-        free(col_opts.cell);
-        free(col_opts.cell_over);
-        free(col_opts.cell_selected);
-        free(col_opts.ln_over);
-        free(col_opts.ln);
-        free(col_opts.sheet_ui);
-        free(col_opts.sheet_ui_over);
-        free(col_opts.sheet_ui_selected);
-        free(col_opts.ui_cell_text);
-        free(col_opts.ui_report);
-        free(col_opts.insert);
-}
-
-char *
-col_format(char **col)
-{
-        char *new = calloc(strlen(*col) + strlen(T_CSI "m") + 1, 1);
-        *new = 0;
-        strcat(new, T_CSI);
-        strcat(new, *col);
-        strcat(new, "m");
-        free(*col);
-        *col = new;
-        return *col;
+        vspl_addvar("ui", col_opts.ui);
+        vspl_addvar("ui_cell_text", col_opts.ui_cell_text);
+        vspl_addvar("ui_report", col_opts.ui_report);
+        vspl_addvar("cell", col_opts.cell);
+        vspl_addvar("cell_over", col_opts.cell_over);
+        vspl_addvar("cell_selected", col_opts.cell_selected);
+        vspl_addvar("ln_over", col_opts.ln_over);
+        vspl_addvar("ln", col_opts.ln);
+        vspl_addvar("sheet_ui", col_opts.sheet_ui);
+        vspl_addvar("sheet_ui_over", col_opts.sheet_ui_over);
+        vspl_addvar("sheet_ui_selected", col_opts.sheet_ui_selected);
+        vspl_addvar("insert", col_opts.insert);
+        vspl_addvar("num_col_width", win_opts.num_col_width);
+        vspl_addvar("col_width", win_opts.col_width);
+        vspl_addvar("row_width", win_opts.row_width);
+        vspl_addvar("use_cell_color_for_sep", win_opts.use_cell_color_for_sep);
+        vspl_addvar("cell_l_sep", win_opts.cell_l_sep);
+        vspl_addvar("cell_r_sep", win_opts.cell_r_sep);
+        vspl_addvar("save_time", win_opts.save_time);
+        vspl_addvar("status_l_stuff", win_opts.status_l_stuff);
+        vspl_addvar("status_filename", win_opts.status_filename);
+        vspl_addvar("status_r_end", win_opts.status_r_end);
+        vspl_addvar("ui_celltext_l_sep", win_opts.ui_celltext_l_sep);
+        vspl_addvar("ui_celltext_m_sep", win_opts.ui_celltext_m_sep);
+        vspl_addvar("ui_celltext_r_sep", win_opts.ui_celltext_r_sep);
+        vspl_addvar("ui_status_bottom_end", win_opts.ui_status_bottom_end);
+        vspl_addvar("use_mouse", win_opts.use_mouse);
+        vspl_addvar("natural_scroll", win_opts.natural_scroll);
 }
 
 void
-get_window_options(toml_table_t *tbl)
+options_destroy()
 {
-        report("Getting [window]");
-        toml_value_t v;
-        if ((v = toml_table_string(tbl, "cell_l_sep")).ok) toml_cpyfree(win_opts.cell_l_sep, v.u.s);
-        if ((v = toml_table_string(tbl, "cell_r_sep")).ok) toml_cpyfree(win_opts.cell_r_sep, v.u.s);
-        if ((v = toml_table_int(tbl, "num_col_width")).ok) win_opts.num_col_width = v.u.i;
-        if ((v = toml_table_int(tbl, "col_width")).ok) win_opts.col_width = v.u.i;
-        if ((v = toml_table_int(tbl, "save_time")).ok) win_opts.save_time = v.u.i;
-        if ((v = toml_table_bool(tbl, "use_cell_color_for_sep")).ok) win_opts.use_cell_color_for_sep = v.u.b;
-        if ((v = toml_table_bool(tbl, "use_mouse")).ok) win_opts.use_mouse = v.u.b;
-        if ((v = toml_table_bool(tbl, "natural_scroll")).ok) win_opts.natural_scroll = v.u.b;
-        if ((v = toml_table_string(tbl, "ui_celltext_l_sep")).ok) toml_cpyfree(win_opts.ui_celltext_l_sep, v.u.s);
-        if ((v = toml_table_string(tbl, "ui_celltext_m_sep")).ok) toml_cpyfree(win_opts.ui_celltext_m_sep, v.u.s);
-        if ((v = toml_table_string(tbl, "ui_celltext_r_sep")).ok) toml_cpyfree(win_opts.ui_celltext_r_sep, v.u.s);
-        if ((v = toml_table_string(tbl, "status_l_stuff")).ok) toml_cpyfree(win_opts.status_l_stuff, v.u.s);
-        if ((v = toml_table_string(tbl, "status_filename")).ok) toml_cpyfree(win_opts.status_filename, v.u.s);
-        if ((v = toml_table_string(tbl, "status_r_end")).ok) toml_cpyfree(win_opts.status_r_end, v.u.s);
-        if ((v = toml_table_string(tbl, "ui_status_bottom_end")).ok) toml_cpyfree(win_opts.ui_status_bottom_end, v.u.s);
-}
-
-void
-get_color_options(toml_table_t *tbl)
-{
-        report("Getting [color]");
-        toml_value_t v;
-        if ((v = toml_table_string(tbl, "ui")).ok) toml_cpyfree(col_opts.ui, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "cell_over")).ok) toml_cpyfree(col_opts.cell_over, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "cell_selected")).ok) toml_cpyfree(col_opts.cell_selected, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "ln_over")).ok) toml_cpyfree(col_opts.ln_over, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "ln")).ok) toml_cpyfree(col_opts.ln, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "sheet_ui")).ok) toml_cpyfree(col_opts.sheet_ui, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "sheet_ui_over")).ok) toml_cpyfree(col_opts.sheet_ui_over, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "sheet_ui_selected")).ok) toml_cpyfree(col_opts.sheet_ui_selected, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "ui_cell_text")).ok) toml_cpyfree(col_opts.ui_cell_text, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "ui_report")).ok) toml_cpyfree(col_opts.ui_report, col_format(&v.u.s));
-        if ((v = toml_table_string(tbl, "insert")).ok) toml_cpyfree(col_opts.insert, col_format(&v.u.s));
-}
-
-void
-get_options(toml_table_t *tbl)
-{
-        toml_table_t *stbl;
-
-        stbl = toml_table_table(tbl, "window");
-        if (stbl) get_window_options(stbl);
-
-        stbl = toml_table_table(tbl, "color");
-        if (stbl) get_color_options(stbl);
-}
-
-void
-parse_options(char *content)
-{
-        char errbuf[1280];
-        toml_table_t *tbl = toml_parse(content, errbuf, sizeof errbuf);
-        if (!tbl) {
-                report("Toml error: %s", errbuf);
-                return;
-        }
-        get_options(tbl);
-        toml_free(tbl);
-}
-
-void
-parse_options_file(FILE *f)
-{
-        if (f == NULL) return;
-
-        char buf[1024];
-        size_t n;
-
-        while ((n = fread(buf, 1, sizeof buf - 1, f))) {
-                buf[n] = 0;
-                parse_options(buf);
-        }
-}
-
-/* unsafe */
-char *
-path_join(char *base, ...)
-{
-        va_list v;
-        char *c;
-        int n = 0;
-        va_start(v, base);
-        *base = 0;
-        while ((c = va_arg(v, char *))) {
-                if (n++) strcat(base, "/");
-                strcat(base, c);
-        }
-
-        report("New route: %s", base);
-        return base;
-}
-
-#define pjoin(base, ...) path_join((base), ##__VA_ARGS__, NULL)
-
-void
-parse_options_default_file()
-{
-        char path[128];
-        char *home = getenv("HOME");
-        report("home=%s", home);
-        if (home == NULL) home = "";
-        parse_options_file(fopen(pjoin(path, home, "vicel.toml"), "r"));
-        parse_options_file(fopen(pjoin(path, home, ".config/vicel.toml"), "r"));
-        parse_options_file(fopen(pjoin(path, home, ".config/vicel/vicel.toml"), "r"));
-        parse_options_file(fopen(pjoin(path, "vicel.toml"), "r"));
+        vspl_end();
 }
