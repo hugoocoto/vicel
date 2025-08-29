@@ -3,7 +3,6 @@ cloc|github.com/AlDanial/cloc v 2.06
 
 File|blank|comment|code
 :-------|-------:|-------:|-------:
-src/toml.h|268|155|1893
 src/vispel/stb_ds.h|269|463|1163
 src/vispel/parser.c|76|24|842
 src/formula.c|84|31|728
@@ -25,7 +24,7 @@ src/options.c|19|20|167
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
 src/aptree.c|24|26|126
-src/main.c|25|21|122
+src/main.c|25|20|122
 src/hm.c|31|23|115
 src/cellmap.h|26|21|106
 src/da.h|15|33|89
@@ -58,6 +57,5 @@ src/vispel/strdup.c|1|0|10
 src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
-src/test.csv|0|0|1
 --------|--------|--------|--------
-SUM:|1576|1566|10691
+SUM:|1308|1410|8797
