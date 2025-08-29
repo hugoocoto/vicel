@@ -10,11 +10,6 @@ OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
 
 CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -fsanitize=address,null -Wall -Wextra -Wno-char-subscripts 
 
-all:
-	rm -rf ./$(OBJ_DIR)
-	make $(OUT)
-	./$(OUT)
-
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md gen
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)
 	rm -f report.log log.txt
