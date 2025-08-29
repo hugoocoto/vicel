@@ -22,7 +22,6 @@
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
-#include "toml.h"
 #include "vispel/embedded.h"
 #include <stdio.h>
 #include <string.h>
@@ -30,11 +29,16 @@
 Win_opts win_opts;
 Col_opts col_opts;
 
-#define copy_free(a, b)             \
-        {                           \
-                __auto_type _b = b; \
-                free(a);            \
-                (a) = strdup(_b);   \
+#define copy_free(a, b)  \
+        {                \
+                free(a); \
+                (a) = b; \
+        }
+
+#define copy(a, b)               \
+        {                        \
+                free(a);         \
+                (a) = strdup(b); \
         }
 
 
@@ -68,7 +72,7 @@ free_opts()
 char *
 col_format(char *col)
 {
-        if (!strncmp(col, T_CSI, strlen(T_CSI))) return col;
+        if (!strncmp(col, T_CSI, strlen(T_CSI))) return strdup(col);
         char *new = calloc(strlen(col) + strlen(T_CSI "m") + 1, 1);
         sprintf(new, T_CSI "%sm", col);
         report("col format: from %s to %s", col, new);
@@ -81,22 +85,22 @@ get_window_options()
         report("Getting [window]");
         char *vs;
         int vi;
-        if (vspl_get_str("cell_l_sep", &vs)) copy_free(win_opts.cell_l_sep, vs);
-        if (vspl_get_str("cell_l_sep", &vs)) copy_free(win_opts.cell_l_sep, vs);
-        if (vspl_get_str("cell_r_sep", &vs)) copy_free(win_opts.cell_r_sep, vs);
+        if (vspl_get_str("cell_l_sep", &vs)) copy(win_opts.cell_l_sep, vs);
+        if (vspl_get_str("cell_l_sep", &vs)) copy(win_opts.cell_l_sep, vs);
+        if (vspl_get_str("cell_r_sep", &vs)) copy(win_opts.cell_r_sep, vs);
         if (vspl_get_int("num_col_width", &vi)) win_opts.num_col_width = vi;
         if (vspl_get_int("col_width", &vi)) win_opts.col_width = vi;
         if (vspl_get_int("save_time", &vi)) win_opts.save_time = vi;
         if (vspl_get_int("use_cell_color_for_sep", &vi)) win_opts.use_cell_color_for_sep = vi;
         if (vspl_get_int("use_mouse", &vi)) win_opts.use_mouse = vi;
         if (vspl_get_int("natural_scroll", &vi)) win_opts.natural_scroll = vi;
-        if (vspl_get_str("ui_celltext_l_sep", &vs)) copy_free(win_opts.ui_celltext_l_sep, vs);
-        if (vspl_get_str("ui_celltext_m_sep", &vs)) copy_free(win_opts.ui_celltext_m_sep, vs);
-        if (vspl_get_str("ui_celltext_r_sep", &vs)) copy_free(win_opts.ui_celltext_r_sep, vs);
-        if (vspl_get_str("status_l_stuff", &vs)) copy_free(win_opts.status_l_stuff, vs);
-        if (vspl_get_str("status_filename", &vs)) copy_free(win_opts.status_filename, vs);
-        if (vspl_get_str("status_r_end", &vs)) copy_free(win_opts.status_r_end, vs);
-        if (vspl_get_str("ui_status_bottom_end", &vs)) copy_free(win_opts.ui_status_bottom_end, vs);
+        if (vspl_get_str("ui_celltext_l_sep", &vs)) copy(win_opts.ui_celltext_l_sep, vs);
+        if (vspl_get_str("ui_celltext_m_sep", &vs)) copy(win_opts.ui_celltext_m_sep, vs);
+        if (vspl_get_str("ui_celltext_r_sep", &vs)) copy(win_opts.ui_celltext_r_sep, vs);
+        if (vspl_get_str("status_l_stuff", &vs)) copy(win_opts.status_l_stuff, vs);
+        if (vspl_get_str("status_filename", &vs)) copy(win_opts.status_filename, vs);
+        if (vspl_get_str("status_r_end", &vs)) copy(win_opts.status_r_end, vs);
+        if (vspl_get_str("ui_status_bottom_end", &vs)) copy(win_opts.ui_status_bottom_end, vs);
 }
 
 void
@@ -169,18 +173,18 @@ options_init()
 {
         vspl_start();
 
-        vspl_addvar("ui", (col_opts.ui = col_format("49;30"), strdup("49;30")));
-        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), strdup("49;39;1")));
-        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39"), strdup("41;39")));
-        vspl_addvar("cell", (col_opts.cell = col_format("49;39"), strdup("49;39")));
-        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1"), strdup("49;39;7;1")));
-        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32"), strdup("49;32")));
-        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1"), strdup("49;32;7;1")));
-        vspl_addvar("ln", (col_opts.ln = col_format("49;32"), strdup("49;32")));
-        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39"), strdup("49;39")));
-        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1"), strdup("45;39;7;1")));
-        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32"), strdup("45;32")));
-        vspl_addvar("insert", (col_opts.insert = col_format("49;39"), strdup("49;39")));
+        vspl_addvar("ui", (col_opts.ui = col_format("49;30"), ("49;30")));
+        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1")));
+        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39"), ("41;39")));
+        vspl_addvar("cell", (col_opts.cell = col_format("49;39"), ("49;39")));
+        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1"), ("49;39;7;1")));
+        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32"), ("49;32")));
+        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1"), ("49;32;7;1")));
+        vspl_addvar("ln", (col_opts.ln = col_format("49;32"), ("49;32")));
+        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39"), ("49;39")));
+        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1"), ("45;39;7;1")));
+        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32"), ("45;32")));
+        vspl_addvar("insert", (col_opts.insert = col_format("49;39"), ("49;39")));
         vspl_addvar("num_col_width", (win_opts.num_col_width = 5));
         vspl_addvar("col_width", (win_opts.col_width = 14));
         vspl_addvar("row_width", (win_opts.row_width = 1));

@@ -8,23 +8,9 @@
 
 extern char *strdup(const char *);
 
-static void
-report(char *format, ...)
-{
-        va_list args;
-        va_start(args, format);
-        if (isatty(STDERR_FILENO)) fprintf(stderr, "\033[31m");
-        vfprintf(stderr, format, args);
-        if (isatty(STDERR_FILENO)) fprintf(stderr, "\033[0m");
-        va_end(args);
-        FILE *f = fopen("log.txt", "a");
-        if (f) {
-                va_start(args, format);
-                vfprintf(f, format, args);
-                va_end(args);
-                fclose(f);
-        }
-}
+void report(char *format, ...);
+
+extern const char *TOKEN_REPR[];
 
 typedef enum {
         LEFT_PARENT,
@@ -80,59 +66,6 @@ typedef enum {
         UNKNOWN,
 } vtoktype;
 
-static const char *TOKEN_REPR[] = {
-        [LEFT_PARENT] = "LEFT_PARENT",
-        [RIGHT_PARENT] = "RIGHT_PARENT",
-        [LEFT_BRACE] = "LEFT_BRACE",
-        [RIGHT_BRACE] = "RIGHT_BRACE",
-        [LEFT_BRACKET] = "LEFT_BRACKET",
-        [RIGHT_BRACKET] = "RIGHT_BRACKET",
-        [COMMA] = "COMMA",
-        [DOT] = "DOT",
-        [MINUS] = "MINUS",
-        [PLUS] = "PLUS",
-        [SEMICOLON] = "SEMICOLON",
-        [SLASH] = "SLASH",
-        [STAR] = "STAR",
-        [BANG] = "BANG",
-        [BANG_EQUAL] = "BANG_EQUAL",
-        [EQUAL] = "EQUAL",
-        [EQUAL_EQUAL] = "EQUAL_EQUAL",
-        [GREATER] = "GREATER",
-        [GREATER_EQUAL] = "GREATER_EQUAL",
-        [LESS] = "LESS",
-        [LESS_EQUAL] = "LESS_EQUAL",
-        [IDENTIFIER] = "IDENTIFIER",
-        [STRING] = "STRING",
-        [NUMBER] = "NUMBER",
-        [AND] = "AND",
-        [CLASS] = "CLASS",
-        [ELSE] = "ELSE",
-        [FALSE] = "FALSE",
-        [FUNCTION] = "FUNCTION",
-        [VAR] = "VAR",
-        [FOR] = "FOR",
-        [IF] = "IF",
-        [NIL] = "NIL",
-        [OR] = "OR",
-        [EXTERN] = "EXTERN",
-        [RETURN] = "RETURN",
-        [TRUE] = "TRUE",
-        [WHILE] = "WHILE",
-        [END_OF_FILE] = "END_OF_FILE",
-        [BITWISE_AND] = "BITWISE_AND",
-        [BITWISE_OR] = "BITWISE_OR",
-        [BITWISE_XOR] = "BITWISE_XOR",
-        [BITWISE_NOT] = "BITWISE_NOT",
-        [PLUS_PLUS] = "PLUS_PLUS",
-        [LESS_LESS] = "LESS_LESS",
-        [SHIFT_LEFT] = "SHIFT_LEFT",
-        [SHIFT_RIGHT] = "SHIFT_RIGHT",
-        [FUNC_INPUT] = "FUNC_INPUT",
-        [FUNC_OUTPUT] = "FUNC_OUTPUT",
-        [ASSERT] = "ASSERT",
-        [UNKNOWN] = "UNKNOWN",
-};
 
 typedef struct vtok {
         const char *lexeme;
@@ -158,16 +91,6 @@ typedef enum Exprtype {
         OREXPR,
 } Exprtype;
 
-static const char *EXPR_REPR[] = {
-        [ASSIGNEXPR] = "ASSIGNEXPR",
-        [BINEXPR] = "BINEXPR",
-        [UNEXPR] = "UNEXPR",
-        [CALLEXPR] = "CALLEXPR",
-        [LITEXPR] = "LITEXPR",
-        [VAREXPR] = "VAREXPR",
-        [ANDEXPR] = "ANDEXPR",
-        [OREXPR] = "OREXPR",
-};
 
 // clang-format off
 typedef struct Expr {
@@ -198,17 +121,6 @@ typedef enum {
         RETSTMT,
 } Stmttype;
 
-static const char *STMT_REPR[] = {
-        [VARDECLSTMT] = "VARDECLSTMT",
-        [BLOCKSTMT] = "BLOCKSTMT",
-        [EXPRSTMT] = "EXPRSTMT",
-        [ASSERTSTMT] = "ASSERTSTMT",
-        [IFSTMT] = "IFSTMT",
-        [WHILESTMT] = "WHILESTMT",
-        [FUNDECLSTMT] = "FUNDECLSTMT",
-        [RETSTMT] = "RETSTMT",
-};
-
 // clang-format off
 typedef struct Stmt {
         union {
@@ -225,6 +137,9 @@ typedef struct Stmt {
         struct Stmt *next;
 } Stmt;
 // clang-format on
+
+extern const char *STMT_REPR[];
+extern const char *EXPR_REPR[]; 
 
 extern vtok *head_token;
 extern Stmt *head_stmt;

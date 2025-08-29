@@ -23,19 +23,19 @@ gen_env_random_name()
         return strdup(name);
 }
 
-static void
-print_env_list()
-{
-        printf("\e[90m");
-        Env *e = lower_env;
-        while (e) {
-                if (e != lower_env) printf(", ");
-                printf("%s", e->name);
-                e = e->upper;
-        }
-        printf("\e[0m");
-        printf("\n");
-}
+// static void
+// print_env_list()
+// {
+//         printf("\e[90m");
+//         Env *e = lower_env;
+//         while (e) {
+//                 if (e != lower_env) printf(", ");
+//                 printf("%s", e->name);
+//                 e = e->upper;
+//         }
+//         printf("\e[0m");
+//         printf("\n");
+// }
 
 void
 env_dump()
@@ -174,6 +174,7 @@ env_set_e(struct Env *env, char *name, Value value)
                 report("Var %s not declared\n", name);
                 longjmp(eval_runtime_error, 1);
         }
+        if (ret->value.type == TYPE_STR) free(ret->value.str);
         return ret->value = value;
 }
 
@@ -200,11 +201,21 @@ env_create_e(Env *upper)
 void
 env_destroy_e(Env *current)
 {
-        if (!lower_env) {
+        Env *e = lower_env;
+        if (!e) {
                 report("Destroying a non existing env!\n");
                 longjmp(eval_runtime_error, 1);
         }
         lower_env = current;
+        int len = shlenu(e->map);
+        for (int i = 0; i < len; i++) {
+                if (e->map[i].value.type == TYPE_STR) {
+                        free(e->map[i].value.str);
+                }
+        }
+        free(e->name);
+        shfree(e->map);
+        free(e);
 }
 
 void
@@ -220,11 +231,21 @@ env_create()
 void
 env_destroy()
 {
-        if (!lower_env) {
+        Env *e = lower_env;
+        if (!e) {
                 report("Destroying a non existing env!\n");
                 longjmp(eval_runtime_error, 1);
         }
         lower_env = lower_env->upper;
+        int len = shlenu(e->map);
+        for (int i = 0; i < len; i++) {
+                if (e->map[i].value.type == TYPE_STR) {
+                        free(e->map[i].value.str);
+                }
+        }
+        free(e->name);
+        shfree(e->map);
+        free(e);
 }
 
 Value

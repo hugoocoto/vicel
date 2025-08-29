@@ -5,6 +5,7 @@
  *
  * */
 
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -30,6 +31,7 @@ core_input(Expr *_)
 {
         char buf[1024];
         char *c;
+        assert((_->next = NULL));
         if (fgets(buf, sizeof buf - 1, stdin)) {
                 if ((c = strchr(buf, '\n'))) {
                         *c = 0;

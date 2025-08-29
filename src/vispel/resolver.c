@@ -45,16 +45,16 @@ sidetable_add_expr(Expr *e)
         }
 }
 
-static void
-sidetable_add_stmt(Stmt *s)
-{
-        switch (s->type) {
-        default:
-                report("No yet implemented: sidetable_add_stmt for %s\n",
-                       STMT_REPR[s->type]);
-                resolve_error();
-        }
-}
+// static void
+// sidetable_add_stmt(Stmt *s)
+// {
+//         switch (s->type) {
+//         default:
+//                 report("No yet implemented: sidetable_add_stmt for %s\n",
+//                        STMT_REPR[s->type]);
+//                 resolve_error();
+//         }
+// }
 
 static int
 sidetable_get(void *e)
@@ -88,17 +88,17 @@ check_declared(char *name)
         resolve_error();
 }
 
-static void
-resolve_declaration(Stmt *s)
-{
-        switch (s->type) {
-        default:
-                report("No yet implemented: resolve_declaration for %s\n",
-                       STMT_REPR[s->type]);
-                resolve_error();
-                break;
-        }
-}
+// static void
+// resolve_declaration(Stmt *s)
+// {
+//         switch (s->type) {
+//         default:
+//                 report("No yet implemented: resolve_declaration for %s\n",
+//                        STMT_REPR[s->type]);
+//                 resolve_error();
+//                 break;
+//         }
+// }
 
 static void resolve_expr_arr(Expr *e);
 

@@ -5,6 +5,8 @@
  *
  * */
 
+
+
 #include <assert.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -458,25 +460,25 @@ vspl_eval_expr(Expr *e)
 
 static Value eval_stmt_arr(Stmt *s);
 
-static ValueNode *
-new_valuenode()
-{
-        return calloc(1, sizeof(ValueNode));
-}
+// static ValueNode *
+// new_valuenode()
+// {
+//         return calloc(1, sizeof(ValueNode));
+// }
 
-static ValueNode *
-parse_params(Expr *e)
-{
-        ValueNode *vn = new_valuenode();
-        ValueNode *v = vn;
-        while (e) {
-                v->v = vspl_eval_expr(e);
-                v->next = new_valuenode();
-                v = v->next;
-                e = e->next;
-        }
-        return vn;
-}
+// static ValueNode *
+// parse_params(Expr *e)
+// {
+//         ValueNode *vn = new_valuenode();
+//         ValueNode *v = vn;
+//         while (e) {
+//                 v->v = vspl_eval_expr(e);
+//                 v->next = new_valuenode();
+//                 v = v->next;
+//                 e = e->next;
+//         }
+//         return vn;
+// }
 
 static void
 eval_funcdeclstmt(Stmt *s)

@@ -8,9 +8,12 @@ HEADERS = $(wildcard src/*.h src/vispel/*.h src/vispel/core/*.h)
 SRC = $(wildcard src/*.c src/vispel/*.c src/vispel/core/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
 
-CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 
-# -Wno-char-subscripts -fsanitize=address,null 
-# -Wall -Wextra 
+CC  = gcc -ggdb -std=gnu11 -O0 -DDEBUG=1 -fsanitize=address,null -Wall -Wextra -Wno-char-subscripts 
+
+all:
+	rm -rf ./$(OBJ_DIR)
+	make $(OUT)
+	./$(OUT)
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md gen
 	$(CC) $(OBJ) $(INC) $(LIB) -o $(OUT)

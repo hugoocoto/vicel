@@ -19,14 +19,7 @@ typedef enum Valtype {
         TYPE_CORE_CALL,
 } Valtype;
 
-static const char *VALTYPE_REPR[] = {
-        [TYPE_NUM] = "NUMBER",
-        [TYPE_STR] = "STRING",
-        [TYPE_ADDR] = "MEMORY ADDRESS",
-        [TYPE_NONE] = "NONE",
-        [TYPE_CALLABLE] = "CALLABLE",
-        [TYPE_CORE_CALL] = "CORE CALL",
-};
+extern const char *VALTYPE_REPR[]; 
 
 struct Env;
 

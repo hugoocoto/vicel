@@ -81,6 +81,12 @@ vspl_free_tokens()
         vtok *current = head_token;
         while (current) {
                 vtok *next = current->next;
+                if (current->token == IDENTIFIER) {
+                        free(current->str_literal);
+                }
+                if (current->token == STRING) {
+                        free(current->str_literal);
+                }
                 free(current);
                 current = next;
         }
