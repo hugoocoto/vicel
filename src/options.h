@@ -39,6 +39,7 @@ typedef struct win_opts {
         char *status_r_end;
         char *ui_status_bottom_end;
         bool use_mouse;
+        bool natural_scroll;
 } Win_opts;
 
 typedef struct Col_opts {

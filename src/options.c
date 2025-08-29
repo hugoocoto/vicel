@@ -39,13 +39,15 @@ Col_opts col_opts;
 static __attribute__((constructor)) void
 init_default_values()
 {
-        win_opts = (Win_opts) {
+        win_opts = (Win_opts)
+        {
                 .num_col_width = 5,
                 .col_width = 14,
                 .row_width = 1,
                 .save_time = 0,
                 .use_cell_color_for_sep = true,
-                .use_mouse = true,
+                .use_mouse = false,
+                .natural_scroll = true,
                 .cell_l_sep = STRDUP(" "),
                 .cell_r_sep = STRDUP(" "),
                 .ui_celltext_l_sep = strdup("cell text: "),
@@ -125,6 +127,7 @@ get_window_options(toml_table_t *tbl)
         if ((v = toml_table_int(tbl, "save_time")).ok) win_opts.save_time = v.u.i;
         if ((v = toml_table_bool(tbl, "use_cell_color_for_sep")).ok) win_opts.use_cell_color_for_sep = v.u.b;
         if ((v = toml_table_bool(tbl, "use_mouse")).ok) win_opts.use_mouse = v.u.b;
+        if ((v = toml_table_bool(tbl, "natural_scroll")).ok) win_opts.natural_scroll = v.u.b;
         if ((v = toml_table_string(tbl, "ui_celltext_l_sep")).ok) toml_cpyfree(win_opts.ui_celltext_l_sep, v.u.s);
         if ((v = toml_table_string(tbl, "ui_celltext_m_sep")).ok) toml_cpyfree(win_opts.ui_celltext_m_sep, v.u.s);
         if ((v = toml_table_string(tbl, "ui_celltext_r_sep")).ok) toml_cpyfree(win_opts.ui_celltext_r_sep, v.u.s);

@@ -80,7 +80,6 @@ get_escape_sequence()
         int cellc;
         int cellr;
         void (*after)(void) = NULL;
-
         flags = fcntl(STDIN_FILENO, F_GETFL, 0);
         fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
 
@@ -93,6 +92,7 @@ get_escape_sequence()
                 /* This is ugly as fuck because it's an experimental feature */
                 if (win_opts.use_mouse && sscanf(buf, "[M%c%c%c", &btn, &c, &r) == 3) {
                         static char hold = 0;
+                        static int wheel_dir = 0;
                         cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
                         cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
                         int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
@@ -121,8 +121,21 @@ get_escape_sequence()
                                 hold = btn;
                                 break;
                         case 'a': /* mouse wheel up */
+                                if (wheel_dir == 0)
+                                        a_scroll_up();
+                                else
+                                        a_scroll_right();
+                                break;
                         case '`': /* mouse wheel down */
+                                if (wheel_dir == 0)
+                                        a_scroll_down();
+                                else
+                                        a_scroll_left();
+                                break;
                         case '!': /* mouse wheel press */
+                                set_ui_report("Change wheel scroll");
+                                wheel_dir = wheel_dir == 0;
+                                break;
                         case 'A': /* mouse wheel hold move */
                         default:
                                 break;
@@ -303,6 +316,18 @@ start_kbhandler()
         add_action(mappings, "gdh", ACTION(a_delete_left_col));
         add_action(mappings, "gdj", ACTION(a_delete_down_row));
         add_action(mappings, "gdl", ACTION(a_delete_right_col));
+
+        if (win_opts.natural_scroll) {
+                add_action(mappings, "ej", ACTION(a_scroll_up));
+                add_action(mappings, "ek", ACTION(a_scroll_down));
+                add_action(mappings, "el", ACTION(a_scroll_left));
+                add_action(mappings, "eh", ACTION(a_scroll_right));
+        } else {
+                add_action(mappings, "ej", ACTION(a_scroll_down));
+                add_action(mappings, "ek", ACTION(a_scroll_up));
+                add_action(mappings, "el", ACTION(a_scroll_right));
+                add_action(mappings, "eh", ACTION(a_scroll_left));
+        }
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
         toggle_raw_mode();

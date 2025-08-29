@@ -64,5 +64,9 @@ void a_delete_right_col();
 void a_delete_left_col();
 void a_delete_down_row();
 void a_delete_up_row();
+void a_scroll_up();
+void a_scroll_down();
+void a_scroll_left();
+void a_scroll_right();
 
 #endif //! MAPPINGS_H

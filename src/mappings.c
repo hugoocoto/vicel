@@ -320,3 +320,39 @@ a_delete_down_row()
         a_delete_up_row();
         if (!zero) a_move_cursor_down();
 }
+
+void
+a_scroll_up()
+{
+        if (active_ctx.scroll_r == 0) return;
+        --active_ctx.scroll_r;
+        if (active_ctx.cursor_pos_r >= active_ctx.max_display_r + active_ctx.scroll_r)
+                a_move_cursor_up();
+}
+
+void
+a_scroll_down()
+{
+        if (active_ctx.scroll_r + active_ctx.max_display_r >= active_ctx.body->size) return;
+        ++active_ctx.scroll_r;
+        if (active_ctx.cursor_pos_r < active_ctx.scroll_r)
+                a_move_cursor_down();
+}
+
+void
+a_scroll_left()
+{
+        if (active_ctx.scroll_c == 0) return;
+        --active_ctx.scroll_c;
+        if (active_ctx.cursor_pos_c >= active_ctx.max_display_c + active_ctx.scroll_c)
+                a_move_cursor_left();
+}
+
+void
+a_scroll_right()
+{
+        if (active_ctx.scroll_c + active_ctx.max_display_c >= active_ctx.body->size) return;
+        ++active_ctx.scroll_c;
+        if (active_ctx.cursor_pos_c < active_ctx.scroll_c)
+                a_move_cursor_right();
+}

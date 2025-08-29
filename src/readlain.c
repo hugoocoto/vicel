@@ -126,16 +126,14 @@ handle_esc()
                         static char hold = 0;
                         int cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
                         int cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
-                        int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
-                        int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
                         set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_r, cellr, active_ctx.max_display_c);
                         switch (btn) {
                         case '"': /* mouse left press */
                                 hold = btn;
                                 break;
                         case '#': /* mouse release */
-                                if (hold == '"')
-                                        ;
+                                if (hold == '"') {
+                                }
                                 if (hold == ' ') {
                                         selection_end = cm_get_cell_ptr(active_ctx.body, cellc, cellr);
                                         if (!selection_start || !selection_end) break;

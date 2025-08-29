@@ -11,7 +11,6 @@
 # To-do (maybe)
 * Add more movement stuff
 * Improve UI and UI customization.
-* Improve colors.
 * Improve input: handle special chars other than BS and Cr.
 * Maybe move from ast-walking to VM in formulas.
 * Maybe add date/time types
@@ -27,6 +26,7 @@
 * Possible leak at return Error from invalid stuff
 * Deletion
 * Options
+* Formulas and deletion are not friends -> need testing
 
 ### err1
 After delete a row or a column, ALL formulas that use cells that are moved

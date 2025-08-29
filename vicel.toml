@@ -27,3 +27,5 @@ ui_celltext_l_sep = ">> \""
 ui_celltext_m_sep = "\" as "        
 ui_celltext_r_sep = " "         
 ui_status_bottom_end = "github: hugoocoto/vicel"       
+use_mouse = true
+natural_scroll = true

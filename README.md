@@ -1,5 +1,10 @@
 # Visual Cell Editor
+Vicel is a free open source TUI spreadsheet editor. You can read, modify and
+save data stored in rows and columns. It aims to be an alternative to
+proprietary non gratis well known Microsoft program, for non professional usage.
+
 Webpage: https://hugoocoto.github.io/vicel/
+
 ![Screenshot](images/image.png)
 
 ## Features
@@ -8,7 +13,6 @@ Webpage: https://hugoocoto.github.io/vicel/
 * Keyboard-focused Vim-style motions
 * Lightweight and minimal code
 * Configuration via .toml file
-* Autosave
 * Mouse support
 
 ## Reference manual 

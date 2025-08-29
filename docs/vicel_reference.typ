@@ -25,8 +25,7 @@
 == Abstract
 Vicel is a free open source TUI spreadsheet editor. You can read, modify and
 save data stored in rows and columns. It aims to be an alternative to
-proprietary non gratis well known Microsoft program, for non professional usage
-(as it is quite simple, al least for now).
+proprietary non gratis well known Microsoft program, for non professional usage.
 
 == About development
 For now it is being developed by Hugo Coto as a side project. He does that
@@ -103,6 +102,26 @@ executed that amount of times. The following table describes the basic movement.
   [ `G`], [ Go to last cell of the current column],
   [ `g0`], [ Same as `^` and `gg`],
 )
+
+== Scrolling
+When using previous commands the editor auto scrolls if it's needed. But
+sometimes you would want to scroll just because. So, the following commands can
+be used to move the editor view without move the cursor (if still in the view).
+
+#table(
+  columns: 2,
+  stroke: none,
+  table.header("Command", "Description"),
+  table.hline(),
+  [`eh`], [Scroll left],
+  [`ej`], [Scroll down],
+  [`ek`], [Scroll up],
+  [`el`], [Scroll right],
+)
+
+Some users may find it reversed. Thus, the option
+#smallcaps("natural_scroll=true") is implemented. Setting it to true reverses
+the scrolling.
 
 == Write or edit
 To write text in a cell, move the cursor there and press `i`. A text input box
@@ -270,15 +289,32 @@ This is an experimental feature. At the time of writing, the cursor follows the
 mouse and you can drag and drop cell values using left click (drag on press,
 drop on release).
 
-Left click over a cell enters insert mode. If you click on a cell, its name
+Right click over a cell enters insert mode. If you click on a cell, its name
 would be appended to input. If you press the mouse over the cell A and move to
-the cell B and then release the left button, the range A:B would be written.
+the cell B and then release the right button, the range A:B would be written.
+
+Mouse wheel scrolls the screen. If you want to scroll in the other direction,
+pressing the mouse wheel changes the direction.
+
+#table(
+  columns: 2,
+  stroke: none,
+  table.header("Command", "Description"),
+  table.hline(),
+  [Enable it], [window.use_mouse = true],
+  [Mouse move], [Cursor follows mouse pointer],
+  [Drag and drop (Left button)], [Delete and paste cell value],
+  [Right click], [Enter insert mode on cell],
+  [Drag and drop on insert (Left button)], [Write selected range (From drag to drop or a single cell if click on it)],
+  [Wheel up/down], [Scroll the view],
+  [Wheel press], [Toggle scroll between horizontal and vertical],
+)
 
 == Configuration
 
 === vicel.toml
 
-You can cutomize some values using a vicel configuration file. By default, vicel
+You can customize some values using a vicel configuration file. By default, vicel
 looks for this file in the following paths:
 - #smallcaps("./vicel.toml")
 - #smallcaps("~/vicel.toml")
@@ -287,7 +323,7 @@ looks for this file in the following paths:
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
 format is #smallcaps("TOML"). You can check out the configuration I currently
-use #link("https://github.com/hugoocoto/vicel/blob/main/vicel.toml","here").
+use #link("https://github.com/hugoocoto/vicel/blob/main/vicel.toml", "here").
 
 #box(
   stroke: black,
