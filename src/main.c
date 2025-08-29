@@ -26,10 +26,8 @@
 #include "mappings.h"
 #include "options.h"
 #include "saving.h"
+#include "vispel/embedded.h"
 #include "window.h"
-#include <assert.h>
-#include <signal.h>
-#include <unistd.h>
 
 void
 resize_handler(int s)
@@ -111,6 +109,12 @@ main(int argc, char *argv[])
         char *cfile;
 
         flag_set(&argc, &argv);
+
+        if (flag_get("--repl")) {
+                extern int REPL();
+                return REPL();
+        }
+
         if (flag_get("-m", "--use-mouse")) {
                 printf("Are you idiot?\n");
                 exit(ERR_NONE);
@@ -126,6 +130,12 @@ main(int argc, char *argv[])
         if (flag_get_value(&cfile, "-c", "--config-file")) {
                 parse_options_file(fopen(cfile, "r"));
         }
+
+        if (flag_get("--dump-options")) {
+                vspl_dump_env();
+                return 0;
+        }
+
         options_destroy();
 
         if (argc == 2) {

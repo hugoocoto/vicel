@@ -169,18 +169,18 @@ options_init()
 {
         vspl_start();
 
-        vspl_addvar("ui", (col_opts.ui = col_format("49;30")));
-        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1")));
-        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39")));
-        vspl_addvar("cell", (col_opts.cell = col_format("49;39")));
-        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1")));
-        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32")));
-        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1")));
-        vspl_addvar("ln", (col_opts.ln = col_format("49;32")));
-        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39")));
-        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1")));
-        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32")));
-        vspl_addvar("insert", (col_opts.insert = col_format("49;39")));
+        vspl_addvar("ui", (col_opts.ui = col_format("49;30"), strdup("49;30")));
+        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), strdup("49;39;1")));
+        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39"), strdup("41;39")));
+        vspl_addvar("cell", (col_opts.cell = col_format("49;39"), strdup("49;39")));
+        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1"), strdup("49;39;7;1")));
+        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32"), strdup("49;32")));
+        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1"), strdup("49;32;7;1")));
+        vspl_addvar("ln", (col_opts.ln = col_format("49;32"), strdup("49;32")));
+        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39"), strdup("49;39")));
+        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1"), strdup("45;39;7;1")));
+        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32"), strdup("45;32")));
+        vspl_addvar("insert", (col_opts.insert = col_format("49;39"), strdup("49;39")));
         vspl_addvar("num_col_width", (win_opts.num_col_width = 5));
         vspl_addvar("col_width", (win_opts.col_width = 14));
         vspl_addvar("row_width", (win_opts.row_width = 1));

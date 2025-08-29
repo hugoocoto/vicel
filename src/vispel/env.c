@@ -37,6 +37,22 @@ print_env_list()
         printf("\n");
 }
 
+void
+env_dump()
+{
+        Env *e = lower_env;
+        while (e) {
+                int len = shlenu(e->map);
+                for (int i = 0; i < len; i++) {
+                        printf("%s = ", e->map[i].key);
+                        print_val(e->map[i].value);
+                        puts(";");
+                }
+                e = e->upper;
+        }
+        printf("\n");
+}
+
 struct Env *
 get_current_env()
 {

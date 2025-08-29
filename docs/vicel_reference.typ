@@ -76,6 +76,8 @@ The options supported are the following:
   [`-m`, `--use-mouse`  ], [Enable mouse support],
   [`-D`, `--debug`      ], [Enable debug output ],
   [`-c`, `--config-file`], [Set custom file path],
+  [`--dump-options`], [Print in stdout the default options and exit],
+  [`--repl`], [Open a vspl repl and exit on repl close],
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
@@ -314,70 +316,64 @@ pressing the mouse wheel changes the direction.
 
 === vicel.toml
 
-You can customize some values using a vicel configuration file. By default, vicel
-looks for this file in the following paths:
-- #smallcaps("./vicel.toml")
-- #smallcaps("~/vicel.toml")
-- #smallcaps("~/.config/vicel.toml")
-- #smallcaps("~/.config/vicel/vicel.toml")
+You can customize some values using a vicel vispel configuration file. By
+default, vicel looks for this file in the following paths:
+- #smallcaps("./vicel.vspl")
+- #smallcaps("~/vicel.vspl")
+- #smallcaps("~/.config/vicel.vspl")
+- #smallcaps("~/.config/vicel/vicel.vspl")
+
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
-format is #smallcaps("TOML"). You can check out the configuration I currently
-use #link("https://github.com/hugoocoto/vicel/blob/main/vicel.toml", "here").
-
-#box(
-  stroke: black,
-  inset: 10pt,
-)[#align(horizon)[Because of the #smallcaps("toml") parser it doesn't accept
-  comments. This would be fixed in the future.]]
+format is #smallcaps("vspl"). You won't find any information about this language
+as is written by myself. Don't worry, you only need to assign values to yet
+declared variables. You can check out the configuration I currently use
+#link("https://github.com/hugoocoto/vicel/blob/main/vicel.vspl", "here").
 
 ==== Color
 Options in this table controls colors in all the editor.
 
-```toml
-[color]
-ui = "49;30"                    # All ui text except ui_text_cell
-ui_cell_text = "49;39;1"        # Cell text representation and previous message
-ui_report = "41;39"             # Error/report message at the bottom right
-cell = "49;39"                  # Cell color if not custom color applied
-cell_over = "49;39;7;1"         # Cell color if cursor is over cell
-cell_selected = "49;32"         # Cell color if selected
-ln_over = "49;32;7;1"           # Row/col number/alpha if cursor is in this row/col
-ln = "49;32"                    # Row/col number/alpha default color
-sheet_ui = "49;39"              # UI elements inside sheet as separators
-sheet_ui_over = "45;39;7;1"     # UI elements inside sheet if cursor is over they
-sheet_ui_selected = "45;32"     # UI elements inside sheet if assigned cell is selected
-insert = "49;39"                # Color used when cell input text is being written
+```c
+ui = "49;30";                   // All ui text except ui_text_cell
+ui_cell_text = "49;39;1";       // Cell text representation and previous message
+ui_report = "41;39";            // Error/report message at the bottom right
+cell = "49;39";                 // Cell color if not custom color applied
+cell_over = "49;39;7;1";        // Cell color if cursor is over cell
+cell_selected = "49;32";        // Cell color if selected
+ln_over = "49;32;7;1";          // Row/col number/alpha if cursor is in this row/col
+ln = "49;32";                   // Row/col number/alpha default color
+sheet_ui = "49;39";             // UI elements inside sheet as separators
+sheet_ui_over = "45;39;7;1";    // UI elements inside sheet if cursor is over they
+sheet_ui_selected = "45;32";    // UI elements inside sheet if assigned cell is selected
+insert = "49;39";               // Color used when cell input text is being written
 ```
 
-==== Window
-Despite of the name, in this table lives all the options that are not colors. In
-the future it would migrate to another table.
+==== UI and others
 
-```toml
-[window]
-num_col_width = 5               # Number column width
-col_width = 14                  # Column width (min is cell_l_sep + cell_r_sep + 1)
-row_width = 1                   # Other size is not supported
-use_cell_color_for_sep = true   # Use cell color for separators instead of sheet_ui
-cell_l_sep = " "                # Left separator
-cell_r_sep = " "                # Right separator
-save_time = 0                   # Time interval (in seconds) where save is call. 0 means no autosave.
-use_mouse = false               # Enable mouse capturing
+```c
+num_col_width = 5;              // Number column width
+col_width = 14;                 // Column width (min is cell_l_sep + cell_r_sep + 1)
+row_width = 1;                  // Other size is not supported
+use_cell_color_for_sep = true;  // Use cell color for separators instead of sheet_ui
+cell_l_sep = " ";               // Left separator
+cell_r_sep = " ";               // Right separator
+save_time = 0;                  // Time interval (in seconds) where save is call. 0 means no autosave.
+use_mouse = false;              // Enable mouse capturing
 
 ```
 
-This is the ui customization, where you can modify how the editor looks like (Also in #smallcaps("window")).
+This is the ui customization, where you can modify how the editor looks like
+(Also in #smallcaps("window")).
 
-```toml
-# Top bar
-status_l_stuff = "vicel | "     # Top Left bar text
-status_filename = "filename: "  # Between status_l_stuff and filename
-status_r_end = "github: hugoocoto/vicel" # Top right-align bar text
+```c
+// Top bar
+status_l_stuff = "vicel | ";    // Top Left bar text
+status_filename = "filename: "; // Between status_l_stuff and filename
+status_r_end = "github: hugoocoto/vicel"; // Top right-align bar text
 
-# Bottom bar
-ui_celltext_l_sep = "cell text: " # Bottom Left bar text, before cell repr text
-ui_celltext_m_sep = " ("        # Between cell text and cell type
-ui_celltext_r_sep = ") "        # Before cell type, left-aligned
-ui_status_bottom_end = ""       # Bottom right-align text
+// Bottom bar
+ui_celltext_l_sep = "cell text: "; // Bottom Left bar text, before cell repr text
+ui_celltext_m_sep = " (";       // Between cell text and cell type
+ui_celltext_r_sep = ") ";       // Before cell type, left-aligned
+ui_status_bottom_end = "";      // Bottom right-align text
 ```

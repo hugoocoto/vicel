@@ -43,10 +43,11 @@ int env_get_offset(char *name);
 
 /* Access by Expr */
 // in resolver.c
-Value env_get_l(void* e, char *name);
-Value env_set_l(void* e, char *name, Value value);
+Value env_get_l(void *e, char *name);
+Value env_set_l(void *e, char *name, Value value);
 
 // Used externally
 node *env_get_node(char *name);
+void env_dump();
 
 #endif // !ENV_H

@@ -40,12 +40,9 @@ vspl_parse(FILE *file)
         if ((n = fread(buf, 1, sizeof buf - 2, file)) <= 0) return false;
         buf[n] = 0;
         buf[n + 1] = EOF;
-        report("Reading file");
         lex_analize(buf);
-        print_tokens();
         tok_parse();
-        print_ast();
-        if (resolve() == 0) eval();
+        if (resolve() == 0) eval_quiet();
         return true;
 }
 
@@ -54,7 +51,6 @@ vspl_get_int(char *name, int *value)
 {
         node *n = env_get_node(name);
         if (n == NULL) return false;
-        report("get `%s` => %d", name, n->value.num);
         *value = n->value.num;
         return true;
 }
@@ -64,9 +60,14 @@ vspl_get_str(char *name, char **value)
 {
         node *n = env_get_node(name);
         if (n == NULL) return false;
-        report("get `%s` => %s", name, n->value.str);
         *value = n->value.str;
         return true;
+}
+
+void
+vspl_dump_env()
+{
+        env_dump();
 }
 
 void

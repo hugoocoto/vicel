@@ -53,7 +53,7 @@ print_val(Value v)
                 printf("%d", v.num);
                 break;
         case TYPE_STR:
-                printf("%s", v.str);
+                printf("\"%s\"", v.str);
                 break;
         case TYPE_NONE:
                 break;
@@ -550,11 +550,17 @@ eval_stmt_arr(Stmt *s)
 }
 
 inline void
-eval()
+eval_quiet()
 {
         if (setjmp(eval_runtime_error)) {
                 return;
         }
+}
+
+inline void
+eval()
+{
+        eval_quiet();
         print_val(eval_stmt_arr(head_stmt));
         printf("\n");
 }

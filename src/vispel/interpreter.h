@@ -70,6 +70,7 @@ Value vspl_eval_expr(Expr *e);
 
 /* Eval all expressions from parsing and print result to stdout */
 void eval();
+void eval_quiet();
 void print_val(Value v);
 
 int resolve();
