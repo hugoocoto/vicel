@@ -20,8 +20,8 @@ src/builtin.c|28|20|226
 src/vispel/tokens.h|16|8|219
 src/vispel/env.c|29|2|217
 src/vispel/core/list.c|32|26|214
-src/options.c|21|20|203
 src/readlain.c|26|30|199
+src/options.c|19|20|167
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
 src/aptree.c|24|26|126
@@ -60,4 +60,4 @@ src/readlain.h|5|21|5
 src/test.csv|0|0|1
 src/vispel/REPL.c|0|63|0
 --------|--------|--------|--------
-SUM:|1564|1626|10659
+SUM:|1562|1626|10623

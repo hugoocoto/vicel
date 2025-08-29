@@ -66,12 +66,12 @@ free_opts()
 }
 
 char *
-col_format(char **col)
+col_format(char *col)
 {
-        if (!strncmp(*col, T_CSI, strlen(T_CSI))) return *col;
-        char *new = calloc(strlen(*col) + strlen(T_CSI "m") + 1, 1);
-        sprintf(new, T_CSI "%sm", *col);
-        report("col format: from %s to %s", *col, new);
+        if (!strncmp(col, T_CSI, strlen(T_CSI))) return col;
+        char *new = calloc(strlen(col) + strlen(T_CSI "m") + 1, 1);
+        sprintf(new, T_CSI "%sm", col);
+        report("col format: from %s to %s", col, new);
         return new;
 }
 
@@ -104,17 +104,17 @@ get_color_options()
 {
         report("Getting [color]");
         char *vs;
-        if (vspl_get_str("ui", &vs)) copy_free(col_opts.ui, col_format(&vs));
-        if (vspl_get_str("cell_over", &vs)) copy_free(col_opts.cell_over, col_format(&vs));
-        if (vspl_get_str("cell_selected", &vs)) copy_free(col_opts.cell_selected, col_format(&vs));
-        if (vspl_get_str("ln_over", &vs)) copy_free(col_opts.ln_over, col_format(&vs));
-        if (vspl_get_str("ln", &vs)) copy_free(col_opts.ln, col_format(&vs));
-        if (vspl_get_str("sheet_ui", &vs)) copy_free(col_opts.sheet_ui, col_format(&vs));
-        if (vspl_get_str("sheet_ui_over", &vs)) copy_free(col_opts.sheet_ui_over, col_format(&vs));
-        if (vspl_get_str("sheet_ui_selected", &vs)) copy_free(col_opts.sheet_ui_selected, col_format(&vs));
-        if (vspl_get_str("ui_cell_text", &vs)) copy_free(col_opts.ui_cell_text, col_format(&vs));
-        if (vspl_get_str("ui_report", &vs)) copy_free(col_opts.ui_report, col_format(&vs));
-        if (vspl_get_str("insert", &vs)) copy_free(col_opts.insert, col_format(&vs));
+        if (vspl_get_str("ui", &vs)) copy_free(col_opts.ui, col_format(vs));
+        if (vspl_get_str("cell_over", &vs)) copy_free(col_opts.cell_over, col_format(vs));
+        if (vspl_get_str("cell_selected", &vs)) copy_free(col_opts.cell_selected, col_format(vs));
+        if (vspl_get_str("ln_over", &vs)) copy_free(col_opts.ln_over, col_format(vs));
+        if (vspl_get_str("ln", &vs)) copy_free(col_opts.ln, col_format(vs));
+        if (vspl_get_str("sheet_ui", &vs)) copy_free(col_opts.sheet_ui, col_format(vs));
+        if (vspl_get_str("sheet_ui_over", &vs)) copy_free(col_opts.sheet_ui_over, col_format(vs));
+        if (vspl_get_str("sheet_ui_selected", &vs)) copy_free(col_opts.sheet_ui_selected, col_format(vs));
+        if (vspl_get_str("ui_cell_text", &vs)) copy_free(col_opts.ui_cell_text, col_format(vs));
+        if (vspl_get_str("ui_report", &vs)) copy_free(col_opts.ui_report, col_format(vs));
+        if (vspl_get_str("insert", &vs)) copy_free(col_opts.insert, col_format(vs));
 }
 
 void
@@ -164,77 +164,39 @@ parse_options_default_file()
         parse_options_file(fopen(pjoin(path, "vicel.vspl"), "r"));
 }
 
-static __attribute__((constructor)) void
-init_default_values()
-{
-        win_opts = (Win_opts) {
-                .num_col_width = 5,
-                .col_width = 14,
-                .row_width = 1,
-                .save_time = 0,
-                .use_cell_color_for_sep = true,
-                .use_mouse = false,
-                .natural_scroll = true,
-                .cell_l_sep = STRDUP(" "),
-                .cell_r_sep = STRDUP(" "),
-                .ui_celltext_l_sep = strdup("cell text: "),
-                .ui_celltext_m_sep = strdup(" ("),
-                .ui_celltext_r_sep = strdup(")"),
-                .status_l_stuff = strdup("vicel | "),
-                .status_filename = strdup("filename: "),
-                .status_r_end = strdup("github: hugoocoto/vicel"),
-                .ui_status_bottom_end = strdup("(Report issues to hugo.coto@member.fsf.org)"),
-        };
-
-        col_opts = (Col_opts) {
-                .ui = Cdup(C_BG_DEFAULT, C_FG_BLACK),
-                .cell = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
-                .cell_over = Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_REVERSE, C_BOLD),
-                .cell_selected = Cdup(C_BG_DEFAULT, C_FG_GREEN),
-                .ln_over = Cdup(C_BG_DEFAULT, C_FG_GREEN, C_REVERSE, C_BOLD),
-                .ln = Cdup(C_BG_DEFAULT, C_FG_GREEN),
-                .sheet_ui = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
-                .sheet_ui_over = Cdup(C_BG_MAGENTA, C_FG_DEFAULT, C_REVERSE, C_BOLD),
-                .sheet_ui_selected = Cdup(C_BG_MAGENTA, C_FG_GREEN),
-                .ui_cell_text = Cdup(C_BG_DEFAULT, C_FG_DEFAULT, C_BOLD),
-                .ui_report = Cdup(C_BG_RED, C_FG_DEFAULT),
-                .insert = Cdup(C_BG_DEFAULT, C_FG_DEFAULT),
-        };
-}
-
 void
 options_init()
 {
         vspl_start();
 
-        vspl_addvar("ui", col_opts.ui);
-        vspl_addvar("ui_cell_text", col_opts.ui_cell_text);
-        vspl_addvar("ui_report", col_opts.ui_report);
-        vspl_addvar("cell", col_opts.cell);
-        vspl_addvar("cell_over", col_opts.cell_over);
-        vspl_addvar("cell_selected", col_opts.cell_selected);
-        vspl_addvar("ln_over", col_opts.ln_over);
-        vspl_addvar("ln", col_opts.ln);
-        vspl_addvar("sheet_ui", col_opts.sheet_ui);
-        vspl_addvar("sheet_ui_over", col_opts.sheet_ui_over);
-        vspl_addvar("sheet_ui_selected", col_opts.sheet_ui_selected);
-        vspl_addvar("insert", col_opts.insert);
-        vspl_addvar("num_col_width", win_opts.num_col_width);
-        vspl_addvar("col_width", win_opts.col_width);
-        vspl_addvar("row_width", win_opts.row_width);
-        vspl_addvar("use_cell_color_for_sep", win_opts.use_cell_color_for_sep);
-        vspl_addvar("cell_l_sep", win_opts.cell_l_sep);
-        vspl_addvar("cell_r_sep", win_opts.cell_r_sep);
-        vspl_addvar("save_time", win_opts.save_time);
-        vspl_addvar("status_l_stuff", win_opts.status_l_stuff);
-        vspl_addvar("status_filename", win_opts.status_filename);
-        vspl_addvar("status_r_end", win_opts.status_r_end);
-        vspl_addvar("ui_celltext_l_sep", win_opts.ui_celltext_l_sep);
-        vspl_addvar("ui_celltext_m_sep", win_opts.ui_celltext_m_sep);
-        vspl_addvar("ui_celltext_r_sep", win_opts.ui_celltext_r_sep);
-        vspl_addvar("ui_status_bottom_end", win_opts.ui_status_bottom_end);
-        vspl_addvar("use_mouse", win_opts.use_mouse);
-        vspl_addvar("natural_scroll", win_opts.natural_scroll);
+        vspl_addvar("ui", (col_opts.ui = col_format("49;30")));
+        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1")));
+        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39")));
+        vspl_addvar("cell", (col_opts.cell = col_format("49;39")));
+        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1")));
+        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32")));
+        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1")));
+        vspl_addvar("ln", (col_opts.ln = col_format("49;32")));
+        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39")));
+        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1")));
+        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32")));
+        vspl_addvar("insert", (col_opts.insert = col_format("49;39")));
+        vspl_addvar("num_col_width", (win_opts.num_col_width = 5));
+        vspl_addvar("col_width", (win_opts.col_width = 14));
+        vspl_addvar("row_width", (win_opts.row_width = 1));
+        vspl_addvar("use_cell_color_for_sep", (win_opts.use_cell_color_for_sep = true));
+        vspl_addvar("cell_l_sep", (win_opts.cell_l_sep = strdup(" ")));
+        vspl_addvar("cell_r_sep", (win_opts.cell_r_sep = strdup(" ")));
+        vspl_addvar("save_time", (win_opts.save_time = 10));
+        vspl_addvar("status_l_stuff", (win_opts.status_l_stuff = strdup("")));
+        vspl_addvar("status_filename", (win_opts.status_filename = strdup(" ./")));
+        vspl_addvar("status_r_end", (win_opts.status_r_end = strdup("")));
+        vspl_addvar("ui_celltext_l_sep", (win_opts.ui_celltext_l_sep = strdup(">> '")));
+        vspl_addvar("ui_celltext_m_sep", (win_opts.ui_celltext_m_sep = strdup("' as ")));
+        vspl_addvar("ui_celltext_r_sep", (win_opts.ui_celltext_r_sep = strdup(" ")));
+        vspl_addvar("ui_status_bottom_end", (win_opts.ui_status_bottom_end = strdup("github: hugoocoto/vicel")));
+        vspl_addvar("use_mouse", (win_opts.use_mouse = true));
+        vspl_addvar("natural_scroll", (win_opts.natural_scroll = true));
 }
 
 void
