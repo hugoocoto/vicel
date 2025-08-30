@@ -140,9 +140,8 @@ add_literal_value(vtok *tok, ...)
 static bool
 match_word(const char *restrict word)
 {
-        int len = strlen(word);
-        if (memcmp(word, current_ptr - 1, len)) return false;
-        current_ptr += len - 1;
+        if (strncmp(word, current_ptr - 1, strlen(word))) return false;
+        current_ptr += strlen(word) - 1;
         return true;
 }
 

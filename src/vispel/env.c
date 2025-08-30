@@ -202,11 +202,11 @@ void
 env_destroy_e(Env *current)
 {
         Env *e = lower_env;
+        lower_env = current;
         if (!e) {
                 report("Destroying a non existing env!\n");
                 longjmp(eval_runtime_error, 1);
         }
-        lower_env = current;
         int len = shlenu(e->map);
         for (int i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {

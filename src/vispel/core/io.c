@@ -44,7 +44,7 @@ core_input(Expr *_)
 static __attribute__((constructor)) void
 __init__()
 {
-        // preload("print", core_print, 1);
-        // preload("println", core_print_ln, 1);
-        // preload("input", core_input, 0);
+        preload("print", core_print, 1);
+        preload("println", core_print_ln, 1);
+        preload("input", core_input, 0);
 }

@@ -234,6 +234,7 @@ resolve()
         Env *prev = env_create_e(NULL);
         load_env_data(prev);
         if (setjmp(resolve_error_jmp) | setjmp(eval_runtime_error)) {
+                env_destroy_e(prev);
                 return 1;
         }
         resolve_stmt_arr(head_stmt);

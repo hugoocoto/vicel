@@ -527,7 +527,6 @@ get_literal()
                 if (t->token == STRING) normalize(t);
                 return new_litexpr(t);
         }
-        /* can't be used expect() because LITERAL is an expression, not a token */
         report_expected_token("LITERAL", TOKEN_REPR[get_token()->token], t);
         panik_exit();
         return NULL;
@@ -938,5 +937,6 @@ tok_parse()
                         if (tok->token == SEMICOLON) break;
                 }
         }
+        if (current_token->token == END_OF_FILE) return;
         link_stmt(get_program());
 }

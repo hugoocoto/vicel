@@ -82,6 +82,7 @@ line_refresh()
         T_RCP();
         printf("%s%s ", lprompt, rline);
         T_RCP();
+        T_CUF((int) strlen(lprompt));
         if (rlindex) {
                 T_CUF((int) rlindex);
         }

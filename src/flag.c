@@ -65,7 +65,7 @@ __flag_get_value(char **value, char *flag_name)
         int i;
         __flag_check_flag_init();
         for (i = 0; i < *flag_argc - 1; i++) {
-                if (!memcmp((*flag_argv)[i], flag_name, strlen(flag_name))) {
+                if (!strcmp((*flag_argv)[i], flag_name)) {
                         *value = (*flag_argv)[i + 1];
                         memcpy((*flag_argv) + i, (*flag_argv) + i + 2,
                                (*flag_argc - i) * sizeof(char *));
@@ -76,7 +76,7 @@ __flag_get_value(char **value, char *flag_name)
 
         /* This is for the case where a flag that expects a name and a value is
          * in the last position, so the value can not be found. */
-        if (!memcmp((*flag_argv)[*flag_argc - 1], flag_name, strlen(flag_name))) {
+        if (!strcmp((*flag_argv)[*flag_argc - 1], flag_name)) {
                 *value = (char *) empty_string;
                 (*flag_argv)[*flag_argc - 1] = NULL;
                 *flag_argc -= 1;
@@ -91,7 +91,7 @@ __flag_get(char *flag_name)
         int i;
         __flag_check_flag_init();
         for (i = 0; i < *flag_argc; i++) {
-                if (!memcmp((*flag_argv)[i], flag_name, strlen(flag_name))) {
+                if (!strcmp((*flag_argv)[i], flag_name)) {
                         (*flag_argv)[i] = (*flag_argv)[*flag_argc - 1];
                         --*flag_argc;
                         return 1;

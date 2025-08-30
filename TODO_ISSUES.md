@@ -18,6 +18,8 @@ Var `hh` not declared
 [vispel] >> a
 3
 
+* print without parenthesis nor arguments segfaults
+
 # vspl todos
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff

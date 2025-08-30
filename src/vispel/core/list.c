@@ -262,11 +262,11 @@ core_list_init(Expr *e)
 static __attribute__((constructor)) void
 __init__()
 {
-        // preload("append", core_list_append, 2);
-        // preload("insert", core_list_insert, 3);
-        // preload("remove", core_list_remove, 2);
-        // preload("destroy", core_list_destroy, 1);
-        // preload("length", core_list_size, 1);
-        // preload("get", core_list_get, 2);
-        // preload("list", core_list_init, 0 | VAARGS); // 0 or more arguments
+        preload("append", core_list_append, 2);
+        preload("insert", core_list_insert, 3);
+        preload("remove", core_list_remove, 2);
+        preload("destroy", core_list_destroy, 1);
+        preload("length", core_list_size, 1);
+        preload("get", core_list_get, 2);
+        preload("list", core_list_init, 0 | VAARGS); // 0 or more arguments
 }

@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -9,34 +10,40 @@
 #include "interpreter.h"
 #include "tokens.h"
 
+#include "../readlain.h"
+
 #define PROMPT "[vispel] >> "
 
-void
-prompt()
-{
-        printf("%s", PROMPT);
-        fflush(stdout);
-}
+extern void toggle_raw_mode();
 
 bool using_repl = false;
 
 int
 REPL()
 {
-        char buf[1024 * 1024];
+        char *buf;
         ssize_t n;
 
         using_repl = true;
         env_create();
         load_core_lib();
-        prompt();
-        while ((n = read(STDIN_FILENO, buf, sizeof buf - 2)) > 0) {
-                buf[n] = 0;
-                buf[n + 1] = EOF;
+
+        toggle_raw_mode();
+        buf = readlain(PROMPT);
+        toggle_raw_mode();
+        puts("");
+
+        while (1) {
                 lex_analize(buf);
+                print_tokens();
                 tok_parse();
+                print_ast();
                 if (resolve() == 0) eval();
-                prompt();
+
+                toggle_raw_mode();
+                buf = readlain(PROMPT);
+                toggle_raw_mode();
+                puts("");
         }
         env_destroy();
         vspl_free_tokens();
