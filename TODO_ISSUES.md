@@ -23,6 +23,8 @@ Var `hh` not declared
 # vspl todos
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff
+* Add global variables as filename, file extension, ... So at can be used to set
+  conditional values.
 
 # To-do (maybe)
 * Add more movement stuff

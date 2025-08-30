@@ -1,0 +1,117 @@
+var a;
+var b = 1;
+assert -1 < 0;
+assert -1 <= -1;
+assert -1 > -2;
+assert -1 >= -1;
+assert 2 == 1 + 1;
+assert -1 + -1 == -2;
+assert b == 1;
+a = b;
+assert a == b;
+assert !!true;
+a = 1;
+assert a == 1;
+
+assert a = b = 2;
+assert a == 2;
+assert b == 2;
+assert (a == b) == true;
+
+var c = 1;
+{
+        assert c == 1;
+        var c = 2;
+        assert c == 2;
+        {
+                var c = 3;
+                assert c == 3;
+        }
+        assert c == 2;
+}
+assert c == 1;
+
+c = 1;
+if (c) {
+        assert c == 1;
+        c = 2;
+}
+assert ( c == 2 ) ;
+
+if (c == 1 || c == 2) c = 3;
+assert c == 3;
+
+if (c == 0) { assert c; }
+else { c = 0; }
+
+assert c == 0;
+
+var d = 5;
+while(d > 0)
+        d = d - 1;
+
+assert d == 0;
+
+d = 5;
+while(d > 0) {
+        d = d - 1;
+}
+assert d == 0;
+
+func p(a, b, c){
+        func double(x) { return x * 2; }
+        return a + b + double(c);
+}
+
+assert p(1, 2, 3) == 1 + 2 + 3 * 2;
+
+{
+        var a = "loc 1";
+        func f()
+        {
+                func c(){
+                        assert(a == "loc 1");
+                }
+
+                var a = "loc 2";
+                c();
+        }
+        f();
+}
+{
+        var a = "loc 1";
+        func f()
+        {
+                func c(){
+                        assert(a == "loc 2");
+                }
+
+                a = "loc 2";
+                c();
+        }
+        f();
+}
+
+var aa = "loc 1";
+func ff()
+{
+        func c(){
+                assert(aa == "loc 1");
+        }
+
+        var aa = "loc 2";
+        c();
+}
+ff();
+
+aa = "loc 1";
+func ff2()
+{
+        func c(){
+                assert(aa == "loc 2");
+        }
+
+        aa = "loc 2";
+        c();
+}
+ff2();

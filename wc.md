@@ -18,7 +18,7 @@ src/vispel/env.c|30|16|239
 src/builtin.c|28|20|226
 src/vispel/core/list.c|32|19|221
 src/vispel/resolver.c|25|21|209
-src/readlain.c|26|30|200
+src/readlain.c|26|30|198
 src/options.c|20|20|170
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1324|1450|8818
+SUM:|1324|1450|8816

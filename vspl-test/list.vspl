@@ -1,0 +1,10 @@
+var l = list(1, 2, "manzana");
+append(l, 3);
+insert(l, 0, 0);
+
+var i = 0;
+while(i < length(l)) {
+        print(get(l, i));
+        i = i + 1;
+}
+
