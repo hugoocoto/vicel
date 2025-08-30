@@ -8,6 +8,7 @@
 #include <assert.h>
 #include <ctype.h>
 #include <fcntl.h>
+#include <setjmp.h>
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -15,6 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "../debug.h"
 #include "tokens.h"
 
 /* Location of current char in file buffer */
@@ -26,6 +28,13 @@ int line = 1;
 /* First token of token list */
 vtok *head_token = NULL;
 
+jmp_buf lexer_error;
+
+_Noreturn void
+raise_lexer_error()
+{
+        longjmp(lexer_error, 1);
+}
 
 void
 print_literal(vtok *tok)
@@ -167,6 +176,10 @@ get_string()
 
         do {
                 tmp = get_consume_lex();
+                if (tmp == 0 || tmp == EOF) {
+                        report("String delimiter `\"` was never closed!\n");
+                        raise_lexer_error();
+                }
         } while (tmp != '"');
 
         current_ptr[-1] = 0;
@@ -215,13 +228,18 @@ get_comment()
         }
 }
 
-void
+int
 lex_analize(char *source)
 {
         char current;
         head_token = NULL;
         current_ptr = source;
         start_line = current_ptr;
+
+        if (setjmp(lexer_error)) {
+                return 1;
+        }
+
         for (;;) {
                 start_offset = current_ptr;
                 switch (current = get_consume_lex()) {
@@ -381,4 +399,5 @@ lex_analize(char *source)
 
                 if (current == EOF || current == 0) break;
         }
+        return 0;
 }

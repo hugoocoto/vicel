@@ -9,7 +9,7 @@ src/formula.c|84|31|728
 src/vispel/eval.c|59|27|482
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
-src/vispel/lexer.c|34|10|340
+src/vispel/lexer.c|37|10|356
 src/keyboard.c|48|31|339
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
@@ -24,7 +24,7 @@ src/dhm.c|32|20|157
 src/saving.c|23|19|150
 src/vispel/tokens.h|17|8|133
 src/aptree.c|24|26|126
-src/main.c|25|20|122
+src/main.c|25|20|124
 src/hm.c|31|23|115
 src/cellmap.h|26|21|106
 src/da.h|15|33|89
@@ -35,7 +35,7 @@ src/color.c|9|19|63
 src/formula.h|11|22|55
 src/vispel/interpreter.h|16|2|54
 src/mappings.h|4|19|49
-src/vispel/REPL.c|12|0|47
+src/vispel/REPL.c|11|0|49
 src/options.h|7|19|43
 src/vispel/core/core.c|6|7|41
 src/window.h|10|20|41
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1322|1450|8798
+SUM:|1324|1450|8818

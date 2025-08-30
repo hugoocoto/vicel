@@ -16,6 +16,7 @@
 
 extern void toggle_raw_mode();
 
+bool repl_verbose = false;
 bool using_repl = false;
 
 int
@@ -34,12 +35,12 @@ REPL()
         puts("");
 
         while (1) {
-                lex_analize(buf);
-                print_tokens();
+                if (lex_analize(buf)) goto _input;
+                if (repl_verbose) print_tokens();
                 tok_parse();
-                print_ast();
+                if (repl_verbose) print_ast();
                 if (resolve() == 0) eval();
-
+        _input:
                 toggle_raw_mode();
                 buf = readlain(PROMPT);
                 toggle_raw_mode();

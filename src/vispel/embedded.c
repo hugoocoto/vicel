@@ -40,7 +40,7 @@ vspl_parse(FILE *file)
         if ((n = fread(buf, 1, sizeof buf - 2, file)) <= 0) return false;
         buf[n] = 0;
         buf[n + 1] = EOF;
-        lex_analize(buf);
+        if (lex_analize(buf)) return false;
         tok_parse();
         if (resolve() == 0) eval_quiet();
         return true;

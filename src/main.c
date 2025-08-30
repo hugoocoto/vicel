@@ -112,6 +112,8 @@ main(int argc, char *argv[])
 
         if (flag_get("--repl")) {
                 extern int REPL();
+                extern bool repl_verbose;
+                repl_verbose = flag_get("-V");
                 return REPL();
         }
 

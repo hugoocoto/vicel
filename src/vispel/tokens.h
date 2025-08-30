@@ -145,7 +145,7 @@ extern vtok *head_token;
 extern Stmt *head_stmt;
 
 /* ./lexer.c */
-void lex_analize(char *source);
+int lex_analize(char *source);
 void print_tokens();
 void vspl_free_tokens();
 void print_literal(vtok *tok);
