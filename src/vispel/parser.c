@@ -12,9 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#include "env.h"
-#include "interpreter.h"
 #include "tokens.h"
 
 vtok *current_token = NULL;

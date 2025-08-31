@@ -1,6 +1,15 @@
 func fib(n) {
-        if (n <= 1) return 1;
-        return n * fib(n - 1);
+        if (n <= 0) return 0;
+        if (n == 1) return 1;
+        return fib(n-1) + fib(n - 2);
 }
 
-print(fib(3));
+func printfib(n){
+        println("fib for", n, "equals", fib(n));
+}
+
+var i = 0;
+while(true){
+        printfib(i);
+        i = i + 1;
+}

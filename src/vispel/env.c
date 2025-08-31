@@ -7,9 +7,14 @@
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
 
+#include "../da.h"
+
 #include "env.h"
 #include "interpreter.h"
 #include "tokens.h"
+
+typedef DA(Env *) Env_da;
+Env_da alive_env = { 0 };
 
 Env *lower_env = NULL;
 
@@ -193,6 +198,7 @@ env_create_e(Env *upper)
         Env *e = new_env();
         e->upper = upper;
         lower_env = e;
+        da_append(&alive_env, e);
         return ret;
 }
 
@@ -206,21 +212,39 @@ env_destroy_e(Env *current)
                 report("Destroying a non existing env!");
                 longjmp(eval_runtime_error, 1);
         }
-        size_t len = shlenu(e->map);
-        for (size_t i = 0; i < len; i++) {
-                if (e->map[i].value.type == TYPE_STR) {
-                        free(e->map[i].value.str);
+        while (e && e != current) {
+                // Env *e_upper = e->upper;
+                size_t len = shlenu(e->map);
+                for (size_t i = 0; i < len; i++) {
+                        if (e->map[i].value.type == TYPE_STR) {
+                                free(e->map[i].value.str);
+                        }
                 }
+
+                free(e->name);
+                shfree(e->map);
+                free(e);
+                // e = e_upper;
+                break;
         }
-        free(e->name);
-        shfree(e->map);
-        free(e);
+
+        int i = 0;
+        for (; i < alive_env.size && alive_env.data[i] != e; i++)
+                ;
+        if (i < alive_env.size)
+                da_remove(&alive_env, i);
+        else {
+                report("Removing from `Alive` a non existing env!");
+                longjmp(eval_runtime_error, 1);
+        }
+
 }
 
 void
 env_create()
 {
         Env *e = new_env();
+        da_append(&alive_env, e);
         if (lower_env != NULL) {
                 e->upper = lower_env;
         }
@@ -231,17 +255,28 @@ void
 env_destroy()
 {
         Env *e = lower_env;
+        lower_env = lower_env->upper;
         if (!e) {
                 report("Destroying a non existing env!");
                 longjmp(eval_runtime_error, 1);
         }
-        lower_env = lower_env->upper;
         int len = shlenu(e->map);
         for (int i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {
                         free(e->map[i].value.str);
                 }
         }
+
+        int i = 0;
+        for (; i < alive_env.size && alive_env.data[i] != e; i++)
+                ;
+        if (i < alive_env.size)
+                da_remove(&alive_env, i);
+        else {
+                report("Removing from `Alive` a non existing env!");
+                longjmp(eval_runtime_error, 1);
+        }
+
         free(e->name);
         shfree(e->map);
         free(e);

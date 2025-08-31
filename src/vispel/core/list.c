@@ -259,6 +259,15 @@ core_list_init(Expr *e)
         return (Value) { .addr = l, .type = TYPE_ADDR };
 }
 
+Value
+core_list_free(Expr *e)
+{
+        Value *v = get_values(e);
+        check_valid_list(v[0]);
+        da_destroy(((List) v->addr));
+        return NO_VALUE;
+}
+
 static __attribute__((constructor)) void
 __init__()
 {
@@ -268,5 +277,6 @@ __init__()
         preload("destroy", core_list_destroy, 1);
         preload("length", core_list_size, 1);
         preload("get", core_list_get, 2);
+        preload("list_free", core_list_free, 1);
         preload("list", core_list_init, 0 | VAARGS); // 0 or more arguments
 }

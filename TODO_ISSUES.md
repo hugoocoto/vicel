@@ -25,14 +25,15 @@
   at the time of expansion it would use the desired spacing.
 * Add copy for blocks
 * Rewrite convert and how to add/update data to cells.
+* Add the option --serve and --connect and let connect to a external vicel
+  session. It would be awesome but it's a bug mine.
 
 # No tested at all
 * CSV reader.
 * Behaviour of corner cases in formulas for builtin, ranges and comparison.
-* Possible leak at return Error from invalid stuff
 * Deletion
-* Options
 * Formulas and deletion are not friends -> need testing
+* vspl (in general)
 
 ### err1
 After delete a row or a column, ALL formulas that use cells that are moved
