@@ -17,7 +17,7 @@ Webpage: https://hugoocoto.github.io/vicel/
 
 ## Reference manual 
 Documentation and installation/usage guide are
-[here](./docs/vicel_reference.pdf). 
+[here](./docs/vicel_reference.pdf). [Download link](https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/vicel_reference.pdf)
 
 ## Latest Version
 [See version](./version.txt)
