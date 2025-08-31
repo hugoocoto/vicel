@@ -8,7 +8,6 @@
 * On color() formula delete it should clear color.
 
 # vspl issues
-* Only first non declared var is reported
 
 # vspl todos
 * Check that all memleaks are fixed

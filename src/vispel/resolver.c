@@ -150,7 +150,7 @@ resolve_expr_arr(Expr *e)
         }
 }
 
-static void resolve_stmt_arr(Stmt *s);
+static void resolve_stmt_arr(Stmt *s, Stmt **);
 
 static void
 resolve_stmt(Stmt *s)
@@ -169,12 +169,12 @@ resolve_stmt(Stmt *s)
                 for (vtok *arg = s->funcdecl.params; arg; arg = arg->next) {
                         declare(arg->str_literal);
                 }
-                resolve_stmt_arr(s->funcdecl.body);
+                resolve_stmt_arr(s->funcdecl.body, NULL);
                 env_destroy();
                 break;
         case BLOCKSTMT:
                 env_create();
-                resolve_stmt_arr(s->block.body);
+                resolve_stmt_arr(s->block.body, NULL);
                 env_destroy();
                 break;
         case EXPRSTMT:
@@ -205,9 +205,10 @@ resolve_stmt(Stmt *s)
 }
 
 static void
-resolve_stmt_arr(Stmt *s)
+resolve_stmt_arr(Stmt *s, Stmt **current)
 {
         while (s) {
+                if (current) *current = s;
                 resolve_stmt(s);
                 s = s->next;
         }
@@ -232,14 +233,15 @@ int
 resolve()
 {
         Env *prev = env_create_e(NULL);
+        Stmt *current = NULL;
+        int has_error = 0;
         load_env_data(prev);
         if (setjmp(resolve_error_jmp) | setjmp(eval_runtime_error)) {
-                env_destroy_e(prev);
-                return 1;
+                has_error = 1;
         }
-        resolve_stmt_arr(head_stmt);
+        resolve_stmt_arr(current ? current->next : head_stmt, &current);
         env_destroy_e(prev);
-        return 0;
+        return has_error;
 }
 
 Value
