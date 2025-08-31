@@ -12,7 +12,7 @@
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff
 * move from stb ds hm to hm.c
-* some extra espaces
+* some extra spaces
 
 # To-do (maybe)
 * Add more movement stuff
@@ -38,3 +38,8 @@
 After delete a row or a column, ALL formulas that use cells that are moved
 should update the id reference to the new one. Formulas that point to a cell
 that was deleted should be set to error. 
+
+# Things todo if for somewhat reason it have to become useful
+* Move from vspl to python
+* Improve formulas: move from ast-walking to something more performant. 
+* Fix all previously written issues and todos.

@@ -97,10 +97,10 @@ The table below summarize it.
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
-a config file in #smallcaps("./config/vicel.toml"), the command line should
+a config file in #smallcaps("./config/vicel.vspl"), the command line should
 looks like that:
 ```sh
-vicel sheets/table.csv -c config/vicel.toml
+vicel sheets/table.csv -c config/vicel.vspl
 ```
 
 == Moving around
@@ -330,7 +330,7 @@ pressing the mouse wheel changes the direction.
 
 == Configuration
 
-=== vicel.toml
+=== vicel.vspl
 
 You can customize some values using a vicel vispel configuration file. By
 default, vicel looks for this file in the following paths:
