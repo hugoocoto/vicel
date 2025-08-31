@@ -4,28 +4,15 @@
 * Input/edit text on the last cell fails
 
 # To-do
-* Toml subset parser
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula delete it should clear color.
 
 # vspl issues
-[vispel] >> a = 0
-0
-[vispel] >> a
-0
-[vispel] >> hh
-Var `hh` not declared
-[vispel] >> a
-3
-
-* print without parenthesis nor arguments segfaults
+* Only first non declared var is reported
 
 # vspl todos
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff
-* Add global variables as filename, file extension, ... So at can be used to set
-  conditional values.
-* Only first non declared var is reported
 
 # To-do (maybe)
 * Add more movement stuff
@@ -34,7 +21,7 @@ Var `hh` not declared
 * Maybe move from ast-walking to VM in formulas.
 * Maybe add date/time types
 * Try to expand with the difference between cell and the one in the opposite
-  direction at least for numbers, that way if the two first numbers are written
+  direction at least for numbers, so if the two first numbers are written
   at the time of expansion it would use the desired spacing.
 * Add copy for blocks
 * Rewrite convert and how to add/update data to cells.

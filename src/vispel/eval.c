@@ -56,6 +56,9 @@ print_val(Value v)
         case TYPE_STR:
                 printf("\"%s\"", v.str);
                 break;
+        case TYPE_CORE_CALL:
+                printf("(core func %s)", v.call.name);
+                break;
         case TYPE_NONE:
                 break;
         default:

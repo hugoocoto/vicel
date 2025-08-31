@@ -6,7 +6,7 @@ File|blank|comment|code
 src/vispel/stb_ds.h|269|463|1163
 src/vispel/parser.c|76|23|843
 src/formula.c|84|31|728
-src/vispel/eval.c|58|27|482
+src/vispel/eval.c|58|27|485
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
 src/vispel/lexer.c|37|12|354
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1337|1453|8877
+SUM:|1337|1453|8880
