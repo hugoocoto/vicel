@@ -6,7 +6,6 @@
  * */
 
 
-
 #include <assert.h>
 #include <setjmp.h>
 #include <stdio.h>
@@ -41,7 +40,7 @@ print_valnl(Value v)
                 printf("\n");
                 break;
         default:
-                report("No yet implemented: print_val for %s\n",
+                report("No yet implemented: print_valnl for %s\n",
                        VALTYPE_REPR[v.type]);
                 runtime_error();
         }

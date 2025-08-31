@@ -65,10 +65,10 @@ __flag_get_value(char **value, char *flag_name)
         int i;
         __flag_check_flag_init();
         for (i = 0; i < *flag_argc - 1; i++) {
-                if (!strcmp((*flag_argv)[i], flag_name)) {
+                if (!strncmp((*flag_argv)[i], flag_name, strlen((*flag_argv)[i]))) {
                         *value = (*flag_argv)[i + 1];
-                        memcpy((*flag_argv) + i, (*flag_argv) + i + 2,
-                               (*flag_argc - i) * sizeof(char *));
+                        memmove((*flag_argv) + i, (*flag_argv) + i + 2,
+                                (*flag_argc - (i + 1)) * sizeof(char *));
                         *flag_argc -= 2;
                         return 1;
                 }
@@ -92,7 +92,8 @@ __flag_get(char *flag_name)
         __flag_check_flag_init();
         for (i = 0; i < *flag_argc; i++) {
                 if (!strcmp((*flag_argv)[i], flag_name)) {
-                        (*flag_argv)[i] = (*flag_argv)[*flag_argc - 1];
+                        memmove((*flag_argv) + i, (*flag_argv) + i + 1,
+                                (*flag_argc - (i)) * sizeof(char *));
                         --*flag_argc;
                         return 1;
                 }
@@ -108,8 +109,9 @@ __flag_get_value_v(char **value, ...)
         char *current_flag;
         va_start(flag_ap, value);
         while ((current_flag = va_arg(flag_ap, char *))) {
-                if (__flag_get_value(value, current_flag))
+                if (__flag_get_value(value, current_flag)) {
                         return 1;
+                }
         }
         return 0;
 }
@@ -121,8 +123,9 @@ __flag_get_v(char *flag1, ...)
         va_start(flag_ap, flag1);
         char *current_flag = flag1;
         do {
-                if (__flag_get(current_flag))
+                if (__flag_get(current_flag)) {
                         return 1;
+                }
         } while ((current_flag = va_arg(flag_ap, char *)));
         return 0;
 }

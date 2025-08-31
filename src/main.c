@@ -102,6 +102,15 @@ catch_sigint()
         signal(SIGINT, exit);
 }
 
+char *
+get_extension(char *filename)
+{
+        if (filename == NULL) return NULL;
+        char *c = strrchr(filename, '.');
+        if (c == NULL) return filename;
+        return c + 1;
+}
+
 int
 main(int argc, char *argv[])
 {
@@ -112,8 +121,11 @@ main(int argc, char *argv[])
 
         if (flag_get("--repl")) {
                 extern int REPL();
+                extern int VSPL(char *);
                 extern bool repl_verbose;
+                char *file;
                 repl_verbose = flag_get("-V");
+                if (flag_get_value(&file, "-f")) return VSPL(file);
                 return REPL();
         }
 
@@ -126,7 +138,8 @@ main(int argc, char *argv[])
         }
 
         report("------| Starting |------");
-        options_init();
+        options_init(.filename = filename,
+                     .fileextension = get_extension(filename));
         parse_options_default_file(); // before parse custom config file
 
         if (flag_get_value(&cfile, "-c", "--config-file")) {

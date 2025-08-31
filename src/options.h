@@ -23,6 +23,12 @@
 
 #include "common.h"
 
+typedef struct {
+        char *filename;
+        char *fileextension;
+        void *none;
+} OptOpts;
+
 typedef struct win_opts {
         int num_col_width;
         int col_width;
@@ -60,10 +66,12 @@ typedef struct Col_opts {
 extern Win_opts win_opts;
 extern Col_opts col_opts;
 
+#define options_init(...) __options_init((OptOpts) { .none = 0, __VA_ARGS__ })
+
 void parse_options_default_file();
 void parse_options_file(FILE *f);
 void free_opts();
-void options_init();
+void __options_init(OptOpts);
 void options_destroy();
 
 #endif //! OPTS_H_

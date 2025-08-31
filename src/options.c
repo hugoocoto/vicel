@@ -23,8 +23,6 @@
 #include "debug.h"
 #include "escape_code.h"
 #include "vispel/embedded.h"
-#include <stdio.h>
-#include <string.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
@@ -75,7 +73,6 @@ col_format(char *col)
         if (!strncmp(col, T_CSI, strlen(T_CSI))) return strdup(col);
         char *new = calloc(strlen(col) + strlen(T_CSI "m") + 1, 1);
         sprintf(new, T_CSI "%sm", col);
-        report("col format: from %s to %s", col, new);
         return new;
 }
 
@@ -169,9 +166,12 @@ parse_options_default_file()
 }
 
 void
-options_init()
+__options_init(OptOpts opts)
 {
         vspl_start();
+
+        if (opts.filename && *opts.filename) vspl_addstr("filename", opts.filename);
+        if (opts.fileextension && *opts.fileextension) vspl_addstr("extension", opts.fileextension);
 
         vspl_addvar("ui", (col_opts.ui = col_format("49;30"), ("49;30")));
         vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1")));

@@ -78,7 +78,18 @@ The options supported are the following:
   [`-c`, `--config-file`], [Set custom file path],
   [`--dump-options`], [Print in stdout the default options and exit],
   [`--repl`], [Open a vspl repl and exit on repl close],
-  [`--repl -V`], [Open a vspl repl in verbose mode and exit on repl close],
+)
+
+There is some flags that only can be used if `--repl` is set. The table below
+summarize it.
+
+#table(
+  columns: 2,
+  stroke: none,
+  table.header("Command", "Description"),
+  table.hline(),
+  [`-V`], [Open repl in verbose mode],
+  [`-f <filename>`], [Run #smallcaps("filename") using the repl and exit],
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
