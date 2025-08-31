@@ -14,14 +14,18 @@
 Value
 core_print(Expr *args)
 {
-        print_val(vspl_eval_expr(args));
+        do {
+                print_val(vspl_eval_expr(args), .nostrdelim = 1);
+                if ((args = args->next))
+                        print_val(((Value) { .type = TYPE_STR, .str = " " }), .nostrdelim = 1);
+        } while (args);
         return NO_VALUE;
 }
 
 Value
 core_print_ln(Expr *args)
 {
-        print_val(vspl_eval_expr(args));
+        core_print(args);
         printf("\n");
         return NO_VALUE;
 }
@@ -44,7 +48,7 @@ core_input(Expr *_)
 static __attribute__((constructor)) void
 __init__()
 {
-        preload("print", core_print, 1);
-        preload("println", core_print_ln, 1);
+        preload("print", core_print, 1 | VAARGS);
+        preload("println", core_print_ln, 1 | VAARGS);
         preload("input", core_input, 0);
 }

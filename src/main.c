@@ -129,15 +129,17 @@ main(int argc, char *argv[])
                 extern bool repl_verbose;
                 char *file;
                 repl_verbose = flag_get("-V");
-                if (flag_get_value(&file, "-f")) return VSPL(file);
 
                 if (flag_get("--preload")) {
                         /* Add config file if interactive repl */
                         options_init(.filename = filename,
                                      .fileextension = get_extension(filename));
                         parse_options_default_file(); // before parse custom config file
-                        if (flag_get_value(&cfile, "-c", "--config-file")) parse_options_file(fopen(cfile, "r"));
+                        while (flag_get_value(&cfile, "-c", "--config-file"))
+                                parse_options_file(fopen(cfile, "r"));
                 }
+
+                if (flag_get_value(&file, "-f")) return VSPL(file);
                 return REPL();
         }
 
@@ -153,7 +155,7 @@ main(int argc, char *argv[])
                      .fileextension = get_extension(filename));
         parse_options_default_file(); // before parse custom config file
 
-        if (flag_get_value(&cfile, "-c", "--config-file")) {
+        while (flag_get_value(&cfile, "-c", "--config-file")) {
                 parse_options_file(fopen(cfile, "r"));
         }
 

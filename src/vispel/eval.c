@@ -30,31 +30,24 @@ runtime_error()
 
 /* Todo: use this instead of print_val and printf newline */
 void
-print_valnl(Value v)
+__print_valnl(Value v, PrintOpts opts)
 {
-        switch (v.type) {
-        case TYPE_NUM:
-        case TYPE_STR:
-        case TYPE_NONE:
-                print_val(v);
-                printf("\n");
-                break;
-        default:
-                report("No yet implemented: print_valnl for %s\n",
-                       VALTYPE_REPR[v.type]);
-                runtime_error();
-        }
+        __print_val(v, opts);
+        printf("\n");
 }
 
 void
-print_val(Value v)
+__print_val(Value v, PrintOpts opts)
 {
         switch (v.type) {
         case TYPE_NUM:
                 printf("%d", v.num);
                 break;
         case TYPE_STR:
-                printf("\"%s\"", v.str);
+                if (opts.nostrdelim)
+                        printf("%s", v.str);
+                else
+                        printf("\"%s\"", v.str);
                 break;
         case TYPE_CORE_CALL:
                 printf("(core func %s)", v.call.name);
@@ -556,15 +549,13 @@ eval_stmt_arr(Stmt *s)
 inline void
 eval_quiet()
 {
-        if (setjmp(eval_runtime_error)) {
-                return;
-        }
+        if (setjmp(eval_runtime_error)) return;
+        eval_stmt_arr(head_stmt);
 }
 
 inline void
 eval()
 {
-        eval_quiet();
-        print_val(eval_stmt_arr(head_stmt));
-        printf("\n");
+        if (setjmp(eval_runtime_error)) return;
+        print_valnl(eval_stmt_arr(head_stmt));
 }

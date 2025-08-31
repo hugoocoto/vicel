@@ -1,6 +1,3 @@
-print ("Filename:", filename);
-print ("Extension:", extension);
-
 ui = "49;30";
 ui_cell_text = "49;39;1";
 ui_report = "41;39";

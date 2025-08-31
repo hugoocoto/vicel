@@ -19,7 +19,7 @@ typedef enum Valtype {
         TYPE_CORE_CALL,
 } Valtype;
 
-extern const char *VALTYPE_REPR[]; 
+extern const char *VALTYPE_REPR[];
 
 struct Env;
 
@@ -64,7 +64,17 @@ Value vspl_eval_expr(Expr *e);
 /* Eval all expressions from parsing and print result to stdout */
 void eval();
 void eval_quiet();
-void print_val(Value v);
+
+typedef struct {
+        char none;
+        char nostrdelim;
+} PrintOpts;
+
+void __print_val(Value v, PrintOpts opts);
+#define print_val(v, ...) __print_val((v), (PrintOpts) { .none = 0, __VA_ARGS__ });
+
+void __print_valnl(Value v, PrintOpts opts);
+#define print_valnl(v, ...) __print_valnl((v), (PrintOpts) { .none = 0, __VA_ARGS__ });
 
 int resolve();
 

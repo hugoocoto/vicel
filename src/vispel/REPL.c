@@ -81,7 +81,7 @@ VSPL(char *filename)
                 if (repl_verbose) print_tokens();
                 tok_parse();
                 if (repl_verbose) print_ast();
-                if (resolve() == 0) eval();
+                if (resolve() == 0) eval_quiet();
         _input:
                 if ((n = read(fd, buf, sizeof buf - 2)) <= 0) return -1;
                 buf[n] = 0;

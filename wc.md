@@ -6,7 +6,7 @@ File|blank|comment|code
 src/vispel/stb_ds.h|269|463|1163
 src/vispel/parser.c|76|23|843
 src/formula.c|84|31|728
-src/vispel/eval.c|58|27|485
+src/vispel/eval.c|58|27|476
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
 src/vispel/lexer.c|37|12|354
@@ -22,7 +22,7 @@ src/readlain.c|26|30|198
 src/options.c|21|20|169
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
-src/main.c|29|21|143
+src/main.c|30|21|144
 src/vispel/tokens.h|17|8|133
 src/aptree.c|24|26|126
 src/hm.c|31|23|115
@@ -31,16 +31,16 @@ src/da.h|15|33|89
 src/flag.c|11|37|83
 src/vispel/lookup_repr_tables.c|5|0|83
 src/vispel/REPL.c|18|0|82
-src/vispel/embedded.c|9|1|69
+src/vispel/embedded.c|9|1|68
 src/color.c|9|19|63
+src/vispel/interpreter.h|19|2|61
 src/formula.h|11|22|55
-src/vispel/interpreter.h|16|2|54
 src/mappings.h|4|19|49
 src/options.h|9|19|49
 src/vispel/core/core.c|6|7|44
+src/vispel/core/io.c|6|6|42
 src/window.h|10|20|41
 src/debug.c|5|23|39
-src/vispel/core/io.c|6|6|38
 src/vispel/env.h|11|14|28
 src/debug.h|5|19|20
 src/hm.h|6|21|20
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1337|1453|8882
+SUM:|1341|1453|8884

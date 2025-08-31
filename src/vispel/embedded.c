@@ -10,7 +10,6 @@ void
 vspl_start()
 {
         env_create();
-        load_core_lib();
 }
 
 void
