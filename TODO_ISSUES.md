@@ -1,17 +1,17 @@
 # Issues
-* use after free in some formulas, irregular: I cant reproduce
-* After row or column deletion some formulas may break. [Link](#err1).
+* use after free in some formulas(at unsubscribe), irregular: I cant reproduce
 * Input/edit text on the last cell fails
+* Fix vspl memleaks
 
 # To-do
+* After row or column deletion some formulas may break. [Link](#err1).
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula delete it should clear color.
-
-# vspl issues
 
 # vspl todos
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff
+* move from stb ds hm to hm.c
 
 # To-do (maybe)
 * Add more movement stuff

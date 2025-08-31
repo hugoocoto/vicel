@@ -99,6 +99,7 @@ vspl_free_tokens()
                 free(current);
                 current = next;
         }
+        head_token = NULL;
 }
 
 static vtok *

@@ -1,4 +1,3 @@
-#include "core/core.h"
 #include "env.h"
 #include "interpreter.h"
 #include "tokens.h"
@@ -25,7 +24,8 @@ vspl_addstr(char *name, char *value)
                 env_add(name, NO_VALUE);
                 return;
         }
-        env_add(name, (Value) { .type = TYPE_STR, .str = strdup(value) });
+        report("Adding string: `%s`", value);
+        env_add(name, (Value) { .type = TYPE_STR, .str = value });
 }
 
 bool

@@ -11,10 +11,10 @@
 struct ValueNode;
 
 typedef enum Valtype {
+        TYPE_NONE,
         TYPE_NUM,
         TYPE_STR,
         TYPE_ADDR,
-        TYPE_NONE,
         TYPE_CALLABLE,
         TYPE_CORE_CALL,
 } Valtype;

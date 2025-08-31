@@ -23,19 +23,16 @@ gen_env_random_name()
         return strdup(name);
 }
 
-// static void
-// print_env_list()
-// {
-//         printf("\e[90m");
-//         Env *e = lower_env;
-//         while (e) {
-//                 if (e != lower_env) printf(", ");
-//                 printf("%s", e->name);
-//                 e = e->upper;
-//         }
-//         printf("\e[0m");
-//         printf("\n");
-// }
+static void
+print_env_list()
+{
+        Env *e = lower_env;
+        while (e) {
+                if (e != lower_env) report("-> ");
+                report("%s", e->name);
+                e = e->upper;
+        }
+}
 
 void
 env_dump()
@@ -84,6 +81,7 @@ env_add_e(struct Env *e, char *name, Value value)
                 longjmp(eval_runtime_error, 1);
         }
 
+        if (value.type == TYPE_STR) value.str = strdup(value.str);
         return shput(e->map, name, value);
 }
 
@@ -174,7 +172,8 @@ env_set_e(struct Env *env, char *name, Value value)
                 report("Var %s not declared\n", name);
                 longjmp(eval_runtime_error, 1);
         }
-        // if (ret->value.type == TYPE_STR) free(ret->value.str);
+        if (value.type == TYPE_STR) value.str = strdup(value.str);
+        if (ret->value.type == TYPE_STR) free(ret->value.str);
         return ret->value = value;
 }
 
@@ -202,17 +201,22 @@ void
 env_destroy_e(Env *current)
 {
         Env *e = lower_env;
+        print_env_list();
         lower_env = current;
         if (!e) {
                 report("Destroying a non existing env!\n");
                 longjmp(eval_runtime_error, 1);
         }
-        int len = shlenu(e->map);
-        for (int i = 0; i < len; i++) {
+        size_t len = shlenu(e->map);
+        report("Env len: %zu", len);
+        for (size_t i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {
+                        report("Free: `%s`", e->map[i].value.str);
                         free(e->map[i].value.str);
+                        e->map[i].value.str = NULL;
                 }
         }
+        report("Destroying env: %s", e->name);
         free(e->name);
         shfree(e->map);
         free(e);
@@ -240,9 +244,12 @@ env_destroy()
         int len = shlenu(e->map);
         for (int i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {
+                        report("Free: `%s`", e->map[i].value.str);
                         free(e->map[i].value.str);
+                        e->map[i].value.str = NULL;
                 }
         }
+        report("Destroying env: %s", e->name);
         free(e->name);
         shfree(e->map);
         free(e);

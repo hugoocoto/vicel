@@ -119,7 +119,7 @@ main(int argc, char *argv[])
 
         flag_set(&argc, &argv);
 
-        if (*argv[1] != '-') {
+        if (argc > 1 && *argv[1] != '-') {
                 filename = argv[1];
         }
 

@@ -79,7 +79,6 @@ col_format(char *col)
 void
 get_window_options()
 {
-        report("Getting [window]");
         char *vs;
         int vi;
         if (vspl_get_str("cell_l_sep", &vs)) copy(win_opts.cell_l_sep, vs);
@@ -103,7 +102,6 @@ get_window_options()
 void
 get_color_options()
 {
-        report("Getting [color]");
         char *vs;
         if (vspl_get_str("ui", &vs)) copy_free(col_opts.ui, col_format(vs));
         if (vspl_get_str("cell_over", &vs)) copy_free(col_opts.cell_over, col_format(vs));

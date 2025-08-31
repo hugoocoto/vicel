@@ -31,9 +31,6 @@ I like to flex on how little code is needed for a fully functional program.
 
 ![](https://wakatime.com/badge/user/2a7b4567-ab1f-4fb2-98ff-2b3fdbf94654/project/98a99176-d7a4-48ba-968c-4e410787a98f.svg)
 
-## Known issues
-Issues [here](./TODO_ISSUES.md).
-
 ## Sheets done by the community
 * *Horario* by @hugoocoto ![](images/image3.png)
 

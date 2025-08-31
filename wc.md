@@ -9,17 +9,17 @@ src/formula.c|84|31|728
 src/vispel/eval.c|58|27|476
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
-src/vispel/lexer.c|37|12|354
+src/vispel/lexer.c|37|12|355
 src/keyboard.c|48|31|339
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/mappings.c|48|19|291
-src/vispel/env.c|30|16|239
+src/vispel/env.c|30|2|260
 src/builtin.c|28|20|226
 src/vispel/core/list.c|32|19|221
 src/vispel/resolver.c|25|21|211
 src/readlain.c|26|30|198
-src/options.c|21|20|169
+src/options.c|21|20|167
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
 src/main.c|30|21|144
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1341|1453|8884
+SUM:|1341|1439|8904
