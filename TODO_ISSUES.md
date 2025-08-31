@@ -12,6 +12,7 @@
 * Check that all memleaks are fixed
 * Try to find segfaults on weird stuff
 * move from stb ds hm to hm.c
+* some extra espaces
 
 # To-do (maybe)
 * Add more movement stuff

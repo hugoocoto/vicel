@@ -14,11 +14,11 @@ src/keyboard.c|48|31|339
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/mappings.c|48|19|291
-src/vispel/env.c|30|2|260
+src/vispel/env.c|30|2|252
 src/builtin.c|28|20|226
 src/vispel/core/list.c|32|19|221
 src/vispel/resolver.c|25|21|211
-src/readlain.c|26|30|198
+src/readlain.c|26|30|196
 src/options.c|21|20|167
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
@@ -39,8 +39,8 @@ src/mappings.h|4|19|49
 src/options.h|9|19|49
 src/vispel/core/core.c|6|7|44
 src/vispel/core/io.c|6|6|42
+src/debug.c|5|23|41
 src/window.h|10|20|41
-src/debug.c|5|23|39
 src/vispel/env.h|11|14|28
 src/debug.h|5|19|20
 src/hm.h|6|21|20
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1341|1439|8904
+SUM:|1341|1439|8896

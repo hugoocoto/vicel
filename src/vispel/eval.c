@@ -55,7 +55,7 @@ __print_val(Value v, PrintOpts opts)
         case TYPE_NONE:
                 break;
         default:
-                report("No yet implemented: print_val for %s\n",
+                report("No yet implemented: print_val for %s",
                        VALTYPE_REPR[v.type]);
                 runtime_error();
         }
@@ -86,7 +86,7 @@ eval_litexpr(Expr *e)
                 v = env_get_l(e, e->litexpr.value->str_literal);
                 break;
         default:
-                report("No yet implemented: eval_litexpr for %s\n",
+                report("No yet implemented: eval_litexpr for %s",
                        TOKEN_REPR[e->litexpr.value->token]);
                 runtime_error();
         }
@@ -96,7 +96,7 @@ eval_litexpr(Expr *e)
 static _Noreturn void
 panik_invalid_binop(Value L, vtoktype OP, Value R)
 {
-        report("Invalid binary operation %s between %s and %s\n",
+        report("Invalid binary operation %s between %s and %s",
                TOKEN_REPR[OP], VALTYPE_REPR[L.type], VALTYPE_REPR[R.type]);
         runtime_error();
 }
@@ -104,7 +104,7 @@ panik_invalid_binop(Value L, vtoktype OP, Value R)
 static _Noreturn void
 panik_invalid_unop(vtoktype OP, Value R)
 {
-        report("Invalid binary operation %s for %s\n",
+        report("Invalid binary operation %s for %s",
                TOKEN_REPR[OP], VALTYPE_REPR[R.type]);
         runtime_error();
 }
@@ -118,7 +118,7 @@ is_true(Value v)
         case TYPE_STR:
                 return v.str && *v.str;
         default:
-                report("No yet implemented: is_true for %s\n",
+                report("No yet implemented: is_true for %s",
                        VALTYPE_REPR[v.type]);
                 runtime_error();
         }
@@ -128,7 +128,7 @@ static int
 is_equal(Value v1, Value v2)
 {
         if (v1.type != v2.type) {
-                report("Type missmatch in is_equal: %s and %s\n",
+                report("Type missmatch in is_equal: %s and %s",
                        VALTYPE_REPR[v1.type], VALTYPE_REPR[v2.type]);
                 return 0;
         }
@@ -139,7 +139,7 @@ is_equal(Value v1, Value v2)
         case TYPE_STR:
                 return strcmp(v1.str, v2.str) == 0;
         default:
-                report("No yet implemented: is_equal for %s and %s\n",
+                report("No yet implemented: is_equal for %s and %s",
                        VALTYPE_REPR[v1.type], VALTYPE_REPR[v2.type]);
                 runtime_error();
         }
@@ -149,7 +149,7 @@ static int
 is_greater(Value v1, Value v2)
 {
         if (v1.type != v2.type) {
-                report("Type missmatch in is_greater: %s and %s\n",
+                report("Type missmatch in is_greater: %s and %s",
                        VALTYPE_REPR[v1.type], VALTYPE_REPR[v2.type]);
                 return 0;
         }
@@ -160,7 +160,7 @@ is_greater(Value v1, Value v2)
         case TYPE_STR:
                 // return strcmp(v1.str, v2.str) > 0;
         default:
-                report("No yet implemented: is_greater for %s and %s\n",
+                report("No yet implemented: is_greater for %s and %s",
                        VALTYPE_REPR[v1.type], VALTYPE_REPR[v2.type]);
                 runtime_error();
         }
@@ -277,7 +277,7 @@ eval_binexpr(Expr *e)
                 break;
 
         default:
-                report("Binexpr Operation no yet implemented: %s\n",
+                report("Binexpr Operation no yet implemented: %s",
                        TOKEN_REPR[e->litexpr.value->token]);
                 runtime_error();
         }
@@ -310,7 +310,7 @@ eval_unexpr(Expr *e)
                 }
                 panik_invalid_unop(e->unexpr.op->token, lhs);
         default:
-                report("Unexpr operation no yet implemented: %s\n",
+                report("Unexpr operation no yet implemented: %s",
                        TOKEN_REPR[e->litexpr.value->token]);
                 runtime_error();
         }
@@ -359,7 +359,7 @@ eval_callexpr(Expr *e)
         case TYPE_CORE_CALL:
                 break;
         default:
-                report("Calling a non callable expression\n");
+                report("Calling a non callable expression");
                 runtime_error();
         }
 
@@ -372,7 +372,7 @@ eval_callexpr(Expr *e)
                         runtime_error();
                 }
         } else if (e->callexpr.count != func.call.arity) {
-                report("Function `%s` expect %d arguments, but got %d\n",
+                report("Function `%s` expect %d arguments, but got %d",
                        func.call.name, func.call.arity, e->callexpr.count);
                 runtime_error();
         }
@@ -419,7 +419,7 @@ eval_callexpr(Expr *e)
                 break;
 
         default:
-                report("No yet implemented: eval_callexpr for %s\n",
+                report("No yet implemented: eval_callexpr for %s",
                        VALTYPE_REPR[func.type]);
                 runtime_error();
         }
@@ -446,7 +446,7 @@ vspl_eval_expr(Expr *e)
                 return eval_callexpr(e);
         case VAREXPR:
         default:
-                report("No yet implemented: vspl_eval_expr for %s\n", EXPR_REPR[e->type]);
+                report("No yet implemented: vspl_eval_expr for %s", EXPR_REPR[e->type]);
                 runtime_error();
                 break;
         }
@@ -503,7 +503,7 @@ eval_stmt(Stmt *s)
                 break;
         case ASSERTSTMT:
                 if (!is_true(vspl_eval_expr(s->assert.body))) {
-                        report("Assert failed\n");
+                        report("Assert failed");
                         runtime_error();
                 }
                 break;
@@ -528,7 +528,7 @@ eval_stmt(Stmt *s)
                 ret_val = vspl_eval_expr(s->retstmt.value);
                 longjmp(ret_env, 1);
         default:
-                report("Todo: eval_stmt for %s\n", STMT_REPR[s->type]);
+                report("Todo: eval_stmt for %s", STMT_REPR[s->type]);
                 runtime_error();
                 break;
         }

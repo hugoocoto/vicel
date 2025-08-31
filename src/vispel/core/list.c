@@ -54,7 +54,7 @@ static void
 check_valid_list(Value l)
 {
         if (l.type != TYPE_ADDR) {
-                report("Argument `l` of type %s incompatible with LIST\n",
+                report("Argument `l` of type %s incompatible with LIST",
                        VALTYPE_REPR[l.type]);
                 longjmp(eval_runtime_error, 1);
         }
@@ -131,7 +131,7 @@ list_insert(Value l, Value e, Value i)
 {
         check_valid_list(l);
         if (i.type != TYPE_NUM) {
-                report("Argument `i` of type %s incompatible with NUM\n",
+                report("Argument `i` of type %s incompatible with NUM",
                        VALTYPE_REPR[TYPE_ADDR]);
                 longjmp(eval_runtime_error, 1);
         }
@@ -185,7 +185,7 @@ list_remove(Value l, Value i)
 {
         check_valid_list(l);
         if (i.type != TYPE_NUM) {
-                report("Argument `i` of type %s incompatible with NUM\n",
+                report("Argument `i` of type %s incompatible with NUM",
                        VALTYPE_REPR[TYPE_ADDR]);
                 longjmp(eval_runtime_error, 1);
         }
@@ -213,12 +213,12 @@ list_get(Value l, Value i)
 {
         check_valid_list(l);
         if (i.type != TYPE_NUM) {
-                report("Argument `i` of type %s incompatible with NUM\n",
+                report("Argument `i` of type %s incompatible with NUM",
                        VALTYPE_REPR[TYPE_ADDR]);
                 longjmp(eval_runtime_error, 1);
         }
         if (i.num < 0 || i.num >= ((List) l.addr)->size) {
-                report("List index out of range: %d for list length %d\n",
+                report("List index out of range: %d for list length %d",
                        i.num, ((List) l.addr)->size);
                 longjmp(eval_runtime_error, 1);
         }

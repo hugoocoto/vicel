@@ -52,7 +52,7 @@ REPL()
         using_repl = false;
 
         if (n < 0) {
-                report("Can't read\n");
+                report("Can't read");
                 return -1;
         }
 
@@ -92,7 +92,7 @@ VSPL(char *filename)
         using_repl = false;
 
         if (n < 0) {
-                report("Can't read\n");
+                report("Can't read");
                 return -1;
         }
 

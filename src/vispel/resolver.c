@@ -30,7 +30,7 @@ sidetable_add_expr(Expr *e)
         switch (e->type) {
         case LITEXPR:
                 if (e->litexpr.value->token != IDENTIFIER) {
-                        report("Sidetable_add_expr case LITEXPR for literal not identifier: error\n");
+                        report("Sidetable_add_expr case LITEXPR for literal not identifier: error");
                         resolve_error();
                 }
                 hmput(sidetable, e, env_get_offset(e->litexpr.value->str_literal));
@@ -39,7 +39,7 @@ sidetable_add_expr(Expr *e)
                 hmput(sidetable, e, env_get_offset(e->assignexpr.name->str_literal));
                 break;
         default:
-                report("No yet implemented: sidetable_add_expr for %s\n",
+                report("No yet implemented: sidetable_add_expr for %s",
                        EXPR_REPR[e->type]);
                 resolve_error();
         }
@@ -50,7 +50,7 @@ sidetable_add_expr(Expr *e)
 // {
 //         switch (s->type) {
 //         default:
-//                 report("No yet implemented: sidetable_add_stmt for %s\n",
+//                 report("No yet implemented: sidetable_add_stmt for %s",
 //                        STMT_REPR[s->type]);
 //                 resolve_error();
 //         }
@@ -62,7 +62,7 @@ sidetable_get(void *e)
         int i;
         i = hmgeti(sidetable, e);
         if (i < 0) {
-                report("Can not resolve %p\n", e);
+                report("Can not resolve %p", e);
                 resolve_error();
         }
         return sidetable[i].value;
@@ -84,7 +84,7 @@ static void
 check_declared(char *name)
 {
         if (env_get(name).num & DECLARED.num) return;
-        report("Var `%s` not declared\n", name);
+        report("Var `%s` not declared", name);
         resolve_error();
 }
 
@@ -93,7 +93,7 @@ check_declared(char *name)
 // {
 //         switch (s->type) {
 //         default:
-//                 report("No yet implemented: resolve_declaration for %s\n",
+//                 report("No yet implemented: resolve_declaration for %s",
 //                        STMT_REPR[s->type]);
 //                 resolve_error();
 //                 break;
@@ -135,7 +135,7 @@ resolve_expr(Expr *e)
                 resolve_expr(e->andexpr.rhs);
                 break;
         default:
-                report("No yet implemented: resolve_expr for %s\n",
+                report("No yet implemented: resolve_expr for %s",
                        EXPR_REPR[e->type]);
                 resolve_error();
         }
@@ -197,7 +197,7 @@ resolve_stmt(Stmt *s)
                 resolve_expr(s->retstmt.value);
                 break;
         default:
-                report("No yet implemented: resolve_stmt for %s\n",
+                report("No yet implemented: resolve_stmt for %s",
                        STMT_REPR[s->type]);
                 resolve_error();
                 break;

@@ -178,7 +178,7 @@ get_string()
         do {
                 tmp = get_consume_lex();
                 if (tmp == 0 || tmp == EOF) {
-                        report("String delimiter `\"` was never closed!\n");
+                        report("String delimiter `\"` was never closed!");
                         raise_lexer_error();
                 }
         } while (tmp != '"');
@@ -362,7 +362,7 @@ lex_analize(char *source)
                 default:
                         if (isspace(current)) break;
                         if (!isalpha(current) && current != '_') {
-                                report("[line %d] Invalid lexeme: `%c`\n",
+                                report("[line %d] Invalid lexeme: `%c`",
                                        line, current);
                                 add_token(UNKNOWN);
                                 break;

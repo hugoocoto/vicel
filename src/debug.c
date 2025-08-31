@@ -36,6 +36,7 @@ report(char *format, ...)
                 va_start(v, format);
                 vprintf(format, v);
                 va_end(v);
+                putchar(10);
                 return;
         }
         if (debug_level == 0) return;
@@ -61,6 +62,7 @@ report(char *format, ...)
                 va_start(v, format);
                 vprintf(format, v);
                 va_end(v);
+                putchar(10);
         }
 }
 

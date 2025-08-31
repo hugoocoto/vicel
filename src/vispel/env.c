@@ -23,7 +23,7 @@ gen_env_random_name()
         return strdup(name);
 }
 
-static void
+void
 print_env_list()
 {
         Env *e = lower_env;
@@ -60,7 +60,7 @@ Env *
 env_change_upper(Env *newupper)
 {
         if (!lower_env) {
-                report("No env created!\n");
+                report("No env created!");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -73,11 +73,11 @@ Value
 env_add_e(struct Env *e, char *name, Value value)
 {
         if (!e) {
-                report("No env created!\n");
+                report("No env created!");
                 longjmp(eval_runtime_error, 1);
         }
         if (shgeti(e->map, name) >= 0) {
-                report("Var `%s` already declared\n", name);
+                report("Var `%s` already declared", name);
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -100,7 +100,7 @@ Value
 env_get_e(struct Env *env, char *name)
 {
         if (!env) {
-                report("No env created!\n");
+                report("No env created!");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -110,7 +110,7 @@ env_get_e(struct Env *env, char *name)
                 e = e->upper;
         }
         if (ret == NULL) {
-                report("Var `%s` not declared\n", name);
+                report("Var `%s` not declared", name);
                 longjmp(eval_runtime_error, 1);
         }
         return ret->value;
@@ -120,7 +120,7 @@ int
 env_get_offset(char *name)
 {
         if (!lower_env) {
-                report("No env created!\n");
+                report("No env created!");
                 longjmp(resolve_error_jmp, 1);
         }
 
@@ -132,7 +132,7 @@ env_get_offset(char *name)
                 ++offset;
         }
         if (ret == NULL) {
-                report("Var `%s` not declared\n", name);
+                report("Var `%s` not declared", name);
                 longjmp(resolve_error_jmp, 1);
                 return -1;
         }
@@ -149,7 +149,7 @@ env_get_by_offset(int offset)
                 --o;
         }
         if (!e) {
-                report("Offset greater than possible jumps\n");
+                report("Offset greater than possible jumps");
                 longjmp(eval_runtime_error, 1);
         }
         return e;
@@ -159,7 +159,7 @@ Value
 env_set_e(struct Env *env, char *name, Value value)
 {
         if (!env) {
-                report("No env created!\n");
+                report("No env created!");
                 longjmp(eval_runtime_error, 1);
         }
 
@@ -169,7 +169,7 @@ env_set_e(struct Env *env, char *name, Value value)
                 e = e->upper;
         }
         if (ret == NULL) {
-                report("Var %s not declared\n", name);
+                report("Var %s not declared", name);
                 longjmp(eval_runtime_error, 1);
         }
         if (value.type == TYPE_STR) value.str = strdup(value.str);
@@ -201,22 +201,17 @@ void
 env_destroy_e(Env *current)
 {
         Env *e = lower_env;
-        print_env_list();
         lower_env = current;
         if (!e) {
-                report("Destroying a non existing env!\n");
+                report("Destroying a non existing env!");
                 longjmp(eval_runtime_error, 1);
         }
         size_t len = shlenu(e->map);
-        report("Env len: %zu", len);
         for (size_t i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {
-                        report("Free: `%s`", e->map[i].value.str);
                         free(e->map[i].value.str);
-                        e->map[i].value.str = NULL;
                 }
         }
-        report("Destroying env: %s", e->name);
         free(e->name);
         shfree(e->map);
         free(e);
@@ -237,19 +232,16 @@ env_destroy()
 {
         Env *e = lower_env;
         if (!e) {
-                report("Destroying a non existing env!\n");
+                report("Destroying a non existing env!");
                 longjmp(eval_runtime_error, 1);
         }
         lower_env = lower_env->upper;
         int len = shlenu(e->map);
         for (int i = 0; i < len; i++) {
                 if (e->map[i].value.type == TYPE_STR) {
-                        report("Free: `%s`", e->map[i].value.str);
                         free(e->map[i].value.str);
-                        e->map[i].value.str = NULL;
                 }
         }
-        report("Destroying env: %s", e->name);
         free(e->name);
         shfree(e->map);
         free(e);

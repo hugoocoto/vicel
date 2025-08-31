@@ -99,7 +99,6 @@ handle_esc()
                 return;
         default:
                 buf[n] = 0;
-                report("Esc buffer: %s", buf);
                 if (!strcmp(buf, "[D")) {
                         if (rlindex) {
                                 --rlindex;
@@ -210,7 +209,6 @@ handle_char(char c)
                 break;
 
         default:
-                report("Unhandled char: %d", c);
                 break;
         }
 }
