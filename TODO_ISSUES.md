@@ -25,6 +25,7 @@ Var `hh` not declared
 * Try to find segfaults on weird stuff
 * Add global variables as filename, file extension, ... So at can be used to set
   conditional values.
+* Only first non declared var is reported
 
 # To-do (maybe)
 * Add more movement stuff

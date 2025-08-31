@@ -80,8 +80,11 @@ The options supported are the following:
   [`--repl`], [Open a vspl repl and exit on repl close],
 )
 
-There is some flags that only can be used if `--repl` is set. The table below
-summarize it.
+=== About vspl repl
+Vicel use #smallcaps("vspl") as the language for configuration. That's why the
+editor contains a _vspl repl interpreter_. You can use it interactively or to
+run a vspl file. There is some flags that only can be used if `--repl` is set.
+The table below summarize it.
 
 #table(
   columns: 2,
@@ -90,6 +93,7 @@ summarize it.
   table.hline(),
   [`-V`], [Open repl in verbose mode],
   [`-f <filename>`], [Run #smallcaps("filename") using the repl and exit],
+  [`--preload`], [Load vicel variables and options from config files],
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with

@@ -170,8 +170,8 @@ __options_init(OptOpts opts)
 {
         vspl_start();
 
-        if (opts.filename && *opts.filename) vspl_addstr("filename", opts.filename);
-        if (opts.fileextension && *opts.fileextension) vspl_addstr("extension", opts.fileextension);
+        vspl_addstr("filename", (opts.filename && *opts.filename) ? opts.filename : "");
+        vspl_addstr("extension", (opts.fileextension && *opts.fileextension) ? opts.fileextension : "");
 
         vspl_addvar("ui", (col_opts.ui = col_format("49;30"), ("49;30")));
         vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1")));

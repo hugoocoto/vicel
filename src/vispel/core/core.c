@@ -46,6 +46,9 @@ preload(const char *name, Value (*func)(Expr *), int arity)
 void
 load_core_lib()
 {
+        static int loaded = 0;
+        if (loaded) return;
+        loaded = 1;
         CoreFunc *c = core_func_list;
         while (c) {
                 load(c);

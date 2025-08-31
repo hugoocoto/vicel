@@ -119,6 +119,10 @@ main(int argc, char *argv[])
 
         flag_set(&argc, &argv);
 
+        if (*argv[1] != '-') {
+                filename = argv[1];
+        }
+
         if (flag_get("--repl")) {
                 extern int REPL();
                 extern int VSPL(char *);
@@ -126,6 +130,14 @@ main(int argc, char *argv[])
                 char *file;
                 repl_verbose = flag_get("-V");
                 if (flag_get_value(&file, "-f")) return VSPL(file);
+
+                if (flag_get("--preload")) {
+                        /* Add config file if interactive repl */
+                        options_init(.filename = filename,
+                                     .fileextension = get_extension(filename));
+                        parse_options_default_file(); // before parse custom config file
+                        if (flag_get_value(&cfile, "-c", "--config-file")) parse_options_file(fopen(cfile, "r"));
+                }
                 return REPL();
         }
 
@@ -133,9 +145,8 @@ main(int argc, char *argv[])
                 printf("Are you idiot?\n");
                 exit(ERR_NONE);
         }
-        if (flag_get("-D", "--debug")) {
-                debug_level = 1;
-        }
+
+        if (flag_get("-D", "--debug")) debug_level = 1;
 
         report("------| Starting |------");
         options_init(.filename = filename,
@@ -153,7 +164,7 @@ main(int argc, char *argv[])
 
         options_destroy();
 
-        if (argc == 2) {
+        if (filename == NULL && argc == 2 && *argv[1] != '-') {
                 filename = argv[1];
         }
 

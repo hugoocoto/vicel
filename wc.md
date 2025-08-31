@@ -22,7 +22,7 @@ src/readlain.c|26|30|198
 src/options.c|21|20|169
 src/dhm.c|32|20|157
 src/saving.c|23|19|150
-src/main.c|26|20|136
+src/main.c|29|21|143
 src/vispel/tokens.h|17|8|133
 src/aptree.c|24|26|126
 src/hm.c|31|23|115
@@ -37,7 +37,7 @@ src/formula.h|11|22|55
 src/vispel/interpreter.h|16|2|54
 src/mappings.h|4|19|49
 src/options.h|9|19|49
-src/vispel/core/core.c|6|7|41
+src/vispel/core/core.c|6|7|44
 src/window.h|10|20|41
 src/debug.c|5|23|39
 src/vispel/core/io.c|6|6|38
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1334|1452|8867
+SUM:|1337|1453|8877
