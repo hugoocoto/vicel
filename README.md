@@ -22,6 +22,12 @@ You can find precompiled binaries in `./build`. Supported archs:
 * linux-riscv64
 * linux-x86_64
 
+```sh
+wget https://raw.githubusercontent.com/hugoocoto/vicel/refs/heads/main/build/vicel_linux-x86_64
+chmod +x vicel_linux-x86_64
+./vicel_linux-x86_64
+```
+
 ## Reference manual 
 Documentation and installation/usage guide are
 [here](./docs/vicel_reference.pdf). [Download link](https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/vicel_reference.pdf)
