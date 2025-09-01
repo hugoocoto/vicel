@@ -384,8 +384,7 @@ use_mouse = false;              // Enable mouse capturing
 
 ```
 
-This is the ui customization, where you can modify how the editor looks like
-(Also in #smallcaps("window")).
+This is the ui customization, where you can modify how the editor looks like.
 
 ```c
 // Top bar
