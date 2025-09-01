@@ -30,17 +30,19 @@ core_print_ln(Expr *args)
         return NO_VALUE;
 }
 
+/* core_input read buffer */
+char buf[1024]; /* weird trick to avoid usage after return, as it's strduped in
+                   env and this value is not used after that */
 Value
 core_input(Expr *_)
 {
-        char buf[1024];
         char *c;
-        assert((_->next = NULL));
+        assert(_ == NULL);
         if (fgets(buf, sizeof buf - 1, stdin)) {
                 if ((c = strchr(buf, '\n'))) {
                         *c = 0;
                 }
-                return (Value) { .type = TYPE_STR, .str = strdup(buf) };
+                return (Value) { .type = TYPE_STR, .str = buf };
         }
         return NO_VALUE;
 }

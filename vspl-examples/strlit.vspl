@@ -1,4 +1,4 @@
 print("hello");
 print("\n");
 print("next line\n");
-print(".");
+println(".");

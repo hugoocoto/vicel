@@ -4,9 +4,9 @@ add(l, 0, 0);
 
 var i = 0;
 while(i < length(l)) {
-        print(get(l, i));
+        println(get(l, i));
         i = i + 1;
 }
 
-list_free(l);
+destroy(l);
 

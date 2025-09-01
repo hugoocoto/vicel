@@ -2,11 +2,8 @@ func a(c, d , e){
         func add2(x) {
                 return x + 2;
         }
-        print("Values:");
-        print(add2(c));
-        print(add2(d));
-        print(add2(e));
-        return c + d + e;
+        println("Values to sum:" ,add2(c) ,d ,e);
+        return add2(c) + d + e;
 }
 
-print(a(1,2,3));
+println(a(1,2,3));

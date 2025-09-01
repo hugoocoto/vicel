@@ -13,7 +13,6 @@
 #include "core.h"
 
 #define DA_REALLOC(dest, size) realloc((dest), (size));
-#define DA_MALLOC(size) malloc((size));
 
 typedef struct {
         int capacity;
@@ -87,6 +86,7 @@ core_list_append(Expr *e)
 {
         Value *v = get_values(e);
         list_append(v[0], v[1]);
+        free(v);
         return NO_VALUE;
 }
 
@@ -112,6 +112,8 @@ core_list_destroy(Expr *e)
 {
         Value *v = get_values(e);
         list_destroy(v[0]);
+        free(v[0].addr);
+        free(v);
         return NO_VALUE;
 }
 
@@ -143,6 +145,7 @@ core_list_insert(Expr *e)
 {
         Value *v = get_values(e);
         list_insert(v[0], v[1], v[2]);
+        free(v);
         return NO_VALUE;
 }
 
@@ -163,7 +166,9 @@ Value
 core_list_size(Expr *e)
 {
         Value *v = get_values(e);
-        return list_size(v[0]);
+        Value ret = list_size(v[0]);
+        free(v);
+        return ret;
 }
 
 /* Get the index of an element given a pointer to this element */
@@ -197,6 +202,7 @@ core_list_remove(Expr *e)
 {
         Value *v = get_values(e);
         list_remove(v[0], v[1]);
+        free(v);
         return NO_VALUE;
 }
 
@@ -229,43 +235,36 @@ Value
 core_list_get(Expr *e)
 {
         Value *v = get_values(e);
-        return list_get(v[0], v[1]);
+        Value ret = list_get(v[0], v[1]);
+        free(v);
+        return ret;
 }
 
 /* Initialize DA_PTR (that is a pointer to a DA). Initial size (int) can be
  * passed as second argument. */
-#define da_init(da_ptr, ...)                                                                \
-        ({                                                                                  \
-                (da_ptr)->capacity = 256;                                                   \
-                __VA_OPT__((da_ptr)->capacity = (__VA_ARGS__);)                             \
-                (da_ptr)->size = 0;                                                         \
-                (da_ptr)->data = NULL;                                                      \
-                (da_ptr)->data = DA_REALLOC((da_ptr)->data,                                 \
-                                            sizeof *((da_ptr)->data) * (da_ptr)->capacity); \
-                assert(da_ptr);                                                             \
-                da_ptr;                                                                     \
+#define da_init(da_ptr, ...)                                                                      \
+        ({                                                                                        \
+                (da_ptr)->capacity = 256;                                                         \
+                __VA_OPT__((da_ptr)->capacity = (__VA_ARGS__);)                                   \
+                (da_ptr)->size = 0;                                                               \
+                (da_ptr)->data = DA_REALLOC(NULL, sizeof *((da_ptr)->data) * (da_ptr)->capacity); \
+                assert(da_ptr);                                                                   \
+                da_ptr;                                                                           \
         })
 
 Value
 core_list_init(Expr *e)
 {
-        List l = da_init((List) calloc(1, sizeof *l));
+        List l = calloc(1, sizeof *l);
+        da_init(l);
         int n;
         Value *v = get_values_n(e, &n);
 
         for (int i = 0; i < n; i++)
                 da_append(l, v[i]);
 
+        free(v);
         return (Value) { .addr = l, .type = TYPE_ADDR };
-}
-
-Value
-core_list_free(Expr *e)
-{
-        Value *v = get_values(e);
-        check_valid_list(v[0]);
-        da_destroy(((List) v->addr));
-        return NO_VALUE;
 }
 
 static __attribute__((constructor)) void
@@ -277,6 +276,5 @@ __init__()
         preload("destroy", core_list_destroy, 1);
         preload("length", core_list_size, 1);
         preload("get", core_list_get, 2);
-        preload("list_free", core_list_free, 1);
         preload("list", core_list_init, 0 | VAARGS); // 0 or more arguments
 }

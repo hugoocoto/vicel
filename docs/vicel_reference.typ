@@ -86,6 +86,12 @@ editor contains a _vspl repl interpreter_. You can use it interactively or to
 run a vspl file. There is some flags that only can be used if `--repl` is set.
 The table below summarize it.
 
+/Color vspl:
+As it's not known language and I don't write a custom highlight or LSP, the text
+will be monochrome. I set the file type to C as the semantics are quite similar.
+Also, the lsp auto format and auto comment works quite well.
+
+
 #table(
   columns: 2,
   stroke: none,

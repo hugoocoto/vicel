@@ -15,7 +15,7 @@ src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/mappings.c|48|19|291
 src/vispel/env.c|37|4|278
-src/vispel/core/list.c|33|19|230
+src/vispel/core/list.c|32|19|229
 src/builtin.c|28|20|226
 src/vispel/resolver.c|25|21|211
 src/readlain.c|26|30|196
@@ -38,7 +38,7 @@ src/formula.h|11|22|55
 src/mappings.h|4|19|49
 src/options.h|9|19|49
 src/vispel/core/core.c|6|7|44
-src/vispel/core/io.c|6|6|42
+src/vispel/core/io.c|6|8|42
 src/debug.c|5|23|41
 src/window.h|10|20|41
 src/vispel/env.h|11|14|28
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1348|1439|8931
+SUM:|1347|1441|8930
