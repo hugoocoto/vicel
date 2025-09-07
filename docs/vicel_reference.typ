@@ -381,7 +381,7 @@ cell_l_sep = " ";               // Left separator
 cell_r_sep = " ";               // Right separator
 save_time = 0;                  // Time interval (in seconds) where save is call. 0 means no autosave.
 use_mouse = false;              // Enable mouse capturing
-
+natural_scroll = true;          // Swap scrolling direction
 ```
 
 This is the ui customization, where you can modify how the editor looks like.
