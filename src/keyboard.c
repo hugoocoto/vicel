@@ -109,7 +109,8 @@ get_escape_sequence()
                                         active_ctx.cursor_pos_r = cellr;
                                 break;
                         case ' ': /* mouse left press */
-                                a_delete();
+                                if (get_cursor_cell()->value.type != TYPE_EMPTY)
+                                        a_delete();
                                 hold = btn;
                                 break;
                         case '#': /* mouse release */
