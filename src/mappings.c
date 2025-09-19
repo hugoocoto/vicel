@@ -351,6 +351,7 @@ a_scroll_left()
 void
 a_scroll_right()
 {
+        /* This code is wrong */
         if (active_ctx.scroll_c + active_ctx.max_display_c >= active_ctx.body->size) return;
         ++active_ctx.scroll_c;
         if (active_ctx.cursor_pos_c < active_ctx.scroll_c)

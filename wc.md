@@ -13,7 +13,7 @@ src/vispel/lexer.c|37|29|357
 src/keyboard.c|48|31|340
 src/escape_code.h|19|24|303
 src/eval.c|36|19|292
-src/mappings.c|48|19|291
+src/mappings.c|48|20|291
 src/vispel/env.c|37|23|278
 src/vispel/core/list.c|32|38|229
 src/builtin.c|28|20|226
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1347|1763|8931
+SUM:|1347|1764|8931

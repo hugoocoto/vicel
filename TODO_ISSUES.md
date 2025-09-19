@@ -2,6 +2,7 @@
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
 * Input/edit text on the last cell fails
 * Fix vspl memleaks
+* Left scrolling on scrolled window scrolls to much
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
@@ -44,3 +45,9 @@ that was deleted should be set to error.
 * Move from vspl to python
 * Improve formulas: move from ast-walking to something more performant. 
 * Fix all previously written issues and todos.
+
+# Merge vspl and formula
+- Move from formula to formula + var 
+- Add type lambda
+- Name it visl: vicel scripting language
+- Move from config.vspl to config.visl
