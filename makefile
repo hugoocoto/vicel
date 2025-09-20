@@ -7,6 +7,7 @@ LIB = -lm
 HEADERS = $(wildcard src/*.h src/vispel/*.h src/vispel/core/*.h)
 SRC = $(wildcard src/*.c src/vispel/*.c src/vispel/core/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
+
 CC = gcc
 TARGET = 
 FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -fsanitize=address,null -Wall -Wextra -Wno-char-subscripts 

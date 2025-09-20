@@ -5,7 +5,7 @@ File|blank|comment|code
 :-------|-------:|-------:|-------:
 src/vispel/stb_ds.h|269|463|1163
 src/vispel/parser.c|75|42|841
-src/formula.c|84|31|728
+src/formula.c|83|30|728
 src/vispel/eval.c|58|46|476
 src/cellmap.c|41|24|427
 src/window.c|53|22|372
@@ -59,4 +59,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|1347|1764|8931
+SUM:|1346|1763|8931

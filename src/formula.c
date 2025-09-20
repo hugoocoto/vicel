@@ -24,9 +24,7 @@
 #include "da.h"
 #include "debug.h"
 #include "eval.h"
-// #include "keyboard.h"
 #include "window.h"
-#include <assert.h>
 
 Cell *cell_self = NULL;
 jmp_buf parsing_error_env;
@@ -151,7 +149,6 @@ new_literal(double value)
         e->as.literal.value = AS_NUMBER(value);
         return e;
 }
-
 
 Expr *
 new_range(Cell *cstart, Cell *cend)
@@ -285,6 +282,7 @@ lexer(char *c)
                 case ':':
                 case '+':
                 case '*':
+                case '#':
                         last->next = TOK_AS_STR(c, 1);
                         last = last->next;
                         ++c;
@@ -535,7 +533,7 @@ get_comparison(Token **t)
 // - unary -> ("!" | "-") unary | group
 // - group -> "(" expr ")" | func
 // - func -> FUNC "(" expr? ("," expr)* ")" | literal
-// - literal -> NUM  | IDENTIFIER
+// - literal -> NUM  | IDENTIFIER 
 
 void
 get_ast_repr(Expr *e, char *buffer, size_t len)

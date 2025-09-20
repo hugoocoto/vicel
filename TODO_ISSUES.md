@@ -2,7 +2,6 @@
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
 * Input/edit text on the last cell fails
 * Fix vspl memleaks
-* Left scrolling on scrolled window scrolls to much
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
