@@ -17,12 +17,40 @@
  *
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
+#include "embedded.h"
 #include "env.h"
 #include "interpreter.h"
 #include "tokens.h"
-#include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
+
+Value last_eval_val = { .type = TYPE_NONE };
+
+char *
+vspl_get_eval_val_repr()
+{
+        Value v = last_eval_val;
+        char last_eval_val_repr[1024];
+        switch (v.type) {
+        case TYPE_NUM:
+                sprintf(last_eval_val_repr, "%d", v.num);
+                break;
+        case TYPE_STR:
+                sprintf(last_eval_val_repr, "\"%s\"", v.str);
+                break;
+        case TYPE_CORE_CALL:
+                sprintf(last_eval_val_repr, "(core func %s)", v.call.name);
+                break;
+        case TYPE_NONE:
+                *last_eval_val_repr = 0;
+                break;
+        default:
+                report("No yet implemented: print_val for %s",
+                       VALTYPE_REPR[v.type]);
+                *last_eval_val_repr = 0;
+                break;
+        }
+        return strdup(last_eval_val_repr);
+}
 
 void
 vspl_start()
@@ -53,12 +81,17 @@ vspl_parse(FILE *file)
         if (file == NULL) return false;
         char buf[1024 * 1024];
         ssize_t n;
-
         /* Todo: allow split file in multiple reads */
         if ((n = fread(buf, 1, sizeof buf - 2, file)) <= 0) return false;
         buf[n] = 0;
         buf[n + 1] = EOF;
-        if (lex_analize(buf)) return false;
+        return vspl_parse_str(buf);
+}
+
+bool
+vspl_parse_str(char *str)
+{
+        if (lex_analize(str)) return false;
         tok_parse();
         if (resolve() == 0) eval_quiet();
         return true;

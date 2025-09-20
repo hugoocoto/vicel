@@ -37,21 +37,17 @@ extern void toggle_raw_mode();
 
 bool repl_verbose = false;
 bool using_repl = false;
+bool vspl_should_quit = false;
 
 int
 REPL()
 {
         char *buf;
-        ssize_t n;
-
         using_repl = true;
         env_create();
         load_core_lib();
 
-        toggle_raw_mode();
-        buf = readlain(PROMPT);
-        toggle_raw_mode();
-        puts("");
+        goto _input;
 
         while (1) {
                 if (lex_analize(buf)) goto _input;
@@ -59,6 +55,8 @@ REPL()
                 tok_parse();
                 if (repl_verbose) print_ast();
                 if (resolve() == 0) eval();
+
+                if (vspl_should_quit) break;
         _input:
                 toggle_raw_mode();
                 buf = readlain(PROMPT);
@@ -69,11 +67,6 @@ REPL()
         vspl_free_tokens();
         free_stmt_head();
         using_repl = false;
-
-        if (n < 0) {
-                report("Can't read");
-                return -1;
-        }
 
         return 0;
 }

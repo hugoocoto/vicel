@@ -569,12 +569,15 @@ inline void
 eval_quiet()
 {
         if (setjmp(eval_runtime_error)) return;
-        eval_stmt_arr(head_stmt);
+        extern Value last_eval_val;
+        last_eval_val = eval_stmt_arr(head_stmt);
 }
 
 inline void
 eval()
 {
         if (setjmp(eval_runtime_error)) return;
-        print_valnl(eval_stmt_arr(head_stmt));
+        extern Value last_eval_val;
+        last_eval_val = eval_stmt_arr(head_stmt);
+        print_valnl(last_eval_val);
 }

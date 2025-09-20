@@ -118,6 +118,7 @@ main(int argc, char *argv[])
         char *cfile;
 
         flag_set(&argc, &argv);
+        vspl_env_start();
 
         if (argc > 1 && *argv[1] != '-') {
                 filename = argv[1];
@@ -139,7 +140,12 @@ main(int argc, char *argv[])
                                 parse_options_file(fopen(cfile, "r"));
                 }
 
-                if (flag_get_value(&file, "-f")) return VSPL(file);
+                if (flag_get_value(&file, "-f")) {
+                        do {
+                                VSPL(file);
+                        } while (flag_get_value(&file, "-f"));
+                        return 0;
+                }
                 return REPL();
         }
 
@@ -149,8 +155,8 @@ main(int argc, char *argv[])
         }
 
         if (flag_get("-D", "--debug")) debug_level = 1;
-
         report("------| Starting |------");
+
         options_init(.filename = filename,
                      .fileextension = get_extension(filename));
         parse_options_default_file(); // before parse custom config file
@@ -164,7 +170,7 @@ main(int argc, char *argv[])
                 return 0;
         }
 
-        options_destroy();
+        vspl_env_end();
 
         if (filename == NULL && argc == 2 && *argv[1] != '-') {
                 filename = argv[1];

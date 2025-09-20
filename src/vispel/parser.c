@@ -24,6 +24,7 @@
  *
  * */
 
+#include "tokens.h"
 #include <assert.h>
 #include <fcntl.h>
 #include <setjmp.h>
@@ -31,7 +32,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include "tokens.h"
 
 vtok *current_token = NULL;
 Stmt *head_stmt = NULL;

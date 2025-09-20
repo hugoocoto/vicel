@@ -26,7 +26,10 @@
 #include "debug.h"
 #include "eval.h"
 #include "formula.h"
+#include "options.h"
+#include "vispel/embedded.h"
 #include "window.h"
+#include <unistd.h>
 
 struct Pair {
         char *name;
@@ -258,6 +261,31 @@ builtin_color(Expr *e)
         return VALUE_EMPTY;
 }
 
+Value
+builtin_vspl(Expr *e)
+{
+        if (e == NULL) return VALUE_EMPTY;
+        Value v = eval_expr(e);
+repeat:
+        switch (v.type) {
+        case TYPE_FORMULA:
+                v = eval_formula(*v.as.formula);
+                goto repeat;
+        case TYPE_TEXT:
+                vspl_start();
+                vspl_parse_str(v.as.text);
+                vspl_env_end();
+                break;
+        default:
+                report("Can not eval expr as vspl expr: is not text");
+                break;
+        }
+
+        Value ret = (Value) { .type = TYPE_TEXT,
+                              .as.text = strdup(vspl_get_eval_val_repr()) };
+        return ret;
+}
+
 static __attribute__((constructor)) void
 __setup__()
 {
@@ -271,4 +299,5 @@ __setup__()
         builtin_add("color", builtin_color);
         builtin_add("colorb", builtin_colorb);
         builtin_add("literal", builtin_literal);
+        builtin_add("vspl", builtin_vspl);
 }

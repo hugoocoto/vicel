@@ -189,7 +189,7 @@ get_input_at_cursor()
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         apply_color("insert");
         printf("%*s", win_opts.col_width, "");
-        T_CUB(win_opts.col_width - 1);
+        cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         T_CUSHW();
 
         rlain_insert(get_cursor_cell()->input_repr);

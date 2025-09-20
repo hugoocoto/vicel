@@ -72,6 +72,7 @@ void parse_options_default_file();
 void parse_options_file(FILE *f);
 void free_opts();
 void __options_init(OptOpts);
-void options_destroy();
+void vspl_env_end();
+void vspl_env_start();
 
 #endif //! OPTS_H_

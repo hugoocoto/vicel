@@ -130,10 +130,10 @@ parse_options_file(FILE *f)
         if (vspl_parse(f)) options_get();
 }
 
-/* unsafe */
 char *
 path_join(char *base, ...)
 {
+        /* unsafe */
         va_list v;
         char *c;
         int n = 0;
@@ -154,9 +154,8 @@ void
 parse_options_default_file()
 {
         char path[128];
-        char *home = getenv("HOME");
+        char *home = getenv("HOME") ?: "";
         report("home=%s", home);
-        if (home == NULL) home = "";
         parse_options_file(fopen(pjoin(path, home, "vicel.vspl"), "r"));
         parse_options_file(fopen(pjoin(path, home, ".config/vicel.vspl"), "r"));
         parse_options_file(fopen(pjoin(path, home, ".config/vicel/vicel.vspl"), "r"));
@@ -166,8 +165,6 @@ parse_options_default_file()
 void
 __options_init(OptOpts opts)
 {
-        vspl_start();
-
         vspl_addstr("filename", (opts.filename && *opts.filename) ? opts.filename : "");
         vspl_addstr("extension", (opts.fileextension && *opts.fileextension) ? opts.fileextension : "");
 
@@ -202,7 +199,13 @@ __options_init(OptOpts opts)
 }
 
 void
-options_destroy()
+vspl_env_start()
+{
+        vspl_start();
+}
+
+void
+vspl_env_end()
 {
         vspl_end();
 }

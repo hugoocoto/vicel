@@ -2,7 +2,6 @@
 
 set -e
 
-
 sudo pacman -S --needed gcc lib32-gcc-libs aarch64-linux-gnu-gcc arm-none-eabi-gcc riscv64-linux-gnu-gcc 
 
 rm -rf ./build

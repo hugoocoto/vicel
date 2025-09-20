@@ -17,23 +17,28 @@
  *
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
+/*
+ * Author: Hugo Coto Florez
+ * Repo: github.com/hugocotoflorez/vispel
+ *
+ * */
+
+#include <assert.h>
 #include <stdbool.h>
-#include <stdio.h>
 
-void vspl_start();
-bool vspl_parse(FILE *file);
-bool vspl_parse_str(char *);
-bool vspl_get_int(char *name, int *value);
-bool vspl_get_str(char *name, char **value);
-void vspl_end();
+#include "core.h"
 
-void vspl_addint(char *name, int value);
-void vspl_addstr(char *name, char *value);
-void vspl_dump_env();
-char * vspl_get_eval_val_repr();
+Value
+core_quit(Expr *args)
+{
+        extern bool vspl_should_quit;
+        vspl_should_quit = true;
+        return NO_VALUE;
+}
 
-#define vspl_addvar(name, v) _Generic((v), \
-char *: vspl_addstr,                       \
-const char *: vspl_addstr,                 \
-int: vspl_addint,                          \
-bool: vspl_addint)(name, v)
+
+static __attribute__((constructor)) void
+__init__()
+{
+        preload("quit", core_quit, 0);
+}

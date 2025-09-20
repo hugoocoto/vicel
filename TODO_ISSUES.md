@@ -1,12 +1,12 @@
 # Issues
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
-* Input/edit text on the last cell fails
-* Fix vspl memleaks
+* vispel memleak [link](#vsplmem)
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
 * Improve update screen when it isn't needed to update the full screen.
-* On color() formula delete it should clear color.
+* On color() formula deletion it should clear color.
+* Input/edit text on the last cell works but it's not what is expected
 
 # vspl todos
 * Check that all memleaks are fixed
@@ -45,8 +45,8 @@ that was deleted should be set to error.
 * Improve formulas: move from ast-walking to something more performant. 
 * Fix all previously written issues and todos.
 
-# Merge vspl and formula
-- Move from formula to formula + var 
-- Add type lambda
-- Name it visl: vicel scripting language
-- Move from config.vspl to config.visl
+### vsplmem
+It can only parse a file. If more files are parsed, head become null so it cant
+be free. If I free if on head change, I get a heap-user-after-free as token
+values are used. I have to implement something as a big repl instead of file
+parsing. 

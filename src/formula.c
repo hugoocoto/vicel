@@ -533,7 +533,7 @@ get_comparison(Token **t)
 // - unary -> ("!" | "-") unary | group
 // - group -> "(" expr ")" | func
 // - func -> FUNC "(" expr? ("," expr)* ")" | literal
-// - literal -> NUM  | IDENTIFIER 
+// - literal -> NUM  | IDENTIFIER
 
 void
 get_ast_repr(Expr *e, char *buffer, size_t len)
