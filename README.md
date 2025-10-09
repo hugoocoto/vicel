@@ -12,7 +12,7 @@ Webpage: https://hugoocoto.github.io/vicel/
 * Supports numbers, text, and formulas
 * Keyboard-focused Vim-style motions
 * Lightweight and minimal code
-* Configuration via .toml file
+* Configuration via .py file
 * Mouse support
 
 ## Reference manual 

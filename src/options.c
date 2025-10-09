@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * For questions or support, contact: hugo.coto@member.fsf.org
+ * For questions or support, contact: me@hugocoto.com
  */
 
 /*---*/
@@ -26,18 +26,35 @@
 /*---*/
 
 #include <Python.h>
+#include <assert.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
 PyObject *globals = NULL;
 
-#define GET_STR(_name_, _var_)                                         \
-        do {                                                           \
-                PyObject *obj;                                         \
-                if ((obj = PyDict_GetItemString(globals, (_name_))) && \
-                    PyUnicode_Check(obj)) {                            \
-                        (_var_) = (char *) PyUnicode_AsUTF8(obj);      \
-                }                                                      \
+#define GET_STR(_name_, _var_)                                            \
+        do {                                                              \
+                PyObject *obj;                                            \
+                if ((obj = PyDict_GetItemString(globals, (_name_))) &&    \
+                    PyUnicode_Check(obj)) {                               \
+                        free((_var_));                                    \
+                        (_var_) = strdup((char *) PyUnicode_AsUTF8(obj)); \
+                        report("CONFIG  %s = \"%s\"", (_name_), (_var_)); \
+                }                                                         \
+        } while (0)
+
+#define GET_COL(_name_, _var_)                                                \
+        do {                                                                  \
+                PyObject *obj;                                                \
+                if ((obj = PyDict_GetItemString(globals, (_name_))) &&        \
+                    PyUnicode_Check(obj)) {                                   \
+                        free((_var_));                                        \
+                        (_var_) = col_format((char *) PyUnicode_AsUTF8(obj)); \
+                        report("CONFIG  %s = \"%s\"", (_name_), (_var_));     \
+                }                                                             \
         } while (0)
 
 #define GET_INT(_name_, _var_)                                         \
@@ -46,6 +63,7 @@ PyObject *globals = NULL;
                 if ((obj = PyDict_GetItemString(globals, (_name_))) && \
                     PyLong_Check(obj)) {                               \
                         (_var_) = PyLong_AsLong(obj);                  \
+                        report("CONFIG  %s = %d", (_name_), (_var_));  \
                 }                                                      \
         } while (0)
 
@@ -86,7 +104,7 @@ col_format(char *col)
         return new;
 }
 
-void
+static void
 get_window_options()
 {
         GET_STR("cell_l_sep", win_opts.cell_l_sep);
@@ -107,23 +125,23 @@ get_window_options()
         GET_STR("ui_status_bottom_end", win_opts.ui_status_bottom_end);
 }
 
-void
+static void
 get_color_options()
 {
-        GET_STR("ui", col_opts.ui);
-        GET_STR("cell_over", col_opts.cell_over);
-        GET_STR("cell_selected", col_opts.cell_selected);
-        GET_STR("ln_over", col_opts.ln_over);
-        GET_STR("ln", col_opts.ln);
-        GET_STR("sheet_ui", col_opts.sheet_ui);
-        GET_STR("sheet_ui_over", col_opts.sheet_ui_over);
-        GET_STR("sheet_ui_selected", col_opts.sheet_ui_selected);
-        GET_STR("ui_cell_text", col_opts.ui_cell_text);
-        GET_STR("ui_report", col_opts.ui_report);
-        GET_STR("insert", col_opts.insert);
+        GET_COL("ui", col_opts.ui);
+        GET_COL("cell_over", col_opts.cell_over);
+        GET_COL("cell_selected", col_opts.cell_selected);
+        GET_COL("ln_over", col_opts.ln_over);
+        GET_COL("ln", col_opts.ln);
+        GET_COL("sheet_ui", col_opts.sheet_ui);
+        GET_COL("sheet_ui_over", col_opts.sheet_ui_over);
+        GET_COL("sheet_ui_selected", col_opts.sheet_ui_selected);
+        GET_COL("ui_cell_text", col_opts.ui_cell_text);
+        GET_COL("ui_report", col_opts.ui_report);
+        GET_COL("insert", col_opts.insert);
 }
 
-void
+static void
 options_get()
 {
         get_color_options();
@@ -161,6 +179,7 @@ parse_options_file(char *filename)
         assert(globals);
         report("Loading config file %s", filename);
         PyRun_File(f, filename, Py_file_input, globals, globals);
+        options_get();
         fclose(f);
 }
 
@@ -204,18 +223,18 @@ __options_init(OptOpts opts)
         PyDict_SetItemString(globals, "extension", PyUnicode_FromString((opts.fileextension && *opts.fileextension) ? opts.fileextension : ""));
 
         // funny chunk of code
-        PyDict_SetItemString(globals, "ui", PyUnicode_FromString((col_opts.ui = col_format("49;30"), ("49;30"))));
-        PyDict_SetItemString(globals, "ui_cell_text", PyUnicode_FromString((col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1"))));
-        PyDict_SetItemString(globals, "ui_report", PyUnicode_FromString((col_opts.ui_report = col_format("41;39"), ("41;39"))));
-        PyDict_SetItemString(globals, "cell", PyUnicode_FromString((col_opts.cell = col_format("49;39"), ("49;39"))));
-        PyDict_SetItemString(globals, "cell_over", PyUnicode_FromString((col_opts.cell_over = col_format("49;39;7;1"), ("49;39;7;1"))));
-        PyDict_SetItemString(globals, "cell_selected", PyUnicode_FromString((col_opts.cell_selected = col_format("49;32"), ("49;32"))));
-        PyDict_SetItemString(globals, "ln_over", PyUnicode_FromString((col_opts.ln_over = col_format("49;32;7;1"), ("49;32;7;1"))));
-        PyDict_SetItemString(globals, "ln", PyUnicode_FromString((col_opts.ln = col_format("49;32"), ("49;32"))));
-        PyDict_SetItemString(globals, "sheet_ui", PyUnicode_FromString((col_opts.sheet_ui = col_format("49;39"), ("49;39"))));
-        PyDict_SetItemString(globals, "sheet_ui_over", PyUnicode_FromString((col_opts.sheet_ui_over = col_format("45;39;7;1"), ("45;39;7;1"))));
-        PyDict_SetItemString(globals, "sheet_ui_selected", PyUnicode_FromString((col_opts.sheet_ui_selected = col_format("45;32"), ("45;32"))));
-        PyDict_SetItemString(globals, "insert", PyUnicode_FromString((col_opts.insert = col_format("49;39"), ("49;39"))));
+        PyDict_SetItemString(globals, "ui", PyUnicode_FromString((col_opts.ui = col_format("49;30"))));
+        PyDict_SetItemString(globals, "ui_cell_text", PyUnicode_FromString((col_opts.ui_cell_text = col_format("49;39;1"))));
+        PyDict_SetItemString(globals, "ui_report", PyUnicode_FromString((col_opts.ui_report = col_format("41;39"))));
+        PyDict_SetItemString(globals, "cell", PyUnicode_FromString((col_opts.cell = col_format("49;39"))));
+        PyDict_SetItemString(globals, "cell_over", PyUnicode_FromString((col_opts.cell_over = col_format("49;39;7;1"))));
+        PyDict_SetItemString(globals, "cell_selected", PyUnicode_FromString((col_opts.cell_selected = col_format("49;32"))));
+        PyDict_SetItemString(globals, "ln_over", PyUnicode_FromString((col_opts.ln_over = col_format("49;32;7;1"))));
+        PyDict_SetItemString(globals, "ln", PyUnicode_FromString((col_opts.ln = col_format("49;32"))));
+        PyDict_SetItemString(globals, "sheet_ui", PyUnicode_FromString((col_opts.sheet_ui = col_format("49;39"))));
+        PyDict_SetItemString(globals, "sheet_ui_over", PyUnicode_FromString((col_opts.sheet_ui_over = col_format("45;39;7;1"))));
+        PyDict_SetItemString(globals, "sheet_ui_selected", PyUnicode_FromString((col_opts.sheet_ui_selected = col_format("45;32"))));
+        PyDict_SetItemString(globals, "insert", PyUnicode_FromString((col_opts.insert = col_format("49;39"))));
         PyDict_SetItemString(globals, "num_col_width", PyLong_FromLong((win_opts.num_col_width = 5)));
         PyDict_SetItemString(globals, "col_width", PyLong_FromLong((win_opts.col_width = 14)));
         PyDict_SetItemString(globals, "row_width", PyLong_FromLong((win_opts.row_width = 1)));
@@ -232,4 +251,12 @@ __options_init(OptOpts opts)
         PyDict_SetItemString(globals, "ui_status_bottom_end", PyUnicode_FromString((win_opts.ui_status_bottom_end = strdup("github: hugoocoto/vicel"))));
         PyDict_SetItemString(globals, "use_mouse", PyBool_FromLong((win_opts.use_mouse = true)));
         PyDict_SetItemString(globals, "natural_scroll", PyBool_FromLong((win_opts.natural_scroll = true)));
+}
+
+void
+parse_options_dump()
+{
+        if (!Py_IsInitialized()) return;
+        if (!globals) return;
+        printf("No yet implemented!");
 }

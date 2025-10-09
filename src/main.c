@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * For questions or support, contact: hugo.coto@member.fsf.org
+ * For questions or support, contact: me@hugocoto.com
  */
 
 #include "common.h"
@@ -121,7 +121,6 @@ main(int argc, char *argv[])
         char *cfile;
 
         flag_set(&argc, &argv);
-        parse_options_init();
 
         if (argc > 1 && *argv[1] != '-') {
                 filename = argv[1];
@@ -133,8 +132,10 @@ main(int argc, char *argv[])
         }
 
         if (flag_get("-D", "--debug")) debug_level = 1;
+
         report("------| Starting |------");
 
+        parse_options_init();
         options_init(.filename = filename,
                      .fileextension = get_extension(filename));
 
@@ -145,6 +146,7 @@ main(int argc, char *argv[])
         }
 
         if (flag_get("--dump-options")) {
+                parse_options_dump();
                 return 0;
         }
 

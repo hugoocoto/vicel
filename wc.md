@@ -11,11 +11,11 @@ src/escape_code.h|19|24|303
 src/eval.c|36|19|292
 src/mappings.c|48|20|291
 src/builtin.c|28|20|227
+src/options.c|23|23|216
 src/readlain.c|26|30|196
-src/options.c|21|23|191
 src/dhm.c|32|20|157
 src/saving.c|23|19|152
-src/main.c|27|22|128
+src/main.c|28|22|129
 src/hm.c|31|23|115
 src/aptree.c|23|26|106
 src/cellmap.h|26|21|106
@@ -23,8 +23,8 @@ src/da.h|15|33|89
 src/flag.c|11|37|83
 src/color.c|9|19|63
 src/formula.h|11|22|55
+src/options.h|9|19|50
 src/mappings.h|4|19|49
-src/options.h|9|19|49
 src/window.h|10|20|41
 src/debug.c|5|23|25
 src/debug.h|5|19|20
@@ -41,4 +41,4 @@ src/builtin.h|5|19|8
 src/saving.h|4|19|6
 src/readlain.h|5|21|5
 --------|--------|--------|--------
-SUM:|709|838|4770
+SUM:|712|838|4797

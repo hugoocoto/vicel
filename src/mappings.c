@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * For questions or support, contact: hugo.coto@member.fsf.org
+ * For questions or support, contact: me@hugocoto.com
  */
 
 #include "mappings.h"

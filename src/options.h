@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * For questions or support, contact: hugo.coto@member.fsf.org
+ * For questions or support, contact: me@hugocoto.com
  */
 
 #ifndef OPTS_H_
@@ -73,5 +73,6 @@ void parse_options_init();
 void parse_options_default_file();
 void parse_options_file(char *filename);
 void __options_init(OptOpts);
+void parse_options_dump();
 
 #endif //! OPTS_H_

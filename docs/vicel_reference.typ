@@ -1,5 +1,5 @@
 #let author = "Hugo Coto Flórez"
-#let mail = "hugo.coto@outlook.com"
+#let mail = "me@hugocoto.com"
 
 #show heading.where(
   level: 1,
@@ -37,6 +37,19 @@ that it's not planned to support any graphs neither economic formulas or such
 specific things. It's true that with builtins someone can adapt vicel to his own
 necessities.
 
+== How to contribute
+This is a community project managed by me, Hugo Coto. I only accept code by
+those who contribute because they love the project and programming. I'm not
+going to accept any LLM generated code, as all this codebase is and would be
+created as a piece of art, I mean, not as a corporative - over engineering chunk
+of unmanaged code. Every modification should be committed only with changes and
+files that solves the same problem. The work philosophy of vicel is about think
+and then write code. Please, ask me about new ideas before request it to be
+included, as I don't want to deny your effort. All the new code should be written
+in gnu-c11, but with c99 style. It have to be formatted using the .clang-format
+file in the root of the project. All the changes should be reflected in
+documentation if needed. Thanks you so much to collaborate in vicel.
+
 == Installation
 This section would guide you to install vicel from source. Source is
 available in #link("https://github.com/hugoocoto/vicel", "github"). First,
@@ -47,8 +60,8 @@ cd vicel
 ```
 
 Then, there are two options to install it.
-+ Local installation: run ```sh make```.
-+ Global installation: run ```sh make install```. This would move the
++ Local (debug) installation: run ```sh make```.
++ Global installation: run ```sh make clean release install```. This would move the
   executable to #smallcaps("~/.local/bin"), make sure this route is in path.
 
 After installation, it will be available. Note that local installation requires
@@ -76,37 +89,14 @@ The options supported are the following:
   [`-m`, `--use-mouse`  ], [Enable mouse support],
   [`-D`, `--debug`      ], [Enable debug output ],
   [`-c`, `--config-file`], [Set custom file path],
-  [`--dump-options`], [Print in stdout the default options and exit],
-  [`--repl`], [Open a vspl repl and exit on repl close],
-)
-
-=== About vspl repl
-Vicel use #smallcaps("vspl") as the language for configuration. That's why the
-editor contains a _vspl repl interpreter_. You can use it interactively or to
-run a vspl file. There is some flags that only can be used if `--repl` is set.
-The table below summarize it.
-
-/Color vspl:
-As it's not known language and I don't write a custom highlight or LSP, the text
-will be monochrome. I set the file type to C as the semantics are quite similar.
-Also, the lsp auto format and auto comment works quite well.
-
-
-#table(
-  columns: 2,
-  stroke: none,
-  table.header("Command", "Description"),
-  table.hline(),
-  [`-V`], [Open repl in verbose mode],
-  [`-f <filename>`], [Run #smallcaps("filename") using the repl and exit],
-  [`--preload`], [Load vicel variables and options from config files],
+  // [`--dump-options`], [Print in stdout the default options and exit],
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
-a config file in #smallcaps("./config/vicel.vspl"), the command line should
+a config file in #smallcaps("./config/vicel.py"), the command line should
 looks like that:
 ```sh
-vicel sheets/table.csv -c config/vicel.vspl
+vicel sheets/table.csv -c config/vicel.py
 ```
 
 == Moving around
@@ -336,67 +326,65 @@ pressing the mouse wheel changes the direction.
 
 == Configuration
 
-=== vicel.vspl
+=== vicel.py
 
-You can customize some values using a vicel vispel configuration file. By
+You can customize some values using a python configuration file. By
 default, vicel looks for this file in the following paths:
-- #smallcaps("./vicel.vspl")
-- #smallcaps("~/vicel.vspl")
-- #smallcaps("~/.config/vicel.vspl")
-- #smallcaps("~/.config/vicel/vicel.vspl")
+- #smallcaps("./vicel.py")
+- #smallcaps("./config/vicel.py")
+- #smallcaps("~/vicel.py")
+- #smallcaps("~/.config/vicel.py")
+- #smallcaps("~/.config/vicel/vicel.py")
 
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
-format is #smallcaps("vspl"). You won't find any information about this language
-as is written by myself. Don't worry, you only need to assign values to yet
-declared variables. You can check out the configuration I currently use
-#link("https://github.com/hugoocoto/vicel/blob/main/vicel.vspl", "here").
+format is #smallcaps(".py").
 
 ==== Color
 Options in this table controls colors in all the editor.
 
-```c
-ui = "49;30";                   // All ui text except ui_text_cell
-ui_cell_text = "49;39;1";       // Cell text representation and previous message
-ui_report = "41;39";            // Error/report message at the bottom right
-cell = "49;39";                 // Cell color if not custom color applied
-cell_over = "49;39;7;1";        // Cell color if cursor is over cell
-cell_selected = "49;32";        // Cell color if selected
-ln_over = "49;32;7;1";          // Row/col number/alpha if cursor is in this row/col
-ln = "49;32";                   // Row/col number/alpha default color
-sheet_ui = "49;39";             // UI elements inside sheet as separators
-sheet_ui_over = "45;39;7;1";    // UI elements inside sheet if cursor is over they
-sheet_ui_selected = "45;32";    // UI elements inside sheet if assigned cell is selected
-insert = "49;39";               // Color used when cell input text is being written
+```py
+ui = "49;30"                   # All ui text except ui_text_cell
+ui_cell_text = "49;39;1"       # Cell text representation and previous message
+ui_report = "41;39"            # Error/report message at the bottom right
+cell = "49;39"                 # Cell color if not custom color applied
+cell_over = "49;39;7;1"        # Cell color if cursor is over cell
+cell_selected = "49;32"        # Cell color if selected
+ln_over = "49;32;7;1"          # Row/col number/alpha if cursor is in this row/col
+ln = "49;32"                   # Row/col number/alpha default color
+sheet_ui = "49;39"             # UI elements inside sheet as separators
+sheet_ui_over = "45;39;7;1"    # UI elements inside sheet if cursor is over they
+sheet_ui_selected = "45;32"    # UI elements inside sheet if assigned cell is selected
+insert = "49;39"               # Color used when cell input text is being written
 ```
 
 ==== UI and others
 
-```c
-num_col_width = 5;              // Number column width
-col_width = 14;                 // Column width (min is cell_l_sep + cell_r_sep + 1)
-row_width = 1;                  // Other size is not supported
-use_cell_color_for_sep = true;  // Use cell color for separators instead of sheet_ui
-cell_l_sep = " ";               // Left separator
-cell_r_sep = " ";               // Right separator
-save_time = 0;                  // Time interval (in seconds) where save is call. 0 means no autosave.
-use_mouse = false;              // Enable mouse capturing
-natural_scroll = true;          // Swap scrolling direction
+```py
+num_col_width = 5              # Number column width
+col_width = 14                 # Column width (min is cell_l_sep + cell_r_sep + 1)
+row_width = 1                  # Other size is not supported
+use_cell_color_for_sep = true  # Use cell color for separators instead of sheet_ui
+cell_l_sep = " "               # Left separator
+cell_r_sep = " "               # Right separator
+save_time = 0                  # Time interval (in seconds) where save is call. 0 means no autosave.
+use_mouse = false              # Enable mouse capturing
+natural_scroll = true          # Swap scrolling direction
 ```
 
 This is the ui customization, where you can modify how the editor looks like.
 
-```c
-// Top bar
-status_l_stuff = "vicel | ";    // Top Left bar text
-status_filename = "filename: "; // Between status_l_stuff and filename
-status_r_end = "github: hugoocoto/vicel"; // Top right-align bar text
+```py
+# Top bar
+status_l_stuff = "vicel | ";              # Top Left bar text
+status_filename = "filename: ";           # Between status_l_stuff and filename
+status_r_end = "github: hugoocoto/vicel"; # Top right-align bar text
 
-// Bottom bar
-ui_celltext_l_sep = "cell text: "; // Bottom Left bar text, before cell repr text
-ui_celltext_m_sep = " (";       // Between cell text and cell type
-ui_celltext_r_sep = ") ";       // Before cell type, left-aligned
-ui_status_bottom_end = "";      // Bottom right-align text
+# Bottom bar
+ui_celltext_l_sep = "cell text: ";  # Bottom Left bar text, before cell repr text
+ui_celltext_m_sep = " (";           # Between cell text and cell type
+ui_celltext_r_sep = ") ";           # Before cell type, left-aligned
+ui_status_bottom_end = "";          # Bottom right-align text
 ```
 
 

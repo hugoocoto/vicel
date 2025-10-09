@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * For questions or support, contact: hugo.coto@member.fsf.org
+ * For questions or support, contact: me@hugocoto.com
  */
 
 #ifndef DYNAMIC_ARRAY_H
@@ -95,7 +95,7 @@
 #define da_insert(da_ptr, e, i)                                                 \
         ({                                                                      \
                 assert((i) >= 0 && (i) <= (da_ptr)->size);                      \
-                da_append((da_ptr), (typeof((e))) { 0 });                       \
+                da_append((da_ptr), (__typeof__((e))) { 0 });                   \
                 memmove((da_ptr)->data + (i) + 1, (da_ptr)->data + (i),         \
                         ((da_ptr)->size - (i) - 1) * sizeof *((da_ptr)->data)); \
                 (da_ptr)->data[(i)] = (e);                                      \

@@ -12,11 +12,13 @@ PYL := $(shell python3-config --embed --ldflags)
 
 CC = gcc
 TARGET = 
-FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -fsanitize=address,null -Wall -Wextra -Wno-char-subscripts 
+FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts 
+#-fsanitize=address,null 
 
 COMP = $(CC) $(TARGET) $(FLAGS)
 
-$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md 
+
+$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md
 	$(COMP) $(OBJ) $(INC) $(PYL) $(LIB) -o $(OUT)
 	rm -f report.log log.txt
 
@@ -46,3 +48,5 @@ release:
 
 compile_flags:
 	$(PYC) | sed "s/ \+/\n/g" > compile_flags.txt
+
+.PHONY: clean install uninstall release
