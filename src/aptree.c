@@ -140,37 +140,16 @@ void
 ap_remove(APTree t, char *prefix, int len)
 {
         assert("No yet implemented: ap_remove" && 0);
-        assert(t);
-        assert(prefix);
-        assert(len);
+        if (t) {
+        }
+        if (prefix) {
+        }
+        if (len) {
+        }
 }
 
 void
 ap_destroy(APTree t)
 {
         ap_destroyv(t);
-}
-
-static __attribute__((constructor)) void
-test()
-{
-        APTree t = ap_init();
-        APTree n;
-        ap_add(t, "hello", 4, (Action) { .action = (void *) 1 });
-        ap_add(t, "h", 1, (Action) { .action = (void *) 2 });
-        ap_add(t, "hola", 4, (Action) { .action = (void *) 3 });
-        n = ap_get(t, "hello", 4);
-        assert(n && "hello");
-        assert(n->action.action == (void *) 1);
-        n = ap_get(t, "h", 1);
-        assert(n && "h");
-        assert(n->action.action == (void *) 2);
-        n = ap_get(t, "hola", 4);
-        assert(n && "hola");
-        assert(n->action.action == (void *) 3);
-        assert(ap_get_unique(t, "hello", 4).action == (void *) 1);
-        assert(ap_get_unique(t, "h", 1).action == NULL);
-        assert(ap_get_unique(t, "hola", 4).action == (void *) 3);
-        assert(ap_get_last(t, "hel", 3).action == (void *) 2);
-        ap_destroy(t);
 }

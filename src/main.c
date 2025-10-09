@@ -26,13 +26,14 @@
 #include "mappings.h"
 #include "options.h"
 #include "saving.h"
-#include "vispel/embedded.h"
 #include "window.h"
 
 void
 resize_handler(int s)
 {
-        assert(s == SIGWINCH);
+        if (s != SIGWINCH) {
+                // shut up unused s
+        }
 
         if (ioctl(0, TIOCGWINSZ, &active_ctx.ws) == -1) {
                 perror("resize_handler: ioctl");
@@ -57,7 +58,9 @@ volatile int save_time = 0;
 void
 autosave_handler(int s)
 {
-        assert(s == SIGALRM);
+        if (s != SIGALRM) {
+                // shut up unused s
+        }
         if (should_autosave) return;
         should_autosave = 1;
         alarm(save_time);
@@ -118,35 +121,10 @@ main(int argc, char *argv[])
         char *cfile;
 
         flag_set(&argc, &argv);
-        vspl_env_start();
+        parse_options_init();
 
         if (argc > 1 && *argv[1] != '-') {
                 filename = argv[1];
-        }
-
-        if (flag_get("--repl")) {
-                extern int REPL();
-                extern int VSPL(char *);
-                extern bool repl_verbose;
-                char *file;
-                repl_verbose = flag_get("-V");
-
-                if (flag_get("--preload")) {
-                        /* Add config file if interactive repl */
-                        options_init(.filename = filename,
-                                     .fileextension = get_extension(filename));
-                        parse_options_default_file(); // before parse custom config file
-                        while (flag_get_value(&cfile, "-c", "--config-file"))
-                                parse_options_file(fopen(cfile, "r"));
-                }
-
-                if (flag_get_value(&file, "-f")) {
-                        do {
-                                VSPL(file);
-                        } while (flag_get_value(&file, "-f"));
-                        return 0;
-                }
-                return REPL();
         }
 
         if (flag_get("-m", "--use-mouse")) {
@@ -159,18 +137,16 @@ main(int argc, char *argv[])
 
         options_init(.filename = filename,
                      .fileextension = get_extension(filename));
+
         parse_options_default_file(); // before parse custom config file
 
         while (flag_get_value(&cfile, "-c", "--config-file")) {
-                parse_options_file(fopen(cfile, "r"));
+                parse_options_file(cfile);
         }
 
         if (flag_get("--dump-options")) {
-                vspl_dump_env();
                 return 0;
         }
-
-        vspl_env_end();
 
         if (filename == NULL && argc == 2 && *argv[1] != '-') {
                 filename = argv[1];
@@ -194,7 +170,7 @@ main(int argc, char *argv[])
         save(&active_ctx);
         cm_destroy(active_ctx.body);
         a_free_yank_buffer();
-        free_opts();
+        parse_options_destroy();
 
         report("---| End without error |---");
         return 0;

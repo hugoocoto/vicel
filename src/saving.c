@@ -188,5 +188,7 @@ save(Context *ctx)
                 dprintf(fd, "\n");
         }
 
-        ftruncate(fd, lseek(fd, 0, SEEK_CUR));
+        if (ftruncate(fd, lseek(fd, 0, SEEK_CUR))) {
+                report("ftruncate failed: csv might be corrupted");
+        }
 }

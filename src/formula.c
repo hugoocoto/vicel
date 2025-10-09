@@ -787,8 +787,8 @@ create_id(int r, int c, bool freeze_r, bool freeze_c)
 static __attribute__((constructor)) void
 test_create_id()
 {
-        char *c0, *c1, *c2;
-        char *c3, *c4, *c5;
+        char *c0=0, *c1=0, *c2=0;
+        char *c3=0, *c4=0, *c5=0;
         assert(!strcmp(c0 = create_id(0, 0, false, false), "A0"));
         assert(!strcmp(c1 = create_id(2, 0, false, false), "A2"));
         assert(!strcmp(c2 = create_id(0, 2, false, false), "C0"));

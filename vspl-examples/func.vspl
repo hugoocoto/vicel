@@ -1,9 +1,0 @@
-func a(c, d , e){
-        func add2(x) {
-                return x + 2;
-        }
-        println("Values to sum:" ,add2(c) ,d ,e);
-        return add2(c) + d + e;
-}
-
-println(a(1,2,3));

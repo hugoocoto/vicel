@@ -64,7 +64,7 @@ set_default_colors()
 char *
 get_color(char *key)
 {
-        char *col;
+        char *col = NULL;
         if (key == NULL) return C(C_NORMAL);
         hmget(colors, key, (void *) &col);
         if (col == NULL) {

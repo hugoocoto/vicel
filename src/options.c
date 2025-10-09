@@ -18,26 +18,36 @@
  * For questions or support, contact: hugo.coto@member.fsf.org
  */
 
+/*---*/
 #include "options.h"
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
-#include "vispel/embedded.h"
+/*---*/
+
+#include <Python.h>
 
 Win_opts win_opts;
 Col_opts col_opts;
+PyObject *globals = NULL;
 
-#define copy_free(a, b)  \
-        {                \
-                free(a); \
-                (a) = b; \
-        }
+#define GET_STR(_name_, _var_)                                         \
+        do {                                                           \
+                PyObject *obj;                                         \
+                if ((obj = PyDict_GetItemString(globals, (_name_))) && \
+                    PyUnicode_Check(obj)) {                            \
+                        (_var_) = (char *) PyUnicode_AsUTF8(obj);      \
+                }                                                      \
+        } while (0)
 
-#define copy(a, b)               \
-        {                        \
-                free(a);         \
-                (a) = strdup(b); \
-        }
+#define GET_INT(_name_, _var_)                                         \
+        do {                                                           \
+                PyObject *obj;                                         \
+                if ((obj = PyDict_GetItemString(globals, (_name_))) && \
+                    PyLong_Check(obj)) {                               \
+                        (_var_) = PyLong_AsLong(obj);                  \
+                }                                                      \
+        } while (0)
 
 
 void
@@ -79,41 +89,38 @@ col_format(char *col)
 void
 get_window_options()
 {
-        char *vs;
-        int vi;
-        if (vspl_get_str("cell_l_sep", &vs)) copy(win_opts.cell_l_sep, vs);
-        if (vspl_get_str("cell_l_sep", &vs)) copy(win_opts.cell_l_sep, vs);
-        if (vspl_get_str("cell_r_sep", &vs)) copy(win_opts.cell_r_sep, vs);
-        if (vspl_get_int("num_col_width", &vi)) win_opts.num_col_width = vi;
-        if (vspl_get_int("col_width", &vi)) win_opts.col_width = vi;
-        if (vspl_get_int("save_time", &vi)) win_opts.save_time = vi;
-        if (vspl_get_int("use_cell_color_for_sep", &vi)) win_opts.use_cell_color_for_sep = vi;
-        if (vspl_get_int("use_mouse", &vi)) win_opts.use_mouse = vi;
-        if (vspl_get_int("natural_scroll", &vi)) win_opts.natural_scroll = vi;
-        if (vspl_get_str("ui_celltext_l_sep", &vs)) copy(win_opts.ui_celltext_l_sep, vs);
-        if (vspl_get_str("ui_celltext_m_sep", &vs)) copy(win_opts.ui_celltext_m_sep, vs);
-        if (vspl_get_str("ui_celltext_r_sep", &vs)) copy(win_opts.ui_celltext_r_sep, vs);
-        if (vspl_get_str("status_l_stuff", &vs)) copy(win_opts.status_l_stuff, vs);
-        if (vspl_get_str("status_filename", &vs)) copy(win_opts.status_filename, vs);
-        if (vspl_get_str("status_r_end", &vs)) copy(win_opts.status_r_end, vs);
-        if (vspl_get_str("ui_status_bottom_end", &vs)) copy(win_opts.ui_status_bottom_end, vs);
+        GET_STR("cell_l_sep", win_opts.cell_l_sep);
+        GET_STR("cell_l_sep", win_opts.cell_l_sep);
+        GET_STR("cell_r_sep", win_opts.cell_r_sep);
+        GET_INT("num_col_width", win_opts.num_col_width);
+        GET_INT("col_width", win_opts.col_width);
+        GET_INT("save_time", win_opts.save_time);
+        GET_INT("use_cell_color_for_sep", win_opts.use_cell_color_for_sep);
+        GET_INT("use_mouse", win_opts.use_mouse);
+        GET_INT("natural_scroll", win_opts.natural_scroll);
+        GET_STR("ui_celltext_l_sep", win_opts.ui_celltext_l_sep);
+        GET_STR("ui_celltext_m_sep", win_opts.ui_celltext_m_sep);
+        GET_STR("ui_celltext_r_sep", win_opts.ui_celltext_r_sep);
+        GET_STR("status_l_stuff", win_opts.status_l_stuff);
+        GET_STR("status_filename", win_opts.status_filename);
+        GET_STR("status_r_end", win_opts.status_r_end);
+        GET_STR("ui_status_bottom_end", win_opts.ui_status_bottom_end);
 }
 
 void
 get_color_options()
 {
-        char *vs;
-        if (vspl_get_str("ui", &vs)) copy_free(col_opts.ui, col_format(vs));
-        if (vspl_get_str("cell_over", &vs)) copy_free(col_opts.cell_over, col_format(vs));
-        if (vspl_get_str("cell_selected", &vs)) copy_free(col_opts.cell_selected, col_format(vs));
-        if (vspl_get_str("ln_over", &vs)) copy_free(col_opts.ln_over, col_format(vs));
-        if (vspl_get_str("ln", &vs)) copy_free(col_opts.ln, col_format(vs));
-        if (vspl_get_str("sheet_ui", &vs)) copy_free(col_opts.sheet_ui, col_format(vs));
-        if (vspl_get_str("sheet_ui_over", &vs)) copy_free(col_opts.sheet_ui_over, col_format(vs));
-        if (vspl_get_str("sheet_ui_selected", &vs)) copy_free(col_opts.sheet_ui_selected, col_format(vs));
-        if (vspl_get_str("ui_cell_text", &vs)) copy_free(col_opts.ui_cell_text, col_format(vs));
-        if (vspl_get_str("ui_report", &vs)) copy_free(col_opts.ui_report, col_format(vs));
-        if (vspl_get_str("insert", &vs)) copy_free(col_opts.insert, col_format(vs));
+        GET_STR("ui", col_opts.ui);
+        GET_STR("cell_over", col_opts.cell_over);
+        GET_STR("cell_selected", col_opts.cell_selected);
+        GET_STR("ln_over", col_opts.ln_over);
+        GET_STR("ln", col_opts.ln);
+        GET_STR("sheet_ui", col_opts.sheet_ui);
+        GET_STR("sheet_ui_over", col_opts.sheet_ui_over);
+        GET_STR("sheet_ui_selected", col_opts.sheet_ui_selected);
+        GET_STR("ui_cell_text", col_opts.ui_cell_text);
+        GET_STR("ui_report", col_opts.ui_report);
+        GET_STR("insert", col_opts.insert);
 }
 
 void
@@ -123,11 +130,38 @@ options_get()
         get_window_options();
 }
 
+void
+parse_options_init()
+{
+        Py_Initialize();
+        if (!Py_IsInitialized()) {
+                report("Impossible to initiaze python interpreter");
+                exit(1);
+        }
+        globals = PyDict_New();
+        if (!globals) {
+                report("Impossible to initiaze gobals dict");
+                exit(1);
+        }
+}
 
 void
-parse_options_file(FILE *f)
+parse_options_destroy()
 {
-        if (vspl_parse(f)) options_get();
+        Py_DECREF(globals);
+        Py_Finalize();
+        free_opts();
+}
+
+void
+parse_options_file(char *filename)
+{
+        FILE *f = fopen(filename, "r");
+        if (!f) return;
+        assert(globals);
+        report("Loading config file %s", filename);
+        PyRun_File(f, filename, Py_file_input, globals, globals);
+        fclose(f);
 }
 
 char *
@@ -156,56 +190,46 @@ parse_options_default_file()
         char path[128];
         char *home = getenv("HOME") ?: "";
         report("home=%s", home);
-        parse_options_file(fopen(pjoin(path, home, "vicel.vspl"), "r"));
-        parse_options_file(fopen(pjoin(path, home, ".config/vicel.vspl"), "r"));
-        parse_options_file(fopen(pjoin(path, home, ".config/vicel/vicel.vspl"), "r"));
-        parse_options_file(fopen(pjoin(path, "vicel.vspl"), "r"));
+        parse_options_file(pjoin(path, home, "vicel.py"));
+        parse_options_file(pjoin(path, home, ".config/vicel.py"));
+        parse_options_file(pjoin(path, home, ".config/vicel/vicel.py"));
+        parse_options_file(pjoin(path, "config/vicel.py"));
+        parse_options_file(pjoin(path, "vicel.py"));
 }
 
 void
 __options_init(OptOpts opts)
 {
-        vspl_addstr("filename", (opts.filename && *opts.filename) ? opts.filename : "");
-        vspl_addstr("extension", (opts.fileextension && *opts.fileextension) ? opts.fileextension : "");
+        PyDict_SetItemString(globals, "filename", PyUnicode_FromString((opts.filename && *opts.filename) ? opts.filename : ""));
+        PyDict_SetItemString(globals, "extension", PyUnicode_FromString((opts.fileextension && *opts.fileextension) ? opts.fileextension : ""));
 
-        vspl_addvar("ui", (col_opts.ui = col_format("49;30"), ("49;30")));
-        vspl_addvar("ui_cell_text", (col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1")));
-        vspl_addvar("ui_report", (col_opts.ui_report = col_format("41;39"), ("41;39")));
-        vspl_addvar("cell", (col_opts.cell = col_format("49;39"), ("49;39")));
-        vspl_addvar("cell_over", (col_opts.cell_over = col_format("49;39;7;1"), ("49;39;7;1")));
-        vspl_addvar("cell_selected", (col_opts.cell_selected = col_format("49;32"), ("49;32")));
-        vspl_addvar("ln_over", (col_opts.ln_over = col_format("49;32;7;1"), ("49;32;7;1")));
-        vspl_addvar("ln", (col_opts.ln = col_format("49;32"), ("49;32")));
-        vspl_addvar("sheet_ui", (col_opts.sheet_ui = col_format("49;39"), ("49;39")));
-        vspl_addvar("sheet_ui_over", (col_opts.sheet_ui_over = col_format("45;39;7;1"), ("45;39;7;1")));
-        vspl_addvar("sheet_ui_selected", (col_opts.sheet_ui_selected = col_format("45;32"), ("45;32")));
-        vspl_addvar("insert", (col_opts.insert = col_format("49;39"), ("49;39")));
-        vspl_addvar("num_col_width", (win_opts.num_col_width = 5));
-        vspl_addvar("col_width", (win_opts.col_width = 14));
-        vspl_addvar("row_width", (win_opts.row_width = 1));
-        vspl_addvar("use_cell_color_for_sep", (win_opts.use_cell_color_for_sep = true));
-        vspl_addvar("cell_l_sep", (win_opts.cell_l_sep = strdup(" ")));
-        vspl_addvar("cell_r_sep", (win_opts.cell_r_sep = strdup(" ")));
-        vspl_addvar("save_time", (win_opts.save_time = 10));
-        vspl_addvar("status_l_stuff", (win_opts.status_l_stuff = strdup("")));
-        vspl_addvar("status_filename", (win_opts.status_filename = strdup(" ./")));
-        vspl_addvar("status_r_end", (win_opts.status_r_end = strdup("")));
-        vspl_addvar("ui_celltext_l_sep", (win_opts.ui_celltext_l_sep = strdup(">> '")));
-        vspl_addvar("ui_celltext_m_sep", (win_opts.ui_celltext_m_sep = strdup("' as ")));
-        vspl_addvar("ui_celltext_r_sep", (win_opts.ui_celltext_r_sep = strdup(" ")));
-        vspl_addvar("ui_status_bottom_end", (win_opts.ui_status_bottom_end = strdup("github: hugoocoto/vicel")));
-        vspl_addvar("use_mouse", (win_opts.use_mouse = true));
-        vspl_addvar("natural_scroll", (win_opts.natural_scroll = true));
-}
-
-void
-vspl_env_start()
-{
-        vspl_start();
-}
-
-void
-vspl_env_end()
-{
-        vspl_end();
+        // funny chunk of code
+        PyDict_SetItemString(globals, "ui", PyUnicode_FromString((col_opts.ui = col_format("49;30"), ("49;30"))));
+        PyDict_SetItemString(globals, "ui_cell_text", PyUnicode_FromString((col_opts.ui_cell_text = col_format("49;39;1"), ("49;39;1"))));
+        PyDict_SetItemString(globals, "ui_report", PyUnicode_FromString((col_opts.ui_report = col_format("41;39"), ("41;39"))));
+        PyDict_SetItemString(globals, "cell", PyUnicode_FromString((col_opts.cell = col_format("49;39"), ("49;39"))));
+        PyDict_SetItemString(globals, "cell_over", PyUnicode_FromString((col_opts.cell_over = col_format("49;39;7;1"), ("49;39;7;1"))));
+        PyDict_SetItemString(globals, "cell_selected", PyUnicode_FromString((col_opts.cell_selected = col_format("49;32"), ("49;32"))));
+        PyDict_SetItemString(globals, "ln_over", PyUnicode_FromString((col_opts.ln_over = col_format("49;32;7;1"), ("49;32;7;1"))));
+        PyDict_SetItemString(globals, "ln", PyUnicode_FromString((col_opts.ln = col_format("49;32"), ("49;32"))));
+        PyDict_SetItemString(globals, "sheet_ui", PyUnicode_FromString((col_opts.sheet_ui = col_format("49;39"), ("49;39"))));
+        PyDict_SetItemString(globals, "sheet_ui_over", PyUnicode_FromString((col_opts.sheet_ui_over = col_format("45;39;7;1"), ("45;39;7;1"))));
+        PyDict_SetItemString(globals, "sheet_ui_selected", PyUnicode_FromString((col_opts.sheet_ui_selected = col_format("45;32"), ("45;32"))));
+        PyDict_SetItemString(globals, "insert", PyUnicode_FromString((col_opts.insert = col_format("49;39"), ("49;39"))));
+        PyDict_SetItemString(globals, "num_col_width", PyLong_FromLong((win_opts.num_col_width = 5)));
+        PyDict_SetItemString(globals, "col_width", PyLong_FromLong((win_opts.col_width = 14)));
+        PyDict_SetItemString(globals, "row_width", PyLong_FromLong((win_opts.row_width = 1)));
+        PyDict_SetItemString(globals, "use_cell_color_for_sep", PyBool_FromLong((win_opts.use_cell_color_for_sep = true)));
+        PyDict_SetItemString(globals, "cell_l_sep", PyUnicode_FromString((win_opts.cell_l_sep = strdup(" "))));
+        PyDict_SetItemString(globals, "cell_r_sep", PyUnicode_FromString((win_opts.cell_r_sep = strdup(" "))));
+        PyDict_SetItemString(globals, "save_time", PyLong_FromLong((win_opts.save_time = 10)));
+        PyDict_SetItemString(globals, "status_l_stuff", PyUnicode_FromString((win_opts.status_l_stuff = strdup(""))));
+        PyDict_SetItemString(globals, "status_filename", PyUnicode_FromString((win_opts.status_filename = strdup(" ./"))));
+        PyDict_SetItemString(globals, "status_r_end", PyUnicode_FromString((win_opts.status_r_end = strdup(""))));
+        PyDict_SetItemString(globals, "ui_celltext_l_sep", PyUnicode_FromString((win_opts.ui_celltext_l_sep = strdup(">> '"))));
+        PyDict_SetItemString(globals, "ui_celltext_m_sep", PyUnicode_FromString((win_opts.ui_celltext_m_sep = strdup("' as "))));
+        PyDict_SetItemString(globals, "ui_celltext_r_sep", PyUnicode_FromString((win_opts.ui_celltext_r_sep = strdup(" "))));
+        PyDict_SetItemString(globals, "ui_status_bottom_end", PyUnicode_FromString((win_opts.ui_status_bottom_end = strdup("github: hugoocoto/vicel"))));
+        PyDict_SetItemString(globals, "use_mouse", PyBool_FromLong((win_opts.use_mouse = true)));
+        PyDict_SetItemString(globals, "natural_scroll", PyBool_FromLong((win_opts.natural_scroll = true)));
 }

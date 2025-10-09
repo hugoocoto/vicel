@@ -7,6 +7,8 @@ LIB = -lm
 HEADERS = $(wildcard src/*.h src/vispel/*.h src/vispel/core/*.h)
 SRC = $(wildcard src/*.c src/vispel/*.c src/vispel/core/*.c)
 OBJ = $(patsubst %.c,$(OBJ_DIR)/%.o,$(SRC))
+PYC := $(shell python3-config --embed --cflags)
+PYL := $(shell python3-config --embed --ldflags) 
 
 CC = gcc
 TARGET = 
@@ -15,11 +17,11 @@ FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -fsanitize=address,null -Wall -Wextra -Wn
 COMP = $(CC) $(TARGET) $(FLAGS)
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md 
-	$(COMP) $(OBJ) $(INC) $(LIB) -o $(OUT)
+	$(COMP) $(OBJ) $(INC) $(PYL) $(LIB) -o $(OUT)
 	rm -f report.log log.txt
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
-	mkdir -p $(dir $@) && $(COMP) -c $< $(INC) -o $@
+	mkdir -p $(dir $@) && $(COMP) $(PYC) -c $< $(INC) -o $@ 
 
 wc.md: $(SRC) $(HEADERS)
 	cloc src --by-file --hide-rate --md > wc.md
@@ -38,3 +40,9 @@ install: $(OUT) clean
 
 uninstall: clean
 	rm ~/.local/bin/$(BIN_NAME) -f
+
+release:
+	gcc `find . -name "*.c"` -w -o $(OUT) $(LIB) $(INC) $(PYC) $(PYL)
+
+compile_flags:
+	$(PYC) | sed "s/ \+/\n/g" > compile_flags.txt

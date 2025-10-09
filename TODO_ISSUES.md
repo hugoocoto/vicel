@@ -1,18 +1,11 @@
 # Issues
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
-* vispel memleak [link](#vsplmem)
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula deletion it should clear color.
 * Input/edit text on the last cell works but it's not what is expected
-
-# vspl todos
-* Check that all memleaks are fixed
-* Try to find segfaults on weird stuff
-* move from stb ds hm to hm.c
-* some extra spaces
 
 # To-do (maybe)
 * Add more movement stuff
@@ -27,13 +20,13 @@
 * Rewrite convert and how to add/update data to cells.
 * Add the option --serve and --connect and let connect to a external vicel
   session. It would be awesome but it's a bug mine.
+* Add history (undo redo)
 
 # No tested at all
 * CSV reader.
 * Behaviour of corner cases in formulas for builtin, ranges and comparison.
 * Deletion
 * Formulas and deletion are not friends -> need testing
-* vspl (in general)
 
 ### err1
 After delete a row or a column, ALL formulas that use cells that are moved
@@ -41,12 +34,6 @@ should update the id reference to the new one. Formulas that point to a cell
 that was deleted should be set to error. 
 
 # Things todo if for somewhat reason it have to become useful
-* Move from vspl to python
 * Improve formulas: move from ast-walking to something more performant. 
 * Fix all previously written issues and todos.
 
-### vsplmem
-It can only parse a file. If more files are parsed, head become null so it cant
-be free. If I free if on head change, I get a heap-user-after-free as token
-values are used. I have to implement something as a big repl instead of file
-parsing. 

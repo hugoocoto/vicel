@@ -68,11 +68,10 @@ extern Col_opts col_opts;
 
 #define options_init(...) __options_init((OptOpts) { .none = 0, __VA_ARGS__ })
 
+void parse_options_destroy();
+void parse_options_init();
 void parse_options_default_file();
-void parse_options_file(FILE *f);
-void free_opts();
+void parse_options_file(char *filename);
 void __options_init(OptOpts);
-void vspl_env_end();
-void vspl_env_start();
 
 #endif //! OPTS_H_
