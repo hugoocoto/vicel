@@ -19,6 +19,13 @@ Webpage: https://hugoocoto.github.io/vicel/
 Documentation and installation/usage guide are
 [here](./docs/vicel_reference.pdf). [Download link](https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/vicel_reference.pdf)
 
+## How to host vicel in the browser
+You can use `ttyd` to host a pty in the browser. Using the following command you
+would have vicel running in http://localhost:08080.
+```sh 
+ttyd --force-tty -p 8080 -W "vicel" 
+```
+
 ## Latest Version
 [See version](./version.txt)
 
