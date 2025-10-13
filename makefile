@@ -26,7 +26,7 @@ $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
 	mkdir -p $(dir $@) && $(COMP) $(PYC) -c $< $(INC) -o $@ 
 
 wc.md: $(SRC) $(HEADERS)
-	cloc src --by-file --hide-rate --md > wc.md
+	wc `find src -name "*.[ch]"` > wc.md
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)

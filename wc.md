@@ -1,44 +1,38 @@
-cloc|github.com/AlDanial/cloc v 2.06
---- | ---
-
-File|blank|comment|code
-:-------|-------:|-------:|-------:
-src/formula.c|83|30|728
-src/cellmap.c|41|24|427
-src/window.c|53|22|372
-src/keyboard.c|48|31|340
-src/escape_code.h|19|24|303
-src/eval.c|36|19|292
-src/mappings.c|48|20|291
-src/builtin.c|28|20|227
-src/options.c|23|23|216
-src/readlain.c|26|30|196
-src/dhm.c|32|20|157
-src/saving.c|23|19|152
-src/main.c|28|22|129
-src/hm.c|31|23|115
-src/aptree.c|23|26|106
-src/cellmap.h|26|21|106
-src/da.h|15|33|89
-src/flag.c|11|37|83
-src/color.c|9|19|63
-src/formula.h|11|22|55
-src/options.h|9|19|50
-src/mappings.h|4|19|49
-src/window.h|10|20|41
-src/debug.c|5|23|25
-src/debug.h|5|19|20
-src/hm.h|6|21|20
-src/aptree.h|6|19|19
-src/common.h|1|19|18
-src/dhm.h|5|19|18
-src/color.h|6|19|16
-src/eval.h|7|20|15
-src/flag.h|8|39|15
-src/keyboard.h|6|19|13
-src/action.h|6|19|12
-src/builtin.h|5|19|8
-src/saving.h|4|19|6
-src/readlain.h|5|21|5
---------|--------|--------|--------
-SUM:|712|838|4797
+    41    176   1143 src/color.h
+    88    329   2433 src/formula.h
+   447   1229  14443 src/window.c
+    38    171   1142 src/common.h
+    42    191   1203 src/dhm.h
+   262    729  11137 src/options.c
+    44    208   1361 src/aptree.h
+    72    234   1982 src/mappings.h
+   179    441   4161 src/main.c
+   194    548   5074 src/saving.c
+    47    217   1364 src/hm.h
+    38    171   1111 src/keyboard.h
+   155    510   3831 src/aptree.c
+    53    213   1383 src/debug.c
+    31    168   1026 src/readlain.h
+   275    814   7553 src/builtin.c
+    44    171   1204 src/debug.h
+    91    282   2610 src/color.c
+   359    631   7527 src/mappings.c
+    29    152    931 src/saving.h
+   169    488   3932 src/hm.c
+    71    303   2137 src/window.h
+    78    251   2118 src/options.h
+   347   1217  11302 src/eval.c
+    62    369   2260 src/flag.h
+   131    524   3934 src/flag.c
+   137    586   6455 src/da.h
+    42    198   1223 src/eval.h
+   419   1310  15472 src/keyboard.c
+   346   1306  10277 src/escape_code.h
+    32    158    986 src/builtin.h
+   492   1280  14488 src/cellmap.c
+   153    479   4234 src/cellmap.h
+   209    674   5506 src/dhm.c
+    37    177   1109 src/action.h
+   841   2147  23143 src/formula.c
+   252    751   7969 src/readlain.c
+  6347  19803 189164 total

@@ -23,7 +23,7 @@ Documentation and installation/usage guide are
 You can use `ttyd` to host a pty in the browser. Using the following command you
 would have vicel running in http://localhost:08080.
 ```sh 
-ttyd --force-tty -p 8080 -W "vicel" 
+ttyd -p 8080 -W "vicel" 
 ```
 
 ## Latest Version
