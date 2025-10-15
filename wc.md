@@ -29,10 +29,10 @@
    425   1344  15926 src/keyboard.c
    346   1306  10277 src/escape_code.h
     32    158    986 src/builtin.h
-   492   1280  14488 src/cellmap.c
+   507   1351  15187 src/cellmap.c
    153    479   4234 src/cellmap.h
    209    674   5506 src/dhm.c
     37    177   1109 src/action.h
    841   2147  23143 src/formula.c
    252    751   7969 src/readlain.c
-  6374  19875 189979 total
+  6389  19946 190678 total

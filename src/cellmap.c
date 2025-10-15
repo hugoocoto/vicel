@@ -23,6 +23,9 @@
 #include "da.h"
 #include "debug.h"
 #include "formula.h"
+#include "window.h"
+#include <stdbool.h>
+#include <unistd.h>
 
 bool
 cm_is_valid_pos(CellMat *mat, int x, int y)
@@ -150,6 +153,7 @@ cm_unsubscribe(Cell *actor, Cell *observer)
 Cell *
 cm_get_cell_ptr(CellMat *mat, int c, int r)
 {
+        if (0 > r || 0 > c) return NULL;
         if (mat->size <= r || mat->data->size <= c) return NULL;
         return &mat->data[r].data[c];
 }
@@ -392,14 +396,19 @@ cm_destroy(CellMat *mat)
 }
 
 static Value
-extend_row(Cell *c, Value origin, int displ)
+extend_row(Cell *c, Value origin, Cell *oposite, int displ)
 {
         switch (origin.type) {
         case TYPE_EMPTY:
         case TYPE_TEXT:
                 return origin;
-        case TYPE_NUMBER:
-                return AS_NUMBER(origin.as.num + abs(displ));
+        case TYPE_NUMBER: {
+                displ = abs(displ);
+                report("oposite: %-10p", oposite);
+                if (oposite && oposite->value.type == TYPE_NUMBER)
+                        displ *= origin.as.num - oposite->value.as.num;
+                return AS_NUMBER(origin.as.num + displ);
+        }
         case TYPE_FORMULA:
                 origin.as.formula = formula_extend(c, origin.as.formula, displ, 0);
                 if (origin.as.formula == NULL) {
@@ -415,14 +424,18 @@ extend_row(Cell *c, Value origin, int displ)
 }
 
 static Value
-extend_col(Cell *c, Value origin, int displ)
+extend_col(Cell *c, Value origin, Cell *oposite, int displ)
 {
         switch (origin.type) {
         case TYPE_EMPTY:
         case TYPE_TEXT:
                 return origin;
         case TYPE_NUMBER:
-                return AS_NUMBER(origin.as.num + abs(displ));
+                displ = abs(displ);
+                report("oposite: %-10p", oposite);
+                if (oposite && oposite->value.type == TYPE_NUMBER)
+                        displ *= origin.as.num - oposite->value.as.num;
+                return AS_NUMBER(origin.as.num + displ);
         case TYPE_FORMULA:
                 origin.as.formula = formula_extend(c, origin.as.formula, 0, displ);
                 if (origin.as.formula == NULL) {
@@ -438,11 +451,11 @@ extend_col(Cell *c, Value origin, int displ)
 }
 
 static void
-set_extended_value(Cell *c, Value v, int displ_r, int displ_c)
+set_extended_value(Cell *c, Value v, Cell *vop, int displ_r, int displ_c)
 {
         Value vnew = v;
-        if (displ_r) vnew = extend_row(c, vnew, displ_r);
-        if (displ_c) vnew = extend_col(c, vnew, displ_c);
+        if (displ_r) vnew = extend_row(c, vnew, vop, displ_r);
+        if (displ_c) vnew = extend_col(c, vnew, vop, displ_c);
         c->value = vnew;
         free(c->repr);
         free(c->input_repr);
@@ -462,15 +475,17 @@ cm_extend(CellMat *mat, int base_x, int base_y, int next_x, int next_y)
                 return;
         }
 
-        Value origin = cm_get_cell(mat, base_x, base_y).value;
         int displ_c = next_x - base_x;
         int displ_r = next_y - base_y;
+
+        Value origin = cm_get_cell(mat, base_x, base_y).value;
+        Cell *oppsite = cm_get_cell_ptr(mat, base_x - displ_c, base_y - displ_r);
         Cell *next_cell = cm_get_cell_ptr(mat, next_x, next_y);
 
         report("next_cell at cm_extend: %p", next_cell);
 
         clear_cell(next_cell);
-        set_extended_value(next_cell, origin, displ_r, displ_c);
+        set_extended_value(next_cell, origin, oppsite, displ_r, displ_c);
 
         for_da_each(o, next_cell->subscribers) cm_notify(next_cell, *o);
 }
