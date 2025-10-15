@@ -101,6 +101,13 @@ get_escape_sequence()
                         report("%d == %d and %d == %d? it should", cellr_max, active_ctx.max_display_r, cellc_max, active_ctx.max_display_c);
                         switch (btn) {
                         case '@': /* mouse left hold move */
+                                do {
+                                        if (cellc < 0 || cellc >= active_ctx.max_display_c) break;
+                                        if (cellr < 0 || cellr >= active_ctx.max_display_r) break;
+                                        cm_extend(active_ctx.body,
+                                                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
+                                                  cellc, cellr);
+                                } while (0); // move the cursor using next case
                         case 'B': /* mouse right hold move */
                         case 'C': /* mouse move */
                                 if (cellc >= 0 && cellc < active_ctx.max_display_c)
@@ -108,13 +115,8 @@ get_escape_sequence()
                                 if (cellr >= 0 && cellr < active_ctx.max_display_r)
                                         active_ctx.cursor_pos_r = cellr;
                                 break;
-                        case ' ': /* mouse left press */
-                                if (get_cursor_cell()->value.type != TYPE_EMPTY)
-                                        a_delete();
-                                hold = btn;
-                                break;
                         case '#': /* mouse release */
-                                if (hold == ' ') a_paste();
+                                // if (hold == ' ') a_paste();
                                 if (hold == '"') after = get_set_cell_input;
                                 hold = 0;
                                 break;
@@ -138,6 +140,7 @@ get_escape_sequence()
                                 wheel_dir = wheel_dir == 0;
                                 break;
                         case 'A': /* mouse wheel hold move */
+                        case ' ': /* mouse left press */
                         default:
                                 break;
                         }
