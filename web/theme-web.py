@@ -1,0 +1,10 @@
+ui = "37;40"
+ui_cell_text = ui
+ui_report = ui
+ln_over = "37;44"
+ln = "37;49"
+insert = "37;49"
+cell_over = "30;47"
+sheet_ui_over = cell_over
+cell_selected = "37;42"
+save_time = 0
