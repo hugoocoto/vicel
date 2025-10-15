@@ -6,11 +6,13 @@
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula deletion it should clear color.
 * Input/edit text on the last cell works but it's not what is expected
+* Add history (undo redo)
 
 # To-do (maybe)
+* Support more than ASCII chars.
 * Add more movement stuff
 * Improve UI and UI customization.
-* Improve input: handle special chars other than BS and Cr.
+* Improve input: handle special chars other than BS and Cr. 
 * Maybe move from ast-walking to VM in formulas.
 * Maybe add date/time types
 * Try to expand with the difference between cell and the one in the opposite
@@ -20,7 +22,6 @@
 * Rewrite convert and how to add/update data to cells.
 * Add the option --serve and --connect and let connect to a external vicel
   session. It would be awesome but it's a bug mine.
-* Add history (undo redo)
 
 # No tested at all
 * CSV reader.
@@ -32,6 +33,9 @@
 After delete a row or a column, ALL formulas that use cells that are moved
 should update the id reference to the new one. Formulas that point to a cell
 that was deleted should be set to error. 
+
+Good news! As it stores cells by reference, the subscriptions are correct. It's
+only needed to change formula text. 
 
 # Things todo if for somewhat reason it have to become useful
 * Improve formulas: move from ast-walking to something more performant. 
