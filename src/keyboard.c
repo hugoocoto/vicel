@@ -193,7 +193,7 @@ get_input_at_cursor()
         T_CUSHW();
 
         rlain_insert(get_cursor_cell()->input_repr);
-        buf = readlain("");
+        buf = readlain(" ");
 
         if (buf == NULL) buf = strdup("");
         if ((c = strchr(buf, '\n'))) *c = 0;   // trim newline
