@@ -283,6 +283,7 @@ users.
   table.hline(),
   [p], [paste],
   [y], [yank (copy)],
+  [d], [delete (and copy)],
 )
 
 == Other commands
@@ -305,8 +306,7 @@ some users may find convenient to do some actions with their mouse. It can be
 enabled setting the option #smallcaps("window.use_mouse") to #smallcaps("true").
 
 This is an experimental feature. At the time of writing, the cursor follows the
-mouse and you can drag and drop cell values using left click (drag on press,
-drop on release).
+mouse and you can expand cells by hold the left click.
 
 Right click over a cell enters insert mode. If you click on a cell, its name
 would be appended to input. If you press the mouse over the cell A and move to
@@ -322,9 +322,8 @@ pressing the mouse wheel changes the direction.
   table.hline(),
   [Enable it], [window.use_mouse = true],
   [Mouse move], [Cursor follows mouse pointer],
-  [Drag and drop (Left button)], [Delete and paste cell value],
+  [Hold left click and move], [expand cells],
   [Right click], [Enter insert mode on cell],
-  [Drag and drop on insert (Left button)], [Write selected range (From drag to drop or a single cell if click on it)],
   [Wheel up/down], [Scroll the view],
   [Wheel press], [Toggle scroll between horizontal and vertical],
 )
@@ -335,11 +334,15 @@ pressing the mouse wheel changes the direction.
 
 You can customize some values using a python configuration file. By
 default, vicel looks for this file in the following paths:
+
 - #smallcaps("./vicel.py")
 - #smallcaps("./config/vicel.py")
 - #smallcaps("~/vicel.py")
 - #smallcaps("~/.config/vicel.py")
 - #smallcaps("~/.config/vicel/vicel.py")
+
+Despite I'm fan of suckless style, you can modify configuration and it would be
+applied on next execution (without the need of recompilation).
 
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
@@ -392,4 +395,4 @@ ui_celltext_r_sep = ") ";           # Before cell type, left-aligned
 ui_status_bottom_end = "";          # Bottom right-align text
 ```
 
-
+You can notice that default settings are not exactly the same as written here.

@@ -26,7 +26,7 @@
    131    524   3934 src/flag.c
    137    586   6455 src/da.h
     42    198   1223 src/eval.h
-   426   1349  16029 src/keyboard.c
+   422   1338  15807 src/keyboard.c
    346   1306  10277 src/escape_code.h
     32    158    986 src/builtin.h
    492   1280  14488 src/cellmap.c
@@ -35,4 +35,4 @@
     37    177   1109 src/action.h
    841   2147  23143 src/formula.c
    252    751   7969 src/readlain.c
-  6354  19842 189721 total
+  6350  19831 189499 total
