@@ -16,7 +16,7 @@
    275    814   7553 src/builtin.c
     44    171   1204 src/debug.h
     91    282   2610 src/color.c
-   377    654   7783 src/mappings.c
+   378    665   7842 src/mappings.c
     29    152    931 src/saving.h
    169    488   3932 src/hm.c
     71    303   2137 src/window.h
@@ -35,4 +35,4 @@
     37    177   1109 src/action.h
    841   2147  23143 src/formula.c
    252    751   7969 src/readlain.c
-  6373  19864 189920 total
+  6374  19875 189979 total

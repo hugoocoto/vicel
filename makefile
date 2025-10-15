@@ -37,14 +37,14 @@ $(BUILD_DIR):
 clean:
 	rm -rf $(OBJ_DIR) $(DEBUG_OUT) $(RELEASE_OUT) 
 
-install: $(OUT) clean
+install: clean release
 	mv $(OUT) ~/.local/bin/$(BIN_NAME)
 
 uninstall: clean
 	rm ~/.local/bin/$(BIN_NAME) -f
 
 release:
-	gcc `find . -name "*.c"` -w -o $(OUT) $(LIB) $(INC) $(PYC) $(PYL)
+	gcc `find src -name "*.c"` -w -o $(OUT) $(LIB) $(INC) $(PYC) $(PYL)
 
 compile_flags:
 	$(PYC) | sed "s/ \+/\n/g" > compile_flags.txt
