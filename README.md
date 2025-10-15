@@ -6,6 +6,7 @@ proprietary non gratis well known Microsoft program, for non professional usage.
 Webpage: https://hugoocoto.github.io/vicel/
 
 ![Screenshot](images/image.png)
+*The previous image does not show the latest version of vicel.*
 
 ## Features
 * Edit CSV-like grids interactively in your terminal
@@ -19,15 +20,17 @@ Webpage: https://hugoocoto.github.io/vicel/
 Documentation and installation/usage guide are
 [here](./docs/vicel_reference.pdf). [Download link](https://raw.githubusercontent.com/hugoocoto/vicel/main/docs/vicel_reference.pdf)
 
-## How to host vicel in the browser
-You can use `ttyd` to host a pty in the browser. Using the following command you
-would have vicel running in http://localhost:08080.
-```sh 
-ttyd -p 8080 -W "vicel" 
-```
+## How to install
+You can install it with make. `make` creates the debug mode executable. `make
+clean install` creates the release executable an moves it to `~/.local/bin`.
 
-## Latest Version
-[See version](./version.txt)
+## How to host vicel in the browser
+You can use `ttyd` to host a pty in the browser. Using the script
+`./web/start.sh` you would have vicel running in http://localhost:8080.
+```sh 
+cd web 
+./start
+```
 
 ## Lines of Code
 [Lines written](./wc.md) A little reflection: the fewer the lines, the better.
