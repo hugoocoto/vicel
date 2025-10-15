@@ -298,6 +298,7 @@ There are another useful commands, described below.
   [w], [Write (save)],
   [r], [Re-render the screen],
   [Ctrl-c], [Quit without save],
+  [+/-], [Increase/decrease column width],
 )
 
 == Mouse support

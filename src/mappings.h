@@ -68,5 +68,7 @@ void a_scroll_up();
 void a_scroll_down();
 void a_scroll_left();
 void a_scroll_right();
+void a_col_decrease();
+void a_col_increase();
 
 #endif //! MAPPINGS_H

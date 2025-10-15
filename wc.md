@@ -5,7 +5,7 @@
     42    191   1203 src/dhm.h
    262    729  11137 src/options.c
     44    208   1361 src/aptree.h
-    72    234   1982 src/mappings.h
+    74    238   2028 src/mappings.h
    179    441   4161 src/main.c
    194    548   5074 src/saving.c
     47    217   1364 src/hm.h
@@ -16,7 +16,7 @@
    275    814   7553 src/builtin.c
     44    171   1204 src/debug.h
     91    282   2610 src/color.c
-   359    631   7527 src/mappings.c
+   377    654   7783 src/mappings.c
     29    152    931 src/saving.h
    169    488   3932 src/hm.c
     71    303   2137 src/window.h
@@ -26,7 +26,7 @@
    131    524   3934 src/flag.c
    137    586   6455 src/da.h
     42    198   1223 src/eval.h
-   422   1338  15807 src/keyboard.c
+   425   1344  15926 src/keyboard.c
    346   1306  10277 src/escape_code.h
     32    158    986 src/builtin.h
    492   1280  14488 src/cellmap.c
@@ -35,4 +35,4 @@
     37    177   1109 src/action.h
    841   2147  23143 src/formula.c
    252    751   7969 src/readlain.c
-  6350  19831 189499 total
+  6373  19864 189920 total

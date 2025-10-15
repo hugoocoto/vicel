@@ -21,8 +21,9 @@
 #include "mappings.h"
 #include "cellmap.h"
 #include "common.h"
-#include "escape_code.h"
+// #include "escape_code.h"
 #include "keyboard.h"
+#include "options.h"
 #include "saving.h"
 #include "window.h"
 
@@ -356,4 +357,22 @@ a_scroll_right()
         ++active_ctx.scroll_c;
         if (active_ctx.cursor_pos_c < active_ctx.scroll_c)
                 a_move_cursor_right();
+}
+
+void
+a_col_increase()
+{
+        /* todo: check that the cursor is on the screen */
+        ++win_opts.col_width;
+        render();
+}
+
+#define COL_WIDTH_MIN 3
+
+void
+a_col_decrease()
+{
+        if (win_opts.col_width == COL_WIDTH_MIN) return;
+        --win_opts.col_width;
+        render();
 }

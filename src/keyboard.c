@@ -321,6 +321,9 @@ start_kbhandler()
         add_action(mappings, "gdj", ACTION(a_delete_down_row));
         add_action(mappings, "gdl", ACTION(a_delete_right_col));
 
+        add_action(mappings, "+", ACTION(a_col_increase));
+        add_action(mappings, "-", ACTION(a_col_decrease));
+
         if (win_opts.natural_scroll) {
                 add_action(mappings, "ej", ACTION(a_scroll_up));
                 add_action(mappings, "ek", ACTION(a_scroll_down));
