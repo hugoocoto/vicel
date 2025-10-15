@@ -97,7 +97,7 @@ get_escape_sequence()
                         cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
                         int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
                         int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
-                        set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_r, cellr, active_ctx.max_display_c);
+                        set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_c, cellr, active_ctx.max_display_r);
                         report("%d == %d and %d == %d? it should", cellr_max, active_ctx.max_display_r, cellc_max, active_ctx.max_display_c);
                         switch (btn) {
                         case '@': /* mouse left hold move */
