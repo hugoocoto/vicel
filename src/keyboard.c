@@ -89,30 +89,34 @@ get_escape_sequence()
                 break;
 
         default:
-                /* This is ugly as fuck because it's an experimental feature */
+                /* This is ugly as fuck because it's an experimental feature
+                 *
+                 * TODO: refactor THIS PIECE OF SHIT
+                 *
+                 */
                 if (win_opts.use_mouse && sscanf(buf, "[M%c%c%c", &btn, &c, &r) == 3) {
                         static char hold = 0;
                         static int wheel_dir = 0;
                         cellc = (c - 33 - win_opts.num_col_width) / win_opts.col_width + active_ctx.scroll_c;
                         cellr = (r - 33 - 2) / win_opts.row_width + active_ctx.scroll_r;
-                        int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
-                        int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
-                        set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_c, cellr, active_ctx.max_display_r);
-                        report("%d == %d and %d == %d? it should", cellr_max, active_ctx.max_display_r, cellc_max, active_ctx.max_display_c);
+                        // int cellr_max = (active_ctx.ws.ws_row - 2) / win_opts.row_width + active_ctx.scroll_r;
+                        // int cellc_max = (active_ctx.ws.ws_col - win_opts.num_col_width - 2) / win_opts.col_width + active_ctx.scroll_c;
+                        // set_ui_report("mouse at %d/%d %d/%d", cellc, active_ctx.max_display_c, cellr, active_ctx.max_display_r);
+                        // report("%d == %d and %d == %d? it should", cellr_max, active_ctx.max_display_r, cellc_max, active_ctx.max_display_c);
                         switch (btn) {
                         case '@': /* mouse left hold move */
                                 do {
-                                        if (cellc < 0 || cellc >= active_ctx.max_display_c) break;
-                                        if (cellr < 0 || cellr >= active_ctx.max_display_r) break;
-                                        cm_extend(active_ctx.body,
-                                                  active_ctx.cursor_pos_c, active_ctx.cursor_pos_r,
-                                                  cellc, cellr);
+                                        if (cellc < active_ctx.scroll_c || cellc >= active_ctx.max_display_c + active_ctx.scroll_c) break;
+                                        if (cellr < active_ctx.scroll_r || cellr >= active_ctx.max_display_r + active_ctx.scroll_r) break;
+                                        cm_extend(active_ctx.body, active_ctx.cursor_pos_c, active_ctx.cursor_pos_r, cellc, cellr);
                                 } while (0); // move the cursor using next case
+                                goto mouse_move;
                         case 'B': /* mouse right hold move */
                         case 'C': /* mouse move */
-                                if (cellc >= 0 && cellc < active_ctx.max_display_c)
+                        mouse_move:
+                                if (cellc >= active_ctx.scroll_c && cellc < active_ctx.max_display_c + active_ctx.scroll_c)
                                         active_ctx.cursor_pos_c = cellc;
-                                if (cellr >= 0 && cellr < active_ctx.max_display_r)
+                                if (cellr >= active_ctx.scroll_r && cellr < active_ctx.max_display_r + active_ctx.scroll_r)
                                         active_ctx.cursor_pos_r = cellr;
                                 break;
                         case '#': /* mouse release */

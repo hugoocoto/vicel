@@ -1,6 +1,5 @@
 # Issues
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
-* Mouse follow cursor fails on scrolled window
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
