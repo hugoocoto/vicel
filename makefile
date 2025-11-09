@@ -18,15 +18,15 @@ FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts
 COMP = $(CC) $(TARGET) $(FLAGS)
 
 
-$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc.md
+$(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc
 	$(COMP) $(OBJ) $(INC) $(PYL) $(LIB) -o $(OUT)
 	rm -f report.log log.txt
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
 	mkdir -p $(dir $@) && $(COMP) $(PYC) -c $< $(INC) -o $@ 
 
-wc.md: $(SRC) $(HEADERS)
-	wc `find src -name "*.[ch]"` > wc.md
+wc: $(SRC) $(HEADERS)
+	wc `find src -name "*.[ch]"` > wc
 
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
