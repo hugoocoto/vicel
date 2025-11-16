@@ -25,6 +25,8 @@
 #include "options.h"
 #include "window.h"
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 /* Append text to line BEFORE call readline */
 void rlain_insert(char *text);
@@ -33,9 +35,16 @@ void rlain_insert(char *text);
 char *readlain(char *prompt);
 
 static char rline[1024] = "";
-static size_t rlindex = 0;
+static int rlindex = 0;
 static bool quit = false;
 static char *lprompt = "";
+static int maxlen = 10;
+
+void
+rlain_setwidth(int width)
+{
+        maxlen = width;
+}
 
 void
 rlain_insert(char *text)
@@ -54,7 +63,7 @@ reset_line()
 static void
 rlinsert(char c)
 {
-        if (rlindex >= sizeof rline - 1) {
+        if (rlindex >= (int) sizeof rline - 1) {
                 report("Invalid insert index: %d", rlindex);
                 return;
         }
@@ -79,11 +88,21 @@ rlinsert(char c)
 static void
 line_refresh()
 {
+        /* Todo: this can be refactored to avoid using buffers */
+        char line[1024] = { 0 };  // unsecure
+        char sline[1024] = { 0 }; // secure if size sline >= line
+        int i = max(rlindex - maxlen + 1, 0);
+        if (lprompt && *lprompt) strcat(line, lprompt);
+        strcat(line, rline);
+        sprintf(sline, "%.*s", maxlen, line + i);
         T_RCP();
-        printf("%s%s ", lprompt, rline);
+        printf("%s ", sline);
+        fflush(stdout);
         T_RCP();
-        if (*lprompt) T_CUF((int) strlen(lprompt));
-        if (rlindex) T_CUF((int) rlindex);
+        if (rlindex >= maxlen)
+                T_CUF(maxlen - 1);
+        else if (rlindex)
+                T_CUF(rlindex);
 }
 
 static void
@@ -102,14 +121,14 @@ handle_esc()
                 if (!strcmp(buf, "[D")) {
                         if (rlindex) {
                                 --rlindex;
-                                T_CUB(1);
+                                line_refresh();
                         }
                         return;
                 }
                 if (!strcmp(buf, "[C")) {
                         if (rline[rlindex]) {
                                 ++rlindex;
-                                T_CUF(1);
+                                line_refresh();
                         }
                         return;
                 }
@@ -220,7 +239,6 @@ readlain(char *prompt)
         lprompt = prompt;
         T_SCP();
         line_refresh();
-        // line_refresh();
 
         /* get line */
         char c;
@@ -232,7 +250,8 @@ readlain(char *prompt)
                 case 0:
                         break;
                 case -1:
-                        report("Exit from readlain due to invalid read:%s", strerror(errno));
+                        report("Exit from readlain due to invalid read:%s",
+                               strerror(errno));
                         quit = true;
                         break;
 

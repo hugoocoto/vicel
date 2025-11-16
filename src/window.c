@@ -49,6 +49,16 @@ clear_ui_report()
         *ui_report = 0;
 }
 
+int
+get_cell_screen_width(Cell *c)
+{
+        /* TODO: handle the case when cell is the last one in the screen so it's
+         * smaller than usual. Also, return some error i cell is not in screen
+         * cell.width is not correct. Idk why. Fix this.
+         * */
+        return 10;
+}
+
 void
 clear_ui_report_ontimeout(time_t maxtime)
 {

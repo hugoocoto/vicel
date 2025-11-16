@@ -52,8 +52,8 @@ set_resize_handler()
         resize_handler(SIGWINCH); // get current winsize
 }
 
-volatile int should_autosave = 0;
-volatile int save_time = 0;
+int should_autosave = 0;
+int save_time = 0;
 
 void
 autosave_handler(int s)

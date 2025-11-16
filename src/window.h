@@ -65,6 +65,7 @@ int parse_coords(char *c, int *x, int *y, bool *freeze_r, bool *freeze_c);
 void set_ui_report(const char *c, ...);
 void clear_ui_report();
 void clear_ui_report_ontimeout(time_t maxtime);
+int get_cell_screen_width(Cell *c);
 
 extern Context active_ctx;
 

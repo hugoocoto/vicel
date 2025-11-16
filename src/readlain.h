@@ -27,5 +27,7 @@ void rlain_insert(char *text);
 /* Return the heap allocated representation of the writen text */
 char *readlain(char *prompt);
 
+/* Set the max width for readlain */
+void rlain_setwidth(int width);
 
 #endif // !READLAIN_H_

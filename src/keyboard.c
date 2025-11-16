@@ -34,7 +34,7 @@
 #include "window.h"
 
 bool quit = false;
-extern volatile int should_autosave;
+extern int should_autosave;
 
 void get_set_cell_input();
 
@@ -199,8 +199,10 @@ get_input_at_cursor()
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         T_CUSHW();
 
+        rlain_setwidth(get_cell_screen_width(get_cursor_cell()));
         rlain_insert(get_cursor_cell()->input_repr);
-        buf = readlain(" ");
+        T_CUF(1);
+        buf = readlain("");
 
         if (buf == NULL) buf = strdup("");
         if ((c = strchr(buf, '\n'))) *c = 0;   // trim newline
