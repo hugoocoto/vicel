@@ -56,6 +56,7 @@ get_cell_screen_width(Cell *c)
          * smaller than usual. Also, return some error i cell is not in screen
          * cell.width is not correct. Idk why. Fix this.
          * */
+        c = (void *) c;
         return 10;
 }
 
@@ -132,6 +133,7 @@ set_cell_color(Cell *cell)
         apply_color("cell");
 }
 
+// can block - it's better to throw an error I think
 void
 get_current_position(int *x, int *y)
 {

@@ -66,6 +66,7 @@ void set_ui_report(const char *c, ...);
 void clear_ui_report();
 void clear_ui_report_ontimeout(time_t maxtime);
 int get_cell_screen_width(Cell *c);
+void get_current_position(int *x, int *y);
 
 extern Context active_ctx;
 

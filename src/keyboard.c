@@ -199,7 +199,9 @@ get_input_at_cursor()
         cursor_gotocell(active_ctx.cursor_pos_c + 1, active_ctx.cursor_pos_r + 1);
         T_CUSHW();
 
-        rlain_setwidth(get_cell_screen_width(get_cursor_cell()));
+        int x, y;
+        get_current_position(&x, &y);
+        rlain_setwidth(active_ctx.ws.ws_col - x);
         rlain_insert(get_cursor_cell()->input_repr);
         T_CUF(1);
         buf = readlain("");
