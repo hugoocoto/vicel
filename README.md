@@ -3,7 +3,7 @@ Vicel is a free open source TUI spreadsheet editor. You can read, modify and
 save data stored in rows and columns. It aims to be an alternative to
 proprietary non gratis well known Microsoft program, for non professional usage.
 
-Webpage: https://hugoocoto.github.io/vicel/
+Webpage: https://hugocoto.com/vicel.html
 
 ![Screenshot](images/image.png)
 *The previous image does not show the latest version of vicel.*
@@ -31,6 +31,8 @@ You can use `ttyd` to host a pty in the browser. Using the script
 cd web 
 ./start
 ```
+
+You can find it as a demo here: https://hugocoto.com/vicel
 
 ## Lines of Code
 [Lines written](./wc.md) A little reflection: the fewer the lines, the better.
