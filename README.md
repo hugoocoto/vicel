@@ -35,7 +35,7 @@ cd web
 You can find it as a demo here: https://hugocoto.com/vicel
 
 ## Lines of Code
-[Lines written](./wc.md) A little reflection: the fewer the lines, the better.
+[Lines written](./wc) A little reflection: the fewer the lines, the better.
 I like to flex on how little code is needed for a fully functional program.
 
 ## Status
