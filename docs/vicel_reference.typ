@@ -338,12 +338,12 @@ default, vicel looks for this file in the following paths:
 
 - #smallcaps("./vicel.py")
 - #smallcaps("./config/vicel.py")
-- #smallcaps("~/vicel.py")
 - #smallcaps("~/.config/vicel.py")
 - #smallcaps("~/.config/vicel/vicel.py")
+- #smallcaps("~/.vicel.py")
 
 Despite I'm fan of suckless style, you can modify configuration and it would be
-applied on next execution (without the need of recompilation).
+applied on next execution (without the needed of recompilation).
 
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
@@ -397,3 +397,8 @@ ui_status_bottom_end = "";          # Bottom right-align text
 ```
 
 You can notice that default settings are not exactly the same as written here.
+
+==== Keymaps
+
+You can modify keymaps. You can find all the names in
+#smallcaps("config/vicel.py").

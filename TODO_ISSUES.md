@@ -5,23 +5,21 @@
 * After row or column deletion some formulas may break. [Link](#err1).
 * Improve update screen when it isn't needed to update the full screen.
 * On color() formula deletion it should clear color.
-* Input/edit text on the last cell works but it's not what is expected
 * Add history (undo redo)
+* Support more than ASCII chars.
 
 # To-do (maybe)
-* Support more than ASCII chars.
 * Add more movement stuff
 * Improve UI and UI customization.
 * Improve input: handle special chars other than BS and Cr. 
 * Maybe move from ast-walking to VM in formulas.
 * Maybe add date/time types
-* Try to expand with the difference between cell and the one in the opposite
-  direction at least for numbers, so if the two first numbers are written
-  at the time of expansion it would use the desired spacing.
 * Add copy for blocks
 * Rewrite convert and how to add/update data to cells.
 * Add the option --serve and --connect and let connect to a external vicel
-  session. It would be awesome but it's a bug mine.
+  session. It would be awesome but it's a bug mine (too much work).
+* Let open/edit new files and save current with other name.
+* Improve mappings customization 
 
 # No tested at all
 * CSV reader.

@@ -23,6 +23,7 @@
 #include "common.h"
 #include "debug.h"
 #include "escape_code.h"
+#include "keyboard.h"
 /*---*/
 
 #include <Python.h>
@@ -33,6 +34,7 @@
 
 Win_opts win_opts;
 Col_opts col_opts;
+Mappings_opts user_mappings;
 PyObject *globals = NULL;
 
 #define GET_STR(_name_, _var_)                                            \
@@ -93,6 +95,49 @@ free_opts()
         free(col_opts.ui_cell_text);
         free(col_opts.ui_report);
         free(col_opts.insert);
+
+        free(user_mappings.func_should_quit);
+        free(user_mappings.func_render);
+        free(user_mappings.func_a_select_toggle_cell);
+        free(user_mappings.func_get_set_cell_input);
+        free(user_mappings.func_a_set_cell_type_numeric);
+        free(user_mappings.func_a_set_cell_type_text);
+        free(user_mappings.func_a_delete);
+        free(user_mappings.func_a_set_cell_type_formula);
+        free(user_mappings.func_a_copy_moving_down);
+        free(user_mappings.func_a_copy_moving_up);
+        free(user_mappings.func_a_copy_moving_left);
+        free(user_mappings.func_a_copy_moving_right);
+        free(user_mappings.func_a_insert_moving_down);
+        free(user_mappings.func_a_insert_moving_up);
+        free(user_mappings.func_a_insert_moving_left);
+        free(user_mappings.func_a_insert_moving_right);
+        free(user_mappings.func_a_goto_top_left);
+        free(user_mappings.func_a_goto_max_left);
+        free(user_mappings.func_a_goto_max_right);
+        free(user_mappings.func_a_goto_top);
+        free(user_mappings.func_a_goto_bottom);
+        free(user_mappings.func_a_yank);
+        free(user_mappings.func_a_paste);
+        free(user_mappings.func_a_save);
+        free(user_mappings.func_a_add_col);
+        free(user_mappings.func_a_add_row);
+        free(user_mappings.func_a_insert_zero_col);
+        free(user_mappings.func_a_insert_zero_row);
+        free(user_mappings.func_a_insert_before_row);
+        free(user_mappings.func_a_insert_before_col);
+        free(user_mappings.func_a_insert_after_row);
+        free(user_mappings.func_a_insert_after_col);
+        free(user_mappings.func_a_delete_up_row);
+        free(user_mappings.func_a_delete_left_col);
+        free(user_mappings.func_a_delete_down_row);
+        free(user_mappings.func_a_delete_right_col);
+        free(user_mappings.func_a_col_increase);
+        free(user_mappings.func_a_col_decrease);
+        free(user_mappings.func_a_scroll_up);
+        free(user_mappings.func_a_scroll_down);
+        free(user_mappings.func_a_scroll_left);
+        free(user_mappings.func_a_scroll_right);
 }
 
 char *
@@ -141,11 +186,60 @@ get_color_options()
         GET_COL("insert", col_opts.insert);
 }
 
+void
+get_func_mappings_opts()
+{
+        GET_STR("func_should_quit", user_mappings.func_should_quit);
+        GET_STR("func_render", user_mappings.func_render);
+        GET_STR("func_a_select_toggle_cell", user_mappings.func_a_select_toggle_cell);
+        GET_STR("func_get_set_cell_input", user_mappings.func_get_set_cell_input);
+        GET_STR("func_a_set_cell_type_numeric", user_mappings.func_a_set_cell_type_numeric);
+        GET_STR("func_a_set_cell_type_text", user_mappings.func_a_set_cell_type_text);
+        GET_STR("func_a_delete", user_mappings.func_a_delete);
+        GET_STR("func_a_set_cell_type_formula", user_mappings.func_a_set_cell_type_formula);
+        GET_STR("func_a_copy_moving_down", user_mappings.func_a_copy_moving_down);
+        GET_STR("func_a_copy_moving_up", user_mappings.func_a_copy_moving_up);
+        GET_STR("func_a_copy_moving_left", user_mappings.func_a_copy_moving_left);
+        GET_STR("func_a_copy_moving_right", user_mappings.func_a_copy_moving_right);
+        GET_STR("func_a_insert_moving_down", user_mappings.func_a_insert_moving_down);
+        GET_STR("func_a_insert_moving_up", user_mappings.func_a_insert_moving_up);
+        GET_STR("func_a_insert_moving_left", user_mappings.func_a_insert_moving_left);
+        GET_STR("func_a_insert_moving_right", user_mappings.func_a_insert_moving_right);
+        GET_STR("func_a_goto_top_left", user_mappings.func_a_goto_top_left);
+        GET_STR("func_a_goto_max_left", user_mappings.func_a_goto_max_left);
+        GET_STR("func_a_goto_max_right", user_mappings.func_a_goto_max_right);
+        GET_STR("func_a_goto_top", user_mappings.func_a_goto_top);
+        GET_STR("func_a_goto_bottom", user_mappings.func_a_goto_bottom);
+        GET_STR("func_a_yank", user_mappings.func_a_yank);
+        GET_STR("func_a_paste", user_mappings.func_a_paste);
+        GET_STR("func_a_save", user_mappings.func_a_save);
+        GET_STR("func_a_add_col", user_mappings.func_a_add_col);
+        GET_STR("func_a_add_row", user_mappings.func_a_add_row);
+        GET_STR("func_a_insert_zero_col", user_mappings.func_a_insert_zero_col);
+        GET_STR("func_a_insert_zero_row", user_mappings.func_a_insert_zero_row);
+        GET_STR("func_a_insert_before_row", user_mappings.func_a_insert_before_row);
+        GET_STR("func_a_insert_before_col", user_mappings.func_a_insert_before_col);
+        GET_STR("func_a_insert_after_row", user_mappings.func_a_insert_after_row);
+        GET_STR("func_a_insert_after_col", user_mappings.func_a_insert_after_col);
+        GET_STR("func_a_delete_up_row", user_mappings.func_a_delete_up_row);
+        GET_STR("func_a_delete_left_col", user_mappings.func_a_delete_left_col);
+        GET_STR("func_a_delete_down_row", user_mappings.func_a_delete_down_row);
+        GET_STR("func_a_delete_right_col", user_mappings.func_a_delete_right_col);
+        GET_STR("func_a_col_increase", user_mappings.func_a_col_increase);
+        GET_STR("func_a_col_decrease", user_mappings.func_a_col_decrease);
+        GET_STR("func_a_scroll_up", user_mappings.func_a_scroll_up);
+        GET_STR("func_a_scroll_down", user_mappings.func_a_scroll_down);
+        GET_STR("func_a_scroll_left", user_mappings.func_a_scroll_left);
+        GET_STR("func_a_scroll_right", user_mappings.func_a_scroll_right);
+}
+
+
 static void
 options_get()
 {
         get_color_options();
         get_window_options();
+        get_func_mappings_opts();
 }
 
 void
@@ -209,7 +303,7 @@ parse_options_default_file()
         char path[128];
         char *home = getenv("HOME") ?: "";
         report("home=%s", home);
-        parse_options_file(pjoin(path, home, "vicel.py"));
+        parse_options_file(pjoin(path, home, ".vicel.py"));
         parse_options_file(pjoin(path, home, ".config/vicel.py"));
         parse_options_file(pjoin(path, home, ".config/vicel/vicel.py"));
         parse_options_file(pjoin(path, "config/vicel.py"));
@@ -251,6 +345,53 @@ __options_init(OptOpts opts)
         PyDict_SetItemString(globals, "ui_status_bottom_end", PyUnicode_FromString((win_opts.ui_status_bottom_end = strdup("github: hugoocoto/vicel"))));
         PyDict_SetItemString(globals, "use_mouse", PyBool_FromLong((win_opts.use_mouse = true)));
         PyDict_SetItemString(globals, "natural_scroll", PyBool_FromLong((win_opts.natural_scroll = true)));
+
+        PyDict_SetItemString(globals, "func_should_quit", PyUnicode_FromString((user_mappings.func_should_quit = strdup("q"))));
+        PyDict_SetItemString(globals, "func_render", PyUnicode_FromString((user_mappings.func_render = strdup("r"))));
+        PyDict_SetItemString(globals, "func_a_move_cursor_down", PyUnicode_FromString((user_mappings.func_a_move_cursor_down = strdup("j"))));
+        PyDict_SetItemString(globals, "func_a_move_cursor_up", PyUnicode_FromString((user_mappings.func_a_move_cursor_up = strdup("k"))));
+        PyDict_SetItemString(globals, "func_a_move_cursor_left", PyUnicode_FromString((user_mappings.func_a_move_cursor_left = strdup("h"))));
+        PyDict_SetItemString(globals, "func_a_move_cursor_right", PyUnicode_FromString((user_mappings.func_a_move_cursor_right = strdup("l"))));
+        PyDict_SetItemString(globals, "func_a_select_toggle_cell", PyUnicode_FromString((user_mappings.func_a_select_toggle_cell = strdup("v"))));
+        PyDict_SetItemString(globals, "func_get_set_cell_input", PyUnicode_FromString((user_mappings.func_get_set_cell_input = strdup("i"))));
+        PyDict_SetItemString(globals, "func_a_set_cell_type_numeric", PyUnicode_FromString((user_mappings.func_a_set_cell_type_numeric = strdup("sd"))));
+        PyDict_SetItemString(globals, "func_a_set_cell_type_text", PyUnicode_FromString((user_mappings.func_a_set_cell_type_text = strdup("st"))));
+        PyDict_SetItemString(globals, "func_a_delete", PyUnicode_FromString((user_mappings.func_a_delete = strdup("d"))));
+        PyDict_SetItemString(globals, "func_a_set_cell_type_formula", PyUnicode_FromString((user_mappings.func_a_set_cell_type_formula = strdup("sf"))));
+        PyDict_SetItemString(globals, "func_a_copy_moving_down", PyUnicode_FromString((user_mappings.func_a_copy_moving_down = strdup("J"))));
+        PyDict_SetItemString(globals, "func_a_copy_moving_up", PyUnicode_FromString((user_mappings.func_a_copy_moving_up = strdup("K"))));
+        PyDict_SetItemString(globals, "func_a_copy_moving_left", PyUnicode_FromString((user_mappings.func_a_copy_moving_left = strdup("H"))));
+        PyDict_SetItemString(globals, "func_a_copy_moving_right", PyUnicode_FromString((user_mappings.func_a_copy_moving_right = strdup("L"))));
+        PyDict_SetItemString(globals, "func_a_insert_moving_down", PyUnicode_FromString((user_mappings.func_a_insert_moving_down = strdup("gij"))));
+        PyDict_SetItemString(globals, "func_a_insert_moving_up", PyUnicode_FromString((user_mappings.func_a_insert_moving_up = strdup("gik"))));
+        PyDict_SetItemString(globals, "func_a_insert_moving_left", PyUnicode_FromString((user_mappings.func_a_insert_moving_left = strdup("gih"))));
+        PyDict_SetItemString(globals, "func_a_insert_moving_right", PyUnicode_FromString((user_mappings.func_a_insert_moving_right = strdup("gil"))));
+        PyDict_SetItemString(globals, "func_a_goto_top_left", PyUnicode_FromString((user_mappings.func_a_goto_top_left = strdup("g0"))));
+        PyDict_SetItemString(globals, "func_a_goto_max_left", PyUnicode_FromString((user_mappings.func_a_goto_max_left = strdup("^"))));
+        PyDict_SetItemString(globals, "func_a_goto_max_right", PyUnicode_FromString((user_mappings.func_a_goto_max_right = strdup("$"))));
+        PyDict_SetItemString(globals, "func_a_goto_top", PyUnicode_FromString((user_mappings.func_a_goto_top = strdup("gg"))));
+        PyDict_SetItemString(globals, "func_a_goto_bottom", PyUnicode_FromString((user_mappings.func_a_goto_bottom = strdup("G"))));
+        PyDict_SetItemString(globals, "func_a_yank", PyUnicode_FromString((user_mappings.func_a_yank = strdup("y"))));
+        PyDict_SetItemString(globals, "func_a_paste", PyUnicode_FromString((user_mappings.func_a_paste = strdup("p"))));
+        PyDict_SetItemString(globals, "func_a_save", PyUnicode_FromString((user_mappings.func_a_save = strdup("w"))));
+        PyDict_SetItemString(globals, "func_a_add_col", PyUnicode_FromString((user_mappings.func_a_add_col = strdup("gL"))));
+        PyDict_SetItemString(globals, "func_a_add_row", PyUnicode_FromString((user_mappings.func_a_add_row = strdup("gJ"))));
+        PyDict_SetItemString(globals, "func_a_insert_zero_col", PyUnicode_FromString((user_mappings.func_a_insert_zero_col = strdup("gL"))));
+        PyDict_SetItemString(globals, "func_a_insert_zero_row", PyUnicode_FromString((user_mappings.func_a_insert_zero_row = strdup("gJ"))));
+        PyDict_SetItemString(globals, "func_a_insert_before_row", PyUnicode_FromString((user_mappings.func_a_insert_before_row = strdup("gk"))));
+        PyDict_SetItemString(globals, "func_a_insert_before_col", PyUnicode_FromString((user_mappings.func_a_insert_before_col = strdup("gh"))));
+        PyDict_SetItemString(globals, "func_a_insert_after_row", PyUnicode_FromString((user_mappings.func_a_insert_after_row = strdup("gj"))));
+        PyDict_SetItemString(globals, "func_a_insert_after_col", PyUnicode_FromString((user_mappings.func_a_insert_after_col = strdup("gl"))));
+        PyDict_SetItemString(globals, "func_a_delete_up_row", PyUnicode_FromString((user_mappings.func_a_delete_up_row = strdup("gdk"))));
+        PyDict_SetItemString(globals, "func_a_delete_left_col", PyUnicode_FromString((user_mappings.func_a_delete_left_col = strdup("gdh"))));
+        PyDict_SetItemString(globals, "func_a_delete_down_row", PyUnicode_FromString((user_mappings.func_a_delete_down_row = strdup("gdj"))));
+        PyDict_SetItemString(globals, "func_a_delete_right_col", PyUnicode_FromString((user_mappings.func_a_delete_right_col = strdup("gdl"))));
+        PyDict_SetItemString(globals, "func_a_col_increase", PyUnicode_FromString((user_mappings.func_a_col_increase = strdup("+"))));
+        PyDict_SetItemString(globals, "func_a_col_decrease", PyUnicode_FromString((user_mappings.func_a_col_decrease = strdup("-"))));
+        PyDict_SetItemString(globals, "func_a_scroll_up", PyUnicode_FromString((user_mappings.func_a_scroll_up = strdup("ej"))));
+        PyDict_SetItemString(globals, "func_a_scroll_down", PyUnicode_FromString((user_mappings.func_a_scroll_down = strdup("ek"))));
+        PyDict_SetItemString(globals, "func_a_scroll_left", PyUnicode_FromString((user_mappings.func_a_scroll_left = strdup("el"))));
+        PyDict_SetItemString(globals, "func_a_scroll_right", PyUnicode_FromString((user_mappings.func_a_scroll_right = strdup("eh"))));
 }
 
 void

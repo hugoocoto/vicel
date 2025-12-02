@@ -282,66 +282,65 @@ start_kbhandler()
         APTree mappings = ap_init();
         int repeat = 0;
 
-        add_action(mappings, "q", ACTION(should_quit));
-        add_action(mappings, "r", ACTION(render));
-        add_action(mappings, "j", ACTION(a_move_cursor_down));
-        add_action(mappings, "k", ACTION(a_move_cursor_up));
-        add_action(mappings, "h", ACTION(a_move_cursor_left));
-        add_action(mappings, "l", ACTION(a_move_cursor_right));
         add_action(mappings, KEY_DOWN, ACTION(a_move_cursor_down));
         add_action(mappings, KEY_UP, ACTION(a_move_cursor_up));
         add_action(mappings, KEY_LEFT, ACTION(a_move_cursor_left));
         add_action(mappings, KEY_RIGHT, ACTION(a_move_cursor_right));
-        add_action(mappings, "v", ACTION(a_select_toggle_cell));
-        add_action(mappings, "i", ACTION(get_set_cell_input));
-        add_action(mappings, "sd", ACTION(a_set_cell_type_numeric));
-        add_action(mappings, "st", ACTION(a_set_cell_type_text));
-        add_action(mappings, "d", ACTION(a_delete));
-        add_action(mappings, "sf", ACTION(a_set_cell_type_formula));
-        add_action(mappings, "J", ACTION(a_copy_moving_down));
-        add_action(mappings, "K", ACTION(a_copy_moving_up));
-        add_action(mappings, "H", ACTION(a_copy_moving_left));
-        add_action(mappings, "L", ACTION(a_copy_moving_right));
-        add_action(mappings, "gij", ACTION(a_insert_moving_down));
-        add_action(mappings, "gik", ACTION(a_insert_moving_up));
-        add_action(mappings, "gih", ACTION(a_insert_moving_left));
-        add_action(mappings, "gil", ACTION(a_insert_moving_right));
-        add_action(mappings, "g0", ACTION(a_goto_top_left));
-        add_action(mappings, "^", ACTION(a_goto_max_left));
-        add_action(mappings, "$", ACTION(a_goto_max_right));
-        add_action(mappings, "gg", ACTION(a_goto_top));
-        add_action(mappings, "G", ACTION(a_goto_bottom));
-        add_action(mappings, "y", ACTION(a_yank));
-        add_action(mappings, "p", ACTION(a_paste));
-        add_action(mappings, "w", ACTION(a_save));
 
-        add_action(mappings, "gL", ACTION(a_add_col));
-        add_action(mappings, "gJ", ACTION(a_add_row));
-        add_action(mappings, "gL", ACTION(a_insert_zero_col));
-        add_action(mappings, "gJ", ACTION(a_insert_zero_row));
-        add_action(mappings, "gk", ACTION(a_insert_before_row));
-        add_action(mappings, "gh", ACTION(a_insert_before_col));
-        add_action(mappings, "gj", ACTION(a_insert_after_row));
-        add_action(mappings, "gl", ACTION(a_insert_after_col));
+#define MAP(_key_, _action_) \
+        add_action(mappings, user_mappings._key_, ACTION(_action_));
 
-        add_action(mappings, "gdk", ACTION(a_delete_up_row));
-        add_action(mappings, "gdh", ACTION(a_delete_left_col));
-        add_action(mappings, "gdj", ACTION(a_delete_down_row));
-        add_action(mappings, "gdl", ACTION(a_delete_right_col));
-
-        add_action(mappings, "+", ACTION(a_col_increase));
-        add_action(mappings, "-", ACTION(a_col_decrease));
+        MAP(func_should_quit, should_quit);
+        MAP(func_render, render);
+        MAP(func_a_move_cursor_down, a_move_cursor_down);
+        MAP(func_a_move_cursor_up, a_move_cursor_up);
+        MAP(func_a_move_cursor_left, a_move_cursor_left);
+        MAP(func_a_move_cursor_right, a_move_cursor_right);
+        MAP(func_a_select_toggle_cell, a_select_toggle_cell);
+        MAP(func_get_set_cell_input, get_set_cell_input);
+        MAP(func_a_set_cell_type_numeric, a_set_cell_type_numeric);
+        MAP(func_a_set_cell_type_text, a_set_cell_type_text);
+        MAP(func_a_delete, a_delete);
+        MAP(func_a_set_cell_type_formula, a_set_cell_type_formula);
+        MAP(func_a_copy_moving_down, a_copy_moving_down);
+        MAP(func_a_copy_moving_up, a_copy_moving_up);
+        MAP(func_a_copy_moving_left, a_copy_moving_left);
+        MAP(func_a_copy_moving_right, a_copy_moving_right);
+        MAP(func_a_insert_moving_down, a_insert_moving_down);
+        MAP(func_a_insert_moving_up, a_insert_moving_up);
+        MAP(func_a_insert_moving_left, a_insert_moving_left);
+        MAP(func_a_insert_moving_right, a_insert_moving_right);
+        MAP(func_a_goto_top_left, a_goto_top_left);
+        MAP(func_a_goto_max_left, a_goto_max_left);
+        MAP(func_a_goto_max_right, a_goto_max_right);
+        MAP(func_a_goto_top, a_goto_top);
+        MAP(func_a_goto_bottom, a_goto_bottom);
+        MAP(func_a_yank, a_yank);
+        MAP(func_a_paste, a_paste);
+        MAP(func_a_save, a_save);
+        MAP(func_a_add_col, a_add_col);
+        MAP(func_a_add_row, a_add_row);
+        MAP(func_a_insert_zero_col, a_insert_zero_col);
+        MAP(func_a_insert_zero_row, a_insert_zero_row);
+        MAP(func_a_insert_before_row, a_insert_before_row);
+        MAP(func_a_insert_before_col, a_insert_before_col);
+        MAP(func_a_insert_after_row, a_insert_after_row);
+        MAP(func_a_insert_after_col, a_insert_after_col);
+        MAP(func_a_delete_up_row, a_delete_up_row);
+        MAP(func_a_delete_left_col, a_delete_left_col);
+        MAP(func_a_delete_down_row, a_delete_down_row);
+        MAP(func_a_delete_right_col, a_delete_right_col);
+        MAP(func_a_col_increase, a_col_increase);
+        MAP(func_a_col_decrease, a_col_decrease);
+        MAP(func_a_scroll_left, a_scroll_left);
+        MAP(func_a_scroll_right, a_scroll_right);
 
         if (win_opts.natural_scroll) {
-                add_action(mappings, "ej", ACTION(a_scroll_up));
-                add_action(mappings, "ek", ACTION(a_scroll_down));
-                add_action(mappings, "el", ACTION(a_scroll_left));
-                add_action(mappings, "eh", ACTION(a_scroll_right));
+                MAP(func_a_scroll_up, a_scroll_up);
+                MAP(func_a_scroll_down, a_scroll_down);
         } else {
-                add_action(mappings, "ej", ACTION(a_scroll_down));
-                add_action(mappings, "ek", ACTION(a_scroll_up));
-                add_action(mappings, "el", ACTION(a_scroll_right));
-                add_action(mappings, "eh", ACTION(a_scroll_left));
+                MAP(func_a_scroll_up, a_scroll_down);
+                MAP(func_a_scroll_down, a_scroll_up);
         }
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);

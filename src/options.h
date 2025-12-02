@@ -18,6 +18,55 @@
  * For questions or support, contact: me@hugocoto.com
  */
 
+typedef struct {
+        char *func_should_quit;
+        char *func_render;
+        char *func_a_move_cursor_down;
+        char *func_a_move_cursor_up;
+        char *func_a_move_cursor_left;
+        char *func_a_move_cursor_right;
+        char *func_a_select_toggle_cell;
+        char *func_get_set_cell_input;
+        char *func_a_set_cell_type_numeric;
+        char *func_a_set_cell_type_text;
+        char *func_a_delete;
+        char *func_a_set_cell_type_formula;
+        char *func_a_copy_moving_down;
+        char *func_a_copy_moving_up;
+        char *func_a_copy_moving_left;
+        char *func_a_copy_moving_right;
+        char *func_a_insert_moving_down;
+        char *func_a_insert_moving_up;
+        char *func_a_insert_moving_left;
+        char *func_a_insert_moving_right;
+        char *func_a_goto_top_left;
+        char *func_a_goto_max_left;
+        char *func_a_goto_max_right;
+        char *func_a_goto_top;
+        char *func_a_goto_bottom;
+        char *func_a_yank;
+        char *func_a_paste;
+        char *func_a_save;
+        char *func_a_add_col;
+        char *func_a_add_row;
+        char *func_a_insert_zero_col;
+        char *func_a_insert_zero_row;
+        char *func_a_insert_before_row;
+        char *func_a_insert_before_col;
+        char *func_a_insert_after_row;
+        char *func_a_insert_after_col;
+        char *func_a_delete_up_row;
+        char *func_a_delete_left_col;
+        char *func_a_delete_down_row;
+        char *func_a_delete_right_col;
+        char *func_a_col_increase;
+        char *func_a_col_decrease;
+        char *func_a_scroll_up;
+        char *func_a_scroll_down;
+        char *func_a_scroll_left;
+        char *func_a_scroll_right;
+} Mappings_opts;
+
 #ifndef OPTS_H_
 #define OPTS_H_
 
@@ -65,6 +114,7 @@ typedef struct Col_opts {
 
 extern Win_opts win_opts;
 extern Col_opts col_opts;
+extern Mappings_opts user_mappings;
 
 #define options_init(...) __options_init((OptOpts) { .none = 0, __VA_ARGS__ })
 
