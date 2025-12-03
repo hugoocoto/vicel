@@ -1,5 +1,6 @@
 # Issues
 * use after free in some formulas(at unsubscribe), irregular: I cant reproduce
+* text expansion is broken
 
 # To-do
 * After row or column deletion some formulas may break. [Link](#err1).
@@ -19,7 +20,7 @@
 * Add the option --serve and --connect and let connect to a external vicel
   session. It would be awesome but it's a bug mine (too much work).
 * Let open/edit new files and save current with other name.
-* Improve mappings customization 
+* Improve mappings customization (+ mouse mappings)
 
 # No tested at all
 * CSV reader.
