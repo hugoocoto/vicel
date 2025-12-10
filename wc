@@ -6,7 +6,7 @@
    403   1094  22997 src/options.c
     44    208   1361 src/aptree.h
     74    238   2028 src/mappings.h
-   179    439   4143 src/main.c
+   185    442   4181 src/main.c
    194    548   5074 src/saving.c
     47    217   1364 src/hm.h
     38    171   1111 src/keyboard.h
@@ -29,10 +29,10 @@
    432   1328  15848 src/keyboard.c
    346   1306  10277 src/escape_code.h
     32    158    986 src/builtin.h
-   507   1351  15187 src/cellmap.c
+   513   1367  15437 src/cellmap.c
    153    479   4234 src/cellmap.h
    209    674   5506 src/dhm.c
     37    177   1109 src/action.h
    841   2147  23143 src/formula.c
    271    825   8512 src/readlain.c
-  6622  20551 205247 total
+  6634  20570 205535 total

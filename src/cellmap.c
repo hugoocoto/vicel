@@ -401,7 +401,10 @@ extend_row(Cell *c, Value origin, Cell *oposite, int displ)
         switch (origin.type) {
         case TYPE_EMPTY:
         case TYPE_TEXT:
-                return origin;
+                return (Value) {
+                        .type = origin.type,
+                        .as.text = strdup(origin.as.text), // TODO: leak
+                };
         case TYPE_NUMBER: {
                 displ = abs(displ);
                 report("oposite: %-10p", oposite);
@@ -429,7 +432,10 @@ extend_col(Cell *c, Value origin, Cell *oposite, int displ)
         switch (origin.type) {
         case TYPE_EMPTY:
         case TYPE_TEXT:
-                return origin;
+                return (Value) {
+                        .type = origin.type,
+                        .as.text = strdup(origin.as.text), // TODO: leak
+                };
         case TYPE_NUMBER:
                 displ = abs(displ);
                 report("oposite: %-10p", oposite);

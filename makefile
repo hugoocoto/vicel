@@ -12,8 +12,7 @@ PYL := $(shell python3-config --embed --ldflags)
 
 CC = gcc
 TARGET = 
-FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts 
-#-fsanitize=address,null 
+FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts -fsanitize=address,null 
 
 COMP = $(CC) $(TARGET) $(FLAGS)
 
@@ -23,7 +22,8 @@ $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc
 	rm -f report.log log.txt
 
 $(OBJ_DIR)/%.o: %.c $(HEADERS) makefile
-	mkdir -p $(dir $@) && $(COMP) $(PYC) -c $< $(INC) -o $@ 
+	mkdir -p $(dir $@) 
+	$(COMP) -c $< $(INC) $(PYC) -o $@ 
 
 wc: $(SRC) $(HEADERS)
 	wc `find src -name "*.[ch]"` > wc

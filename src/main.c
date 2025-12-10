@@ -99,10 +99,21 @@ reset_at_exit()
         fflush(stdout);
 }
 
+_Noreturn void
+safe_exit(int sig)
+{
+        (void) sig;
+        cm_destroy(active_ctx.body);
+        a_free_yank_buffer();
+        parse_options_destroy();
+        exit(0);
+}
+
+
 void
 catch_sigint()
 {
-        signal(SIGINT, exit);
+        signal(SIGINT, safe_exit);
 }
 
 char *
@@ -170,10 +181,5 @@ main(int argc, char *argv[])
         start_kbhandler(); // loop
 
         save(&active_ctx);
-        cm_destroy(active_ctx.body);
-        a_free_yank_buffer();
-        parse_options_destroy();
-
-        report("---| End without error |---");
-        return 0;
+        safe_exit(0);
 }
