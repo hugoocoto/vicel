@@ -1,38 +1,38 @@
-    41    176   1143 src/color.h
-    88    329   2433 src/formula.h
-   459   1294  14810 src/window.c
-    38    171   1142 src/common.h
-    42    191   1203 src/dhm.h
-   403   1094  22997 src/options.c
-    44    208   1361 src/aptree.h
-    74    238   2028 src/mappings.h
-   185    442   4181 src/main.c
-   194    548   5074 src/saving.c
-    47    217   1364 src/hm.h
-    38    171   1111 src/keyboard.h
-   155    510   3831 src/aptree.c
-    53    213   1383 src/debug.c
-    33    179   1095 src/readlain.h
-   275    814   7553 src/builtin.c
-    44    171   1204 src/debug.h
-    91    282   2610 src/color.c
-   378    665   7842 src/mappings.c
-    29    152    931 src/saving.h
-   169    488   3932 src/hm.c
     73    311   2216 src/window.h
+   459   1294  14810 src/window.c
+    29    152    931 src/saving.h
+   208    584   5368 src/saving.c
+    33    179   1095 src/readlain.h
+   271    825   8512 src/readlain.c
    128    351   3865 src/options.h
-   347   1217  11302 src/eval.c
+   403   1094  22997 src/options.c
+    74    238   2028 src/mappings.h
+   378    665   7842 src/mappings.c
+   185    442   4181 src/main.c
+    38    171   1111 src/keyboard.h
+   432   1328  15848 src/keyboard.c
+    47    217   1364 src/hm.h
+   169    488   3932 src/hm.c
+    88    329   2433 src/formula.h
+   841   2147  23143 src/formula.c
     62    369   2260 src/flag.h
    131    524   3934 src/flag.c
-   137    586   6455 src/da.h
     42    198   1223 src/eval.h
-   432   1328  15848 src/keyboard.c
+   347   1217  11302 src/eval.c
    346   1306  10277 src/escape_code.h
-    32    158    986 src/builtin.h
-   513   1367  15437 src/cellmap.c
-   153    479   4234 src/cellmap.h
+    42    191   1203 src/dhm.h
    209    674   5506 src/dhm.c
+    44    171   1204 src/debug.h
+    53    213   1383 src/debug.c
+   137    586   6455 src/da.h
+    38    171   1142 src/common.h
+    41    176   1143 src/color.h
+    91    282   2610 src/color.c
+   153    479   4234 src/cellmap.h
+   513   1373  15465 src/cellmap.c
+    32    158    986 src/builtin.h
+   275    814   7553 src/builtin.c
+    44    208   1361 src/aptree.h
+   155    510   3831 src/aptree.c
     37    177   1109 src/action.h
-   841   2147  23143 src/formula.c
-   271    825   8512 src/readlain.c
-  6634  20570 205535 total
+  6648  20612 205857 total

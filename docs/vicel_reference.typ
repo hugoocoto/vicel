@@ -80,8 +80,9 @@ normal terminal tool:
 ```sh
 vicel filename [options]
 ```
-If the filename is omitted it opens an unnamed sheet. Note that this sheet
-can't be saved. Also, you can't open more than one file at the same time.
+If the filename is omitted it opens an unnamed sheet. Note that this sheet is
+going to be saved with a random name. Also, you can't open more than one file at
+the same time.
 
 === Options
 The options supported are the following:

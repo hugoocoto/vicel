@@ -28,7 +28,7 @@ use_mouse = True
 natural_scroll = True
 
 # default mappings
-func_should_quit = "ZZ"
+func_should_quit = "q"
 func_render = "r"
 func_a_move_cursor_down = "j"
 func_a_move_cursor_up = "k"

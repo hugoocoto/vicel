@@ -25,6 +25,8 @@
 #include "debug.h"
 #include "keyboard.h"
 #include "window.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 void
 remove_spaces(char *c)
@@ -160,20 +162,27 @@ load_blank:
         ctx->body = cm_init();
 }
 
+static int
+create_new_filename(Context *ctx)
+{
+        ctx->filename = strdup("vicel_unnamed_XXXXXX");
+        return mkstemp(ctx->filename);
+}
+
 void
 save(Context *ctx)
 {
         int fd;
-        if (ctx->filename == NULL) {
-                report("Can't save unamed sheet");
-                return;
-        }
 
-        fd = open(ctx->filename, O_WRONLY | O_CREAT, 0600);
+        fd = ctx->filename ?
+             open(ctx->filename, O_WRONLY | O_CREAT, 0600) :
+             create_new_filename(ctx);
 
         if (fd < 0) {
                 report("Can't open %s to write", ctx->filename);
-                return;
+                /* Its better to get it in the stdout than to lose the data */
+                fd = STDOUT_FILENO;
+                ctx->filename = NULL; // may cause a chain of errors
         }
 
         for_da_each(row, *ctx->body)
