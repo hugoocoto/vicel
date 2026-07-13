@@ -96,6 +96,7 @@ reset_at_exit()
         T_ASBD();
         T_CUSHW();
         toggle_mouse_support();
+        toggle_raw_mode();
         fflush(stdout);
 }
 
@@ -178,6 +179,7 @@ main(int argc, char *argv[])
         set_resize_handler();
         set_autosave_handler();
 
+        toggle_raw_mode();
         start_kbhandler(); // loop
 
         save(&active_ctx);

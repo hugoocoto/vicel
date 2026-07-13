@@ -344,7 +344,6 @@ start_kbhandler()
         }
 
         print_mapping_buffer("", 0, MAX_MAPPING_LEN, repeat);
-        toggle_raw_mode();
         render();
 
         while (!quit && read(STDIN_FILENO, buf + read_index, 1)) {
@@ -428,5 +427,4 @@ start_kbhandler()
         }
 
         ap_destroy(mappings);
-        toggle_raw_mode();
 }

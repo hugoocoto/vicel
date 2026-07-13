@@ -11,10 +11,9 @@ PYC := $(shell python3-config --embed --cflags)
 PYL := $(shell python3-config --embed --ldflags) 
 
 CC = gcc
-TARGET = 
 FLAGS = -ggdb -std=gnu11 -O0 -DDEBUG=1 -Wall -Wextra -Wno-char-subscripts -fsanitize=address,null 
 
-COMP = $(CC) $(TARGET) $(FLAGS)
+COMP = $(CC) $(FLAGS)
 
 
 $(OUT): $(OBJ) $(OBJ_DIR) $(BUILD_DIR) wc
