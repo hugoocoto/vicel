@@ -13,7 +13,7 @@ Webpage: https://wiki.hugocoto.com/projects/vicel
 * Supports numbers, text, and formulas
 * Keyboard-focused Vim-style motions
 * Lightweight and minimal code
-* Configuration via .py file
+* Configuration via .lua file
 * Mouse support
 
 ## Reference manual 
@@ -23,6 +23,8 @@ Documentation and installation/usage guide are
 ## How to install
 You can install it with make. `make` creates the debug mode executable. `make
 clean install` creates the release executable an moves it to `~/.local/bin`.
+The build requires Lua development headers and libraries; set `LUA` to select a
+different Lua pkg-config module.
 
 ## How to host vicel in the browser
 You can use `ttyd` to host a pty in the browser. Using the script
@@ -45,4 +47,3 @@ I like to flex on how little code is needed for a fully functional program.
 ## Sheets done by the community
 * *Horario* by @hugoocoto ![](images/image3.png)
 * *Weatherdata* ![](images/image4.png)
-

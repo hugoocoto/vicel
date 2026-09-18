@@ -25,7 +25,7 @@
     38    171   1111 src/keyboard.h
    378    665   7842 src/mappings.c
     74    238   2028 src/mappings.h
-   403   1094  22997 src/options.c
+   396    929  17083 src/options.c
    128    351   3865 src/options.h
    271    825   8512 src/readlain.c
     33    179   1095 src/readlain.h
@@ -35,4 +35,5 @@
     73    311   2216 src/window.h
    187    444   4235 src/main.c
    430   1326  15794 src/keyboard.c
-  6643  20611 205855 total
+   459   2008  15676 src/conf.h
+  7095  22454 215617 total

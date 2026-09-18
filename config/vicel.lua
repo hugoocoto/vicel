@@ -13,7 +13,7 @@ insert = "49;39"
 num_col_width = 5
 col_width = 14
 row_width = 1
-use_cell_color_for_sep = True
+use_cell_color_for_sep = true
 cell_l_sep = " "
 cell_r_sep = " "
 save_time = 10
@@ -24,10 +24,10 @@ ui_celltext_l_sep = ">> '"
 ui_celltext_m_sep = "' as "
 ui_celltext_r_sep = " "
 ui_status_bottom_end = "github: hugoocoto/vicel"
-use_mouse = True
-natural_scroll = True
+use_mouse = true
+natural_scroll = true
 
-# default mappings
+-- default mappings
 func_should_quit = "q"
 func_render = "r"
 func_a_move_cursor_down = "j"

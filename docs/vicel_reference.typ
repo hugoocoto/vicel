@@ -63,6 +63,7 @@ it's needed to clone the repo to your own machine.
 git clone "https://github.com/hugoocoto/vicel"
 cd vicel
 ```
+The build requires Lua development headers and libraries.
 
 Then, there are two options to install it.
 + Local (debug) installation: run ```sh make```.
@@ -99,10 +100,10 @@ The options supported are the following:
 )
 
 For example, if you want to open the file #smallcaps("./sheets/table.csv") with
-a config file in #smallcaps("./config/vicel.py"), the command line should
+a config file in #smallcaps("./config/vicel.lua"), the command line should
 looks like that:
 ```sh
-vicel sheets/table.csv -c config/vicel.py
+vicel sheets/table.csv -c config/vicel.lua
 ```
 
 == Moving around
@@ -332,69 +333,69 @@ pressing the mouse wheel changes the direction.
 
 == Configuration
 
-=== vicel.py
+=== vicel.lua
 
-You can customize some values using a python configuration file. By
+You can customize some values using a Lua configuration file. By
 default, vicel looks for this file in the following paths:
 
-- #smallcaps("./vicel.py")
-- #smallcaps("./config/vicel.py")
-- #smallcaps("~/.config/vicel.py")
-- #smallcaps("~/.config/vicel/vicel.py")
-- #smallcaps("~/.vicel.py")
+- #smallcaps("./vicel.lua")
+- #smallcaps("./config/vicel.lua")
+- #smallcaps("~/.config/vicel.lua")
+- #smallcaps("~/.config/vicel/vicel.lua")
+- #smallcaps("~/.vicel.lua")
 
 Despite I'm fan of suckless style, you can modify configuration and it would be
 applied on next execution (without the needed of recompilation).
 
 If you want to use a different file, you can specify it with the `-c` or
 `--config-file` fag, followed by the full path to the file. The configuration
-format is #smallcaps(".py").
+format is #smallcaps(".lua").
 
 ==== Color
 Options in this table controls colors in all the editor.
 
-```py
-ui = "49;30"                   # All ui text except ui_text_cell
-ui_cell_text = "49;39;1"       # Cell text representation and previous message
-ui_report = "41;39"            # Error/report message at the bottom right
-cell = "49;39"                 # Cell color if not custom color applied
-cell_over = "49;39;7;1"        # Cell color if cursor is over cell
-cell_selected = "49;32"        # Cell color if selected
-ln_over = "49;32;7;1"          # Row/col number/alpha if cursor is in this row/col
-ln = "49;32"                   # Row/col number/alpha default color
-sheet_ui = "49;39"             # UI elements inside sheet as separators
-sheet_ui_over = "45;39;7;1"    # UI elements inside sheet if cursor is over they
-sheet_ui_selected = "45;32"    # UI elements inside sheet if assigned cell is selected
-insert = "49;39"               # Color used when cell input text is being written
+```lua
+ui = "49;30"                   -- All ui text except ui_text_cell
+ui_cell_text = "49;39;1"       -- Cell text representation and previous message
+ui_report = "41;39"            -- Error/report message at the bottom right
+cell = "49;39"                 -- Cell color if not custom color applied
+cell_over = "49;39;7;1"        -- Cell color if cursor is over cell
+cell_selected = "49;32"        -- Cell color if selected
+ln_over = "49;32;7;1"          -- Row/col number/alpha if cursor is in this row/col
+ln = "49;32"                   -- Row/col number/alpha default color
+sheet_ui = "49;39"             -- UI elements inside sheet as separators
+sheet_ui_over = "45;39;7;1"    -- UI elements inside sheet if cursor is over they
+sheet_ui_selected = "45;32"    -- UI elements inside sheet if assigned cell is selected
+insert = "49;39"               -- Color used when cell input text is being written
 ```
 
 ==== UI and others
 
-```py
-num_col_width = 5              # Number column width
-col_width = 14                 # Column width (min is cell_l_sep + cell_r_sep + 1)
-row_width = 1                  # Other size is not supported
-use_cell_color_for_sep = true  # Use cell color for separators instead of sheet_ui
-cell_l_sep = " "               # Left separator
-cell_r_sep = " "               # Right separator
-save_time = 0                  # Time interval (in seconds) where save is call. 0 means no autosave.
-use_mouse = false              # Enable mouse capturing
-natural_scroll = true          # Swap scrolling direction
+```lua
+num_col_width = 5              -- Number column width
+col_width = 14                 -- Column width (min is cell_l_sep + cell_r_sep + 1)
+row_width = 1                  -- Other size is not supported
+use_cell_color_for_sep = true  -- Use cell color for separators instead of sheet_ui
+cell_l_sep = " "               -- Left separator
+cell_r_sep = " "               -- Right separator
+save_time = 0                  -- Time interval (in seconds) where save is call. 0 means no autosave.
+use_mouse = false              -- Enable mouse capturing
+natural_scroll = true          -- Swap scrolling direction
 ```
 
 This is the ui customization, where you can modify how the editor looks like.
 
-```py
-# Top bar
-status_l_stuff = "vicel | ";              # Top Left bar text
-status_filename = "filename: ";           # Between status_l_stuff and filename
-status_r_end = "github: hugoocoto/vicel"; # Top right-align bar text
+```lua
+-- Top bar
+status_l_stuff = "vicel | ";              -- Top Left bar text
+status_filename = "filename: ";           -- Between status_l_stuff and filename
+status_r_end = "github: hugoocoto/vicel"; -- Top right-align bar text
 
-# Bottom bar
-ui_celltext_l_sep = "cell text: ";  # Bottom Left bar text, before cell repr text
-ui_celltext_m_sep = " (";           # Between cell text and cell type
-ui_celltext_r_sep = ") ";           # Before cell type, left-aligned
-ui_status_bottom_end = "";          # Bottom right-align text
+-- Bottom bar
+ui_celltext_l_sep = "cell text: ";  -- Bottom Left bar text, before cell repr text
+ui_celltext_m_sep = " (";           -- Between cell text and cell type
+ui_celltext_r_sep = ") ";           -- Before cell type, left-aligned
+ui_status_bottom_end = "";          -- Bottom right-align text
 ```
 
 You can notice that default settings are not exactly the same as written here.
@@ -402,4 +403,4 @@ You can notice that default settings are not exactly the same as written here.
 ==== Keymaps
 
 You can modify keymaps. You can find all the names in
-#smallcaps("config/vicel.py").
+#smallcaps("config/vicel.lua").
