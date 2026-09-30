@@ -3,7 +3,7 @@ Vicel is a free open source TUI spreadsheet editor. You can read, modify and
 save data stored in rows and columns. It aims to be an alternative to
 proprietary non gratis well known Microsoft program, for non professional usage.
 
-Webpage: https://wiki.hugocoto.com/projects/vicel
+Webpage: https://hugocoto.com/wiki/projects/vicel.html
 
 ![Screenshot](images/image.png)
 *The previous image does not show the latest version of vicel.*
